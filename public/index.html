@@ -27,9 +27,14 @@
       </a>
 
       <nav class="top-links" id="platform-links"></nav>
+
       <div class="top-actions">
-        <button class="ghost-btn" id="install-app" hidden>Install App</button>
-        <a class="primary-btn" href="#booking">Book Now</a>
+        <select id="language-select" class="lang-select" aria-label="Language selector">
+          <option value="en">English</option>
+          <option value="sw">Kiswahili</option>
+        </select>
+        <a class="ghost-btn" href="/admin" data-i18n="nav.admin">Admin</a>
+        <a class="primary-btn" href="#booking" data-i18n="nav.bookNow">Book Now</a>
       </div>
     </header>
 
@@ -44,15 +49,15 @@
           <div class="hero-stats">
             <article>
               <strong id="stat-rooms">2 Rooms</strong>
-              <span>Handpicked comfort</span>
+              <span data-i18n="hero.roomsLabel">Ready to book</span>
             </article>
             <article>
               <strong>24/7</strong>
-              <span>Support by host team</span>
+              <span data-i18n="hero.supportLabel">Guest support</span>
             </article>
             <article>
               <strong id="stat-location">Kigombe</strong>
-              <span>Prime location</span>
+              <span data-i18n="hero.locationLabel">Prime location</span>
             </article>
           </div>
         </div>
@@ -60,132 +65,122 @@
 
       <section class="section section-intro">
         <article>
-          <h2>Stay in style with easy direct booking</h2>
+          <h2 data-i18n="intro.title">Stay in style with easy booking</h2>
           <p id="about-text">
             Bomagawani House Rent blends comfort and convenience for guests, families, and business travelers.
           </p>
         </article>
-
-        <aside class="info-panel">
-          <div>
-            <i data-lucide="clock-3"></i>
-            <p><strong>Check-in</strong> <span id="check-in-time">14:00</span></p>
-          </div>
-          <div>
-            <i data-lucide="clock-9"></i>
-            <p><strong>Check-out</strong> <span id="check-out-time">11:00</span></p>
-          </div>
-          <div>
-            <i data-lucide="map-pin"></i>
-            <p><strong>Address</strong> <span id="address-text">Kigombe</span></p>
-          </div>
-          <div>
-            <i data-lucide="phone"></i>
-            <p><strong>Contact</strong> <span id="phone-text">+255...</span></p>
-          </div>
-        </aside>
       </section>
 
       <section class="section" id="rooms-section">
         <div class="section-head">
-          <h2>Our Rooms</h2>
-          <p>Master Bedroom and Guest Room are available now. Admin can add more later from dashboard.</p>
+          <h2 data-i18n="rooms.title">Our Rooms</h2>
+          <p data-i18n="rooms.subtitle">Choose your room and book in minutes.</p>
         </div>
         <div class="rooms-grid" id="rooms-grid"></div>
       </section>
 
       <section class="section amenities-area">
         <div class="section-head">
-          <h2>Amenities At A Glance</h2>
-          <p>Quick icon view to reduce text and help guests decide faster.</p>
+          <h2 data-i18n="amenities.title">Amenities At A Glance</h2>
+          <p data-i18n="amenities.subtitle">Everything you need for a comfortable stay.</p>
         </div>
         <div class="amenity-wall" id="amenity-wall"></div>
       </section>
 
       <section class="section booking-layout" id="booking">
         <div class="booking-card">
-          <h2>Book Direct on Bomagawani.com</h2>
-          <p>Choose your room, dates, and currency. We will create a booking code and receipt instantly.</p>
+          <h2 data-i18n="booking.title">Book Direct on Bomagawani.com</h2>
+          <p data-i18n="booking.subtitle">Select room, date, and currency. Your booking code is created instantly.</p>
 
           <form id="booking-form">
             <label>
-              Room
+              <span data-i18n="form.room">Room</span>
               <select id="room-select" required></select>
             </label>
 
             <div class="date-grid">
               <label>
-                Check-in
+                <span data-i18n="form.checkIn">Check-in</span>
                 <input type="date" id="check-in" required />
               </label>
               <label>
-                Check-out
+                <span data-i18n="form.checkOut">Check-out</span>
                 <input type="date" id="check-out" required />
               </label>
             </div>
 
             <div class="date-grid">
               <label>
-                Guests
+                <span data-i18n="form.guests">Guests</span>
                 <input type="number" id="guests-count" min="1" value="1" required />
               </label>
               <label>
-                Currency
+                <span data-i18n="form.currency">Currency</span>
                 <select id="currency-select"></select>
               </label>
             </div>
 
-            <div class="quote-box" id="quote-box">Enter dates to see your live quote.</div>
+            <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to see your live quote.</div>
 
             <hr />
 
             <label>
-              Full name
+              <span data-i18n="form.fullName">Full name</span>
               <input type="text" id="guest-name" required />
             </label>
             <div class="date-grid">
               <label>
-                Email
+                <span data-i18n="form.email">Email</span>
                 <input type="email" id="guest-email" required />
               </label>
               <label>
-                Phone
+                <span data-i18n="form.phone">Phone</span>
                 <input type="tel" id="guest-phone" required />
               </label>
             </div>
             <label>
-              Note (optional)
-              <textarea id="guest-note" rows="3" placeholder="Late arrival, special request, etc"></textarea>
+              <span data-i18n="form.note">Note (optional)</span>
+              <textarea id="guest-note" rows="3" data-i18n-placeholder="form.notePlaceholder" placeholder="Late arrival, special request"></textarea>
             </label>
 
-            <button type="submit" class="primary-btn wide">Send Booking Request</button>
+            <button type="submit" class="primary-btn wide" data-i18n="form.submit">Send Booking Request</button>
             <p class="form-status" id="booking-status"></p>
           </form>
         </div>
 
         <aside class="side-cards">
           <article class="quick-card">
-            <h3>Check your booking status</h3>
+            <h3 data-i18n="tracking.title">Check your booking status</h3>
             <form id="tracking-form">
               <label>
-                Booking code
+                <span data-i18n="tracking.code">Booking code</span>
                 <input id="tracking-code" placeholder="BOMA-XXXXXX" required />
               </label>
-              <button type="submit" class="ghost-btn wide">Track Booking</button>
+              <button type="submit" class="ghost-btn wide" data-i18n="tracking.button">Track Booking</button>
             </form>
             <div id="tracking-result"></div>
           </article>
 
           <article class="quick-card">
-            <h3>Location & direction</h3>
-            <p id="location-line">Open map directions and find us quickly.</p>
-            <a id="map-link" class="ghost-btn wide" target="_blank" rel="noreferrer">Open Map</a>
-            <button id="use-location" class="ghost-btn wide" type="button">Use my location for route</button>
+            <h3 data-i18n="location.title">Location & direction</h3>
+            <p id="location-line">Kigombe, Tanga, Tanzania</p>
+            <div class="map-wrap">
+              <iframe
+                id="map-embed"
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Bomagawani location map"
+              ></iframe>
+            </div>
+            <a id="map-link" class="ghost-btn wide" target="_blank" rel="noreferrer" data-i18n="location.openMap">Open Map</a>
+            <button id="use-location" class="ghost-btn wide" type="button" data-i18n="location.route">Use my location for route</button>
             <small id="location-status"></small>
           </article>
 
           <article class="quick-card channels-card">
-            <h3>Also listed on travel channels</h3>
+            <h3 data-i18n="channels.title">Also listed on travel channels</h3>
             <div id="channel-list"></div>
           </article>
         </aside>
@@ -197,8 +192,25 @@
         <strong id="footer-brand">Bomagawani House Rent</strong>
         <p id="footer-domain">Domain: Bomagawani.com</p>
       </div>
-      <a href="/admin" class="ghost-btn">Admin Portal</a>
     </footer>
+
+    <section class="floating-prompt" id="language-prompt" hidden>
+      <h4 data-i18n="languagePrompt.title">Change language?</h4>
+      <p id="language-prompt-text"></p>
+      <div class="prompt-actions">
+        <button class="primary-btn" id="language-yes" type="button" data-i18n="languagePrompt.yes">Switch</button>
+        <button class="ghost-btn" id="language-no" type="button" data-i18n="languagePrompt.no">Keep English</button>
+      </div>
+    </section>
+
+    <section class="floating-prompt" id="install-prompt" hidden>
+      <h4 data-i18n="installPrompt.title">Install Bomagawani App?</h4>
+      <p data-i18n="installPrompt.body">Add it to your home screen for faster booking.</p>
+      <div class="prompt-actions">
+        <button class="primary-btn" id="install-yes" type="button" data-i18n="installPrompt.yes">Install</button>
+        <button class="ghost-btn" id="install-no" type="button" data-i18n="installPrompt.no">Not now</button>
+      </div>
+    </section>
 
     <script id="seo-structured-data" type="application/ld+json">
       {}

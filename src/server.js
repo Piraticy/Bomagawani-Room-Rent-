@@ -20,6 +20,7 @@ const { watermarkImage } = require('./services/imageProcessor');
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const isProduction = process.env.NODE_ENV === 'production';
+const forceSecureCookie = process.env.COOKIE_SECURE === '1';
 
 const publicDir = path.join(process.cwd(), 'public');
 const roomUploadDir = path.join(publicDir, 'uploads', 'rooms');
@@ -92,7 +93,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 12,
       sameSite: 'lax',
-      secure: isProduction,
+      secure: forceSecureCookie ? true : 'auto',
       httpOnly: true
     }
   })

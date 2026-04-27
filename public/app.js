@@ -1,23 +1,159 @@
+const SUPPORTED_LANGUAGES = ['en', 'sw'];
+
+const translations = {
+  en: {
+    'nav.admin': 'Admin',
+    'nav.bookNow': 'Book Now',
+    'hero.roomsLabel': 'Ready to book',
+    'hero.supportLabel': 'Guest support',
+    'hero.locationLabel': 'Prime location',
+    'intro.title': 'Stay in style with easy booking',
+    'rooms.title': 'Our Rooms',
+    'rooms.subtitle': 'Choose your room and book in minutes.',
+    'amenities.title': 'Amenities At A Glance',
+    'amenities.subtitle': 'Everything you need for a comfortable stay.',
+    'booking.title': 'Book Direct on Bomagawani.com',
+    'booking.subtitle': 'Select room, date, and currency. Your booking code is created instantly.',
+    'form.room': 'Room',
+    'form.checkIn': 'Check-in',
+    'form.checkOut': 'Check-out',
+    'form.guests': 'Guests',
+    'form.currency': 'Currency',
+    'form.fullName': 'Full name',
+    'form.email': 'Email',
+    'form.phone': 'Phone',
+    'form.note': 'Note (optional)',
+    'form.notePlaceholder': 'Late arrival, special request',
+    'form.submit': 'Send Booking Request',
+    'tracking.title': 'Check your booking status',
+    'tracking.code': 'Booking code',
+    'tracking.button': 'Track Booking',
+    'location.title': 'Location & direction',
+    'location.openMap': 'Open Map',
+    'location.route': 'Use my location for route',
+    'channels.title': 'Also listed on travel channels',
+    'quote.empty': 'Enter dates to see your live quote.',
+    'quote.loading': 'Calculating quote...',
+    'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
+    'quote.unavailable': 'Could not get quote.',
+    'quote.serviceDown': 'Quote service unavailable. Try again.',
+    'quote.nights': '{nights} night(s) x {price}',
+    'quote.total': 'Total: {total}',
+    'status.checkQuoteFirst': 'Please check dates and quote first.',
+    'status.submittingBooking': 'Submitting booking request...',
+    'status.bookingFailed': 'Booking failed.',
+    'status.bookingServiceDown': 'Booking service is currently unavailable.',
+    'status.bookingSuccessPrefix': 'Booking submitted. Your code is',
+    'status.openReceipt': 'Open receipt',
+    'tracking.checking': 'Checking status...',
+    'tracking.notFound': 'Booking not found.',
+    'tracking.serviceDown': 'Tracking service unavailable.',
+    'tracking.status': 'Status',
+    'tracking.room': 'Room',
+    'tracking.dates': 'Dates',
+    'tracking.payment': 'Payment',
+    'location.noSupport': 'Geolocation is not supported on this device.',
+    'location.reading': 'Reading your location...',
+    'location.ready': 'Route link is ready. Tap Open Map.',
+    'location.failed': 'Could not read your location. Please allow permission and try again.',
+    'languagePrompt.title': 'Switch language?',
+    'languagePrompt.body': 'We detected your region language ({language}). Want to switch?',
+    'languagePrompt.yes': 'Switch',
+    'languagePrompt.no': 'Keep English',
+    'installPrompt.title': 'Install Bomagawani App?',
+    'installPrompt.body': 'Add it to your home screen for faster booking.',
+    'installPrompt.yes': 'Install',
+    'installPrompt.no': 'Not now'
+  },
+  sw: {
+    'nav.admin': 'Admin',
+    'nav.bookNow': 'Weka Nafasi',
+    'hero.roomsLabel': 'Tayari kupokelewa',
+    'hero.supportLabel': 'Huduma ya wageni',
+    'hero.locationLabel': 'Eneo zuri',
+    'intro.title': 'Furahia ukaaji kwa kuweka nafasi kwa urahisi',
+    'rooms.title': 'Vyumba Vyetu',
+    'rooms.subtitle': 'Chagua chumba na weka nafasi kwa dakika chache.',
+    'amenities.title': 'Huduma Muhimu',
+    'amenities.subtitle': 'Vitu muhimu vyote kwa ukaaji wa starehe.',
+    'booking.title': 'Weka Nafasi Moja kwa Moja Bomagawani.com',
+    'booking.subtitle': 'Chagua chumba, tarehe na sarafu. Namba ya booking hutolewa papo hapo.',
+    'form.room': 'Chumba',
+    'form.checkIn': 'Kuingia',
+    'form.checkOut': 'Kutoka',
+    'form.guests': 'Wageni',
+    'form.currency': 'Sarafu',
+    'form.fullName': 'Jina kamili',
+    'form.email': 'Barua pepe',
+    'form.phone': 'Simu',
+    'form.note': 'Ujumbe (si lazima)',
+    'form.notePlaceholder': 'Kuchelewa kufika, ombi maalum',
+    'form.submit': 'Tuma Ombi la Booking',
+    'tracking.title': 'Angalia hali ya booking yako',
+    'tracking.code': 'Namba ya booking',
+    'tracking.button': 'Fuatilia Booking',
+    'location.title': 'Eneo na maelekezo',
+    'location.openMap': 'Fungua Ramani',
+    'location.route': 'Tumia eneo langu kwa njia',
+    'channels.title': 'Pia tupo kwenye majukwaa haya',
+    'quote.empty': 'Weka tarehe kuona bei ya moja kwa moja.',
+    'quote.loading': 'Inahesabu bei...',
+    'quote.conflict': 'Tarehe hizi tayari zimechukuliwa. Tafadhali chagua tarehe nyingine.',
+    'quote.unavailable': 'Imeshindikana kupata bei.',
+    'quote.serviceDown': 'Huduma ya bei haipatikani sasa. Jaribu tena.',
+    'quote.nights': 'Usiku {nights} x {price}',
+    'quote.total': 'Jumla: {total}',
+    'status.checkQuoteFirst': 'Tafadhali hakiki bei kwanza.',
+    'status.submittingBooking': 'Inatuma ombi la booking...',
+    'status.bookingFailed': 'Booking imekataa.',
+    'status.bookingServiceDown': 'Huduma ya booking haipatikani sasa.',
+    'status.bookingSuccessPrefix': 'Booking imetumwa. Namba yako ni',
+    'status.openReceipt': 'Fungua risiti',
+    'tracking.checking': 'Inaangalia hali...',
+    'tracking.notFound': 'Booking haijapatikana.',
+    'tracking.serviceDown': 'Huduma ya kufuatilia haipatikani.',
+    'tracking.status': 'Hali',
+    'tracking.room': 'Chumba',
+    'tracking.dates': 'Tarehe',
+    'tracking.payment': 'Malipo',
+    'location.noSupport': 'Kifaa hiki hakiungi mkono geolocation.',
+    'location.reading': 'Inasoma eneo lako...',
+    'location.ready': 'Njia ipo tayari. Bonyeza Fungua Ramani.',
+    'location.failed': 'Imeshindikana kusoma eneo lako. Ruhusu ruhusa na ujaribu tena.',
+    'languagePrompt.title': 'Ungependa kubadili lugha?',
+    'languagePrompt.body': 'Tumegundua lugha ya eneo lako ({language}). Unataka kubadili?',
+    'languagePrompt.yes': 'Badili',
+    'languagePrompt.no': 'Baki English',
+    'installPrompt.title': 'Sakinisha App ya Bomagawani?',
+    'installPrompt.body': 'Ongeza kwenye home screen kwa booking ya haraka.',
+    'installPrompt.yes': 'Sakinisha',
+    'installPrompt.no': 'Baadaye'
+  }
+};
+
 const state = {
   settings: null,
   rooms: [],
   links: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
   currentQuote: null,
-  deferredInstallPrompt: null
+  deferredInstallPrompt: null,
+  language: localStorage.getItem('preferred_language') || 'en',
+  roomSlideIntervals: {}
 };
+
+if (!SUPPORTED_LANGUAGES.includes(state.language)) {
+  state.language = 'en';
+}
 
 const dom = {
   headline: document.getElementById('headline'),
   subheadline: document.getElementById('subheadline'),
   aboutText: document.getElementById('about-text'),
-  checkInTime: document.getElementById('check-in-time'),
-  checkOutTime: document.getElementById('check-out-time'),
-  addressText: document.getElementById('address-text'),
-  phoneText: document.getElementById('phone-text'),
   footerBrand: document.getElementById('footer-brand'),
   footerDomain: document.getElementById('footer-domain'),
   mapLink: document.getElementById('map-link'),
+  mapEmbed: document.getElementById('map-embed'),
   locationLine: document.getElementById('location-line'),
   locationStatus: document.getElementById('location-status'),
   platformLinks: document.getElementById('platform-links'),
@@ -38,8 +174,15 @@ const dom = {
   statRooms: document.getElementById('stat-rooms'),
   statLocation: document.getElementById('stat-location'),
   useLocation: document.getElementById('use-location'),
-  installApp: document.getElementById('install-app'),
-  structuredData: document.getElementById('seo-structured-data')
+  structuredData: document.getElementById('seo-structured-data'),
+  languageSelect: document.getElementById('language-select'),
+  languagePrompt: document.getElementById('language-prompt'),
+  languagePromptText: document.getElementById('language-prompt-text'),
+  languageYes: document.getElementById('language-yes'),
+  languageNo: document.getElementById('language-no'),
+  installPrompt: document.getElementById('install-prompt'),
+  installYes: document.getElementById('install-yes'),
+  installNo: document.getElementById('install-no')
 };
 
 const amenityIconMap = {
@@ -55,8 +198,48 @@ const amenityIconMap = {
   utensils: 'utensils',
   bed: 'bed',
   pool: 'waves',
+  beach: 'waves',
+  waves: 'waves',
   lock: 'shield-check'
 };
+
+function t(key, vars = {}) {
+  const phrase = translations[state.language]?.[key] || translations.en[key] || key;
+  return phrase.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+}
+
+function languageLabel(code) {
+  if (code === 'sw') return 'Kiswahili';
+  return 'English';
+}
+
+function applyTranslations() {
+  document.documentElement.lang = state.language;
+  dom.languageSelect.value = state.language;
+
+  document.querySelectorAll('[data-i18n]').forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+    element.setAttribute('placeholder', t(element.dataset.i18nPlaceholder));
+  });
+
+  if (!state.currentQuote) {
+    dom.quoteBox.textContent = t('quote.empty');
+  }
+}
+
+function setLanguage(languageCode) {
+  const next = SUPPORTED_LANGUAGES.includes(languageCode) ? languageCode : 'en';
+  state.language = next;
+  localStorage.setItem('preferred_language', next);
+  applyTranslations();
+
+  if (state.currentQuote) {
+    renderQuote(state.currentQuote);
+  }
+}
 
 function normalizeDate(dateString) {
   return dateString ? new Date(`${dateString}T00:00:00`) : null;
@@ -77,7 +260,7 @@ function isDateRangeAvailable(roomId, checkIn, checkOut) {
 
 function formatAmount(value, currency) {
   try {
-    return new Intl.NumberFormat('en', {
+    return new Intl.NumberFormat(state.language === 'sw' ? 'sw-TZ' : 'en', {
       style: 'currency',
       currency,
       maximumFractionDigits: 2
@@ -85,6 +268,59 @@ function formatAmount(value, currency) {
   } catch (error) {
     return `${Number(value).toFixed(2)} ${currency}`;
   }
+}
+
+function clearRoomSlideIntervals() {
+  Object.values(state.roomSlideIntervals).forEach((timerId) => clearInterval(timerId));
+  state.roomSlideIntervals = {};
+}
+
+function initRoomSlides() {
+  clearRoomSlideIntervals();
+
+  dom.roomsGrid.querySelectorAll('.room-slider').forEach((slider) => {
+    const slides = [...slider.querySelectorAll('.room-image')];
+    if (slides.length <= 1) return;
+
+    const sliderKey = slider.dataset.sliderKey;
+    let current = 0;
+
+    const show = (index) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('is-active', idx === current);
+      });
+    };
+
+    const nextButton = slider.querySelector('[data-slide="next"]');
+    const prevButton = slider.querySelector('[data-slide="prev"]');
+
+    const stopTimer = () => {
+      if (state.roomSlideIntervals[sliderKey]) {
+        clearInterval(state.roomSlideIntervals[sliderKey]);
+      }
+    };
+
+    const startTimer = () => {
+      stopTimer();
+      state.roomSlideIntervals[sliderKey] = setInterval(() => show(current + 1), 4500);
+    };
+
+    nextButton?.addEventListener('click', () => {
+      show(current + 1);
+      startTimer();
+    });
+
+    prevButton?.addEventListener('click', () => {
+      show(current - 1);
+      startTimer();
+    });
+
+    slider.addEventListener('mouseenter', stopTimer);
+    slider.addEventListener('mouseleave', startTimer);
+
+    startTimer();
+  });
 }
 
 function renderLinks() {
@@ -109,8 +345,6 @@ function renderLinks() {
     channel.innerHTML = `<span><i data-lucide="${icon}"></i> ${link.platform_name}</span><i data-lucide="external-link"></i>`;
     dom.channelList.appendChild(channel);
   });
-
-  refreshIcons();
 }
 
 function renderRooms() {
@@ -118,15 +352,15 @@ function renderRooms() {
   dom.roomSelect.innerHTML = '';
 
   state.rooms.forEach((room) => {
-    const imageUrl = room.cover_image || room.images?.[0]?.image_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
+    const roomImages = (room.images || []).map((item) => item.image_url).filter(Boolean);
+    const fallback = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
+    const imageSources = roomImages.length ? roomImages : [room.cover_image || fallback];
+
     const card = document.createElement('article');
     card.className = 'room-card';
     card.id = `room-${room.slug}`;
 
-    const badges = [
-      `<span class="badge">${room.size_label}</span>`,
-      `<span class="badge">Up to ${room.max_guests} guests</span>`
-    ];
+    const badges = [`<span class="badge">${room.size_label}</span>`, `<span class="badge">Up to ${room.max_guests} guests</span>`];
 
     if (room.featured) {
       badges.unshift('<span class="badge">Featured</span>');
@@ -134,11 +368,29 @@ function renderRooms() {
 
     const unavailableCount = room.unavailable?.length || 0;
     if (unavailableCount > 0) {
-      badges.push(`<span class="badge">${unavailableCount} date range(s) booked</span>`);
+      badges.push(`<span class="badge">${unavailableCount} booked range(s)</span>`);
     }
 
+    const slides = imageSources
+      .map(
+        (src, index) =>
+          `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${src}" alt="${room.name}" loading="lazy" />`
+      )
+      .join('');
+
+    const controls =
+      imageSources.length > 1
+        ? `
+      <button class="slide-control prev" type="button" data-slide="prev" aria-label="Previous image">‹</button>
+      <button class="slide-control next" type="button" data-slide="next" aria-label="Next image">›</button>
+    `
+        : '';
+
     card.innerHTML = `
-      <img class="room-image" src="${imageUrl}" alt="${room.name}" loading="lazy" />
+      <div class="room-slider" data-slider-key="room-${room.id}">
+        ${slides}
+        ${controls}
+      </div>
       <div class="room-content">
         <div class="room-top">
           <h3>${room.name}</h3>
@@ -146,7 +398,7 @@ function renderRooms() {
         </div>
         <p>${room.short_description}</p>
         <div class="room-badges">${badges.join('')}</div>
-        <button class="ghost-btn wide" data-book-room="${room.id}">Book ${room.name}</button>
+        <button class="ghost-btn wide" data-book-room="${room.id}">${t('nav.bookNow')} ${room.name}</button>
       </div>
     `;
 
@@ -165,15 +417,17 @@ function renderRooms() {
       requestQuote();
     });
   });
+
+  initRoomSlides();
 }
 
 function renderAmenities() {
   const seen = new Map();
   state.rooms.forEach((room) => {
-    (room.amenities || []).forEach((am) => {
-      const key = `${am.icon}:${am.label}`;
+    (room.amenities || []).forEach((amenity) => {
+      const key = `${amenity.icon}:${amenity.label}`;
       if (!seen.has(key)) {
-        seen.set(key, am);
+        seen.set(key, amenity);
       }
     });
   });
@@ -185,8 +439,6 @@ function renderAmenities() {
     item.innerHTML = `<i data-lucide="${iconName}"></i><span>${amenity.label}</span>`;
     dom.amenityWall.appendChild(item);
   });
-
-  refreshIcons();
 }
 
 function renderCurrencies() {
@@ -206,14 +458,14 @@ function applySettings() {
   dom.headline.textContent = settings.headline;
   dom.subheadline.textContent = settings.subheadline;
   dom.aboutText.textContent = settings.about_text;
-  dom.checkInTime.textContent = settings.check_in_time;
-  dom.checkOutTime.textContent = settings.check_out_time;
-  dom.addressText.textContent = settings.address;
-  dom.phoneText.textContent = settings.contact_phone;
   dom.footerBrand.textContent = settings.site_name;
   dom.footerDomain.textContent = `Domain: ${settings.domain}`;
-  dom.mapLink.href = settings.map_link;
   dom.locationLine.textContent = settings.address;
+  dom.mapLink.href = settings.map_link;
+
+  const mapQuery = encodeURIComponent(settings.address || 'Kigombe, Tanga, Tanzania');
+  dom.mapEmbed.src = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
+
   dom.statRooms.textContent = `${state.rooms.length} Rooms`;
   dom.statLocation.textContent = settings.address.split(',')[0] || settings.address;
   document.title = `${settings.domain} | Coastal Room Booking`;
@@ -258,6 +510,19 @@ function updateStructuredData() {
   dom.structuredData.textContent = JSON.stringify(schema);
 }
 
+function renderQuote(quote) {
+  if (!quote) {
+    dom.quoteBox.textContent = t('quote.empty');
+    return;
+  }
+
+  dom.quoteBox.innerHTML = `
+    <strong>${quote.roomName}</strong><br/>
+    ${t('quote.nights', { nights: quote.nights, price: formatAmount(quote.pricePerNightUsd, 'USD') })}<br/>
+    <strong>${t('quote.total', { total: formatAmount(quote.totalInCurrency, quote.currency) })}</strong>
+  `;
+}
+
 async function requestQuote() {
   const roomId = dom.roomSelect.value;
   const checkIn = dom.checkIn.value;
@@ -265,36 +530,34 @@ async function requestQuote() {
   const currency = dom.currencySelect.value;
 
   if (!roomId || !checkIn || !checkOut) {
-    dom.quoteBox.textContent = 'Enter dates to see your live quote.';
+    renderQuote(null);
     return;
   }
 
   if (!isDateRangeAvailable(roomId, checkIn, checkOut)) {
-    dom.quoteBox.textContent = 'Those dates are already confirmed for this room. Please pick another date.';
+    dom.quoteBox.textContent = t('quote.conflict');
     state.currentQuote = null;
     return;
   }
 
   try {
-    dom.quoteBox.textContent = 'Calculating quote...';
-    const response = await fetch(`/api/public/quote?roomId=${encodeURIComponent(roomId)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&currency=${encodeURIComponent(currency)}`);
+    dom.quoteBox.textContent = t('quote.loading');
+    const response = await fetch(
+      `/api/public/quote?roomId=${encodeURIComponent(roomId)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&currency=${encodeURIComponent(currency)}`
+    );
 
     if (!response.ok) {
       const payload = await response.json();
-      dom.quoteBox.textContent = payload.error || 'Could not get quote.';
+      dom.quoteBox.textContent = payload.error || t('quote.unavailable');
       state.currentQuote = null;
       return;
     }
 
     const quote = await response.json();
     state.currentQuote = quote;
-    dom.quoteBox.innerHTML = `
-      <strong>${quote.roomName}</strong><br/>
-      ${quote.nights} night(s) x ${formatAmount(quote.pricePerNightUsd, 'USD')}<br/>
-      Total: <strong>${formatAmount(quote.totalInCurrency, quote.currency)}</strong>
-    `;
+    renderQuote(quote);
   } catch (error) {
-    dom.quoteBox.textContent = 'Quote service unavailable. Try again.';
+    dom.quoteBox.textContent = t('quote.serviceDown');
     state.currentQuote = null;
   }
 }
@@ -305,7 +568,7 @@ async function submitBooking(event) {
 
   await requestQuote();
   if (!state.currentQuote) {
-    dom.bookingStatus.textContent = 'Please check dates and quote first.';
+    dom.bookingStatus.textContent = t('status.checkQuoteFirst');
     return;
   }
 
@@ -322,7 +585,7 @@ async function submitBooking(event) {
   };
 
   try {
-    dom.bookingStatus.textContent = 'Submitting booking request...';
+    dom.bookingStatus.textContent = t('status.submittingBooking');
 
     const response = await fetch('/api/public/bookings', {
       method: 'POST',
@@ -332,18 +595,18 @@ async function submitBooking(event) {
 
     const result = await response.json();
     if (!response.ok) {
-      dom.bookingStatus.textContent = result.error || 'Booking failed.';
+      dom.bookingStatus.textContent = result.error || t('status.bookingFailed');
       return;
     }
 
-    dom.bookingStatus.innerHTML = `Booking submitted. Your code is <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">Open receipt</a>.`;
+    dom.bookingStatus.innerHTML = `${t('status.bookingSuccessPrefix')} <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>.`;
     dom.bookingForm.reset();
     state.currentQuote = null;
-    dom.quoteBox.textContent = 'Enter dates to see your live quote.';
+    renderQuote(null);
 
     await boot();
   } catch (error) {
-    dom.bookingStatus.textContent = 'Booking service is currently unavailable.';
+    dom.bookingStatus.textContent = t('status.bookingServiceDown');
   }
 }
 
@@ -352,26 +615,26 @@ async function trackBooking(event) {
   const code = dom.trackingCode.value.trim().toUpperCase();
   if (!code) return;
 
-  dom.trackingResult.textContent = 'Checking status...';
+  dom.trackingResult.textContent = t('tracking.checking');
 
   try {
     const response = await fetch(`/api/public/bookings/${encodeURIComponent(code)}`);
     const result = await response.json();
 
     if (!response.ok) {
-      dom.trackingResult.textContent = result.error || 'Booking not found.';
+      dom.trackingResult.textContent = result.error || t('tracking.notFound');
       return;
     }
 
     dom.trackingResult.innerHTML = `
-      <strong>Status:</strong> ${result.booking_status}<br/>
-      <strong>Room:</strong> ${result.room_name}<br/>
-      <strong>Dates:</strong> ${result.check_in} to ${result.check_out}<br/>
-      <strong>Payment:</strong> ${result.payment_status}<br/>
-      <a href="/receipt/${result.booking_code}" target="_blank" rel="noreferrer">Open receipt</a>
+      <strong>${t('tracking.status')}:</strong> ${result.booking_status}<br/>
+      <strong>${t('tracking.room')}:</strong> ${result.room_name}<br/>
+      <strong>${t('tracking.dates')}:</strong> ${result.check_in} to ${result.check_out}<br/>
+      <strong>${t('tracking.payment')}:</strong> ${result.payment_status}<br/>
+      <a href="/receipt/${result.booking_code}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>
     `;
   } catch (error) {
-    dom.trackingResult.textContent = 'Tracking service unavailable.';
+    dom.trackingResult.textContent = t('tracking.serviceDown');
   }
 }
 
@@ -399,11 +662,11 @@ function configureDateInputs() {
 function configureLocationRoute() {
   dom.useLocation.addEventListener('click', () => {
     if (!navigator.geolocation) {
-      dom.locationStatus.textContent = 'Geolocation is not supported on this device.';
+      dom.locationStatus.textContent = t('location.noSupport');
       return;
     }
 
-    dom.locationStatus.textContent = 'Reading your location...';
+    dom.locationStatus.textContent = t('location.reading');
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -411,33 +674,94 @@ function configureLocationRoute() {
         const destination = encodeURIComponent(state.settings.address);
         const routeUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${destination}`;
         dom.mapLink.href = routeUrl;
-        dom.locationStatus.textContent = 'Route link is ready. Tap Open Map.';
+        dom.locationStatus.textContent = t('location.ready');
       },
       () => {
-        dom.locationStatus.textContent = 'Could not read your location. Please allow permission and try again.';
+        dom.locationStatus.textContent = t('location.failed');
       }
     );
   });
 }
 
+function getSuggestedLanguage() {
+  const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  if (SUPPORTED_LANGUAGES.includes(browserLang) && browserLang !== state.language) {
+    return browserLang;
+  }
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  if (timezone.includes('Dar_es_Salaam') && state.language !== 'sw') {
+    return 'sw';
+  }
+
+  return null;
+}
+
+function configureLanguagePreference() {
+  dom.languageSelect.value = state.language;
+  dom.languageSelect.addEventListener('change', (event) => {
+    setLanguage(event.target.value);
+  });
+
+  const promptAlreadyShown = localStorage.getItem('language_prompt_seen') === '1';
+  const suggested = getSuggestedLanguage();
+
+  if (!promptAlreadyShown && suggested) {
+    dom.languagePromptText.textContent = t('languagePrompt.body', { language: languageLabel(suggested) });
+    dom.languagePrompt.hidden = false;
+
+    dom.languageYes.onclick = () => {
+      setLanguage(suggested);
+      dom.languagePrompt.hidden = true;
+      localStorage.setItem('language_prompt_seen', '1');
+    };
+
+    dom.languageNo.onclick = () => {
+      dom.languagePrompt.hidden = true;
+      localStorage.setItem('language_prompt_seen', '1');
+    };
+  }
+}
+
 function configureInstallPrompt() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  if (isStandalone) {
+    localStorage.setItem('install_prompt_seen', '1');
+  }
+
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     state.deferredInstallPrompt = event;
-    dom.installApp.hidden = false;
+
+    const promptAlreadyShown = localStorage.getItem('install_prompt_seen') === '1';
+    if (!promptAlreadyShown && !isStandalone) {
+      dom.installPrompt.hidden = false;
+    }
   });
 
-  dom.installApp.addEventListener('click', async () => {
-    if (!state.deferredInstallPrompt) return;
+  dom.installYes.addEventListener('click', async () => {
+    if (!state.deferredInstallPrompt) {
+      dom.installPrompt.hidden = true;
+      localStorage.setItem('install_prompt_seen', '1');
+      return;
+    }
 
     state.deferredInstallPrompt.prompt();
     await state.deferredInstallPrompt.userChoice;
     state.deferredInstallPrompt = null;
-    dom.installApp.hidden = true;
+    dom.installPrompt.hidden = true;
+    localStorage.setItem('install_prompt_seen', '1');
+  });
+
+  dom.installNo.addEventListener('click', () => {
+    dom.installPrompt.hidden = true;
+    localStorage.setItem('install_prompt_seen', '1');
   });
 
   window.addEventListener('appinstalled', () => {
-    dom.installApp.hidden = true;
+    dom.installPrompt.hidden = true;
+    localStorage.setItem('install_prompt_seen', '1');
   });
 }
 
@@ -465,13 +789,15 @@ async function boot() {
     renderAmenities();
     renderCurrencies();
     updateStructuredData();
-
+    applyTranslations();
     refreshIcons();
   } catch (error) {
-    dom.quoteBox.textContent = 'Failed to load booking data. Refresh this page.';
+    dom.quoteBox.textContent = t('status.bookingServiceDown');
   }
 }
 
+applyTranslations();
+configureLanguagePreference();
 configureDateInputs();
 configureLocationRoute();
 configureInstallPrompt();

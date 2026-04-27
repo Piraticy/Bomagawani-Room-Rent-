@@ -10,12 +10,15 @@ Complete booking platform for **Bomagawani.com** with production-ready backend, 
 - Booking status tracking with booking code
 - Printable receipt page per booking
 - Installable web app support (PWA)
+- One-time install prompt (does not stay on screen)
+- Language suggestion prompt based on visitor locale
 - SEO support (`sitemap.xml`, `robots.txt`, structured data)
 - Admin dashboard for no-code updates:
   - Site details and content
-  - Room details, pricing, amenities, active/inactive
-  - Photo upload with automatic logo watermark
-  - Set room cover image and remove old photos
+- Room details, pricing, amenities, active/inactive
+- Photo upload with automatic logo watermark
+- Landing page room slideshow driven by admin-uploaded photos
+- Set room cover image and remove old photos
   - Travel platform links (Booking.com, Tripadvisor, etc.)
   - Booking confirmation/cancel/payment status updates
 - Confirmed booking dates are blocked instantly for new bookings
@@ -73,6 +76,7 @@ This starts:
 NODE_ENV=development
 PORT=3000
 TRUST_PROXY=0
+COOKIE_SECURE=0
 SESSION_SECRET=replace-with-long-random-secret
 ADMIN_EMAIL=admin@bomagawani.com
 ADMIN_PASSWORD=Admin@12345

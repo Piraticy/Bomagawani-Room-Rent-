@@ -166,7 +166,7 @@ if (!roomsCount) {
     featured: 1,
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
-      { icon: 'snowflake', label: 'Air Conditioning' },
+      { icon: 'waves', label: 'Beach View' },
       { icon: 'bath', label: 'Private Bathroom' },
       { icon: 'coffee', label: 'Coffee Station' },
       { icon: 'tv', label: 'Smart TV' }
@@ -206,6 +206,33 @@ if (!adminCount) {
   const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
   const passwordHash = bcrypt.hashSync(adminPassword, 10);
   db.prepare('INSERT INTO admins (full_name, email, password_hash) VALUES (?, ?, ?)').run('Main Admin', adminEmail, passwordHash);
+}
+
+const masterRoom = db.prepare("SELECT id, amenities_json FROM rooms WHERE slug = 'master-bedroom'").get();
+if (masterRoom) {
+  const amenities = JSON.parse(masterRoom.amenities_json || '[]');
+  let changed = false;
+
+  const normalizedAmenities = amenities.map((item) => {
+    if (item.label === 'Air Conditioning') {
+      changed = true;
+      return { icon: 'waves', label: 'Beach View' };
+    }
+    return item;
+  });
+
+  const hasBeachView = normalizedAmenities.some((item) => item.label === 'Beach View');
+  if (!hasBeachView) {
+    changed = true;
+    normalizedAmenities.push({ icon: 'waves', label: 'Beach View' });
+  }
+
+  if (changed) {
+    db.prepare('UPDATE rooms SET amenities_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
+      JSON.stringify(normalizedAmenities),
+      masterRoom.id
+    );
+  }
 }
 
 module.exports = db;
