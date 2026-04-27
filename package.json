@@ -1,0 +1,31 @@
+{
+  "name": "bomagawani-room-rent-",
+  "version": "1.0.0",
+  "description": "Bomagawani House Rent booking and admin platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Piraticy/Bomagawani-Room-Rent-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Piraticy/Bomagawani-Room-Rent-/issues"
+  },
+  "homepage": "https://github.com/Piraticy/Bomagawani-Room-Rent-#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.9.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.1.1",
+    "node-fetch": "^2.7.0",
+    "sharp": "^0.34.5"
+  }
+}

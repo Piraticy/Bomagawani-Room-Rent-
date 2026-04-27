@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bomagawani.com | Coastal Room Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="#" class="brand">
+        <img src="/logo.svg" alt="Bomagawani logo" class="brand-logo" />
+        <span class="brand-text">Bomagawani.com</span>
+      </a>
+
+      <nav class="top-links" id="platform-links"></nav>
+      <a class="primary-btn" href="#booking">Book Now</a>
+    </header>
+
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="hero-kicker">Kigombe, Tanzania</p>
+          <h1 id="headline">Beautiful Coastal Stays</h1>
+          <p id="subheadline">Direct booking, instant availability, and a warm welcome.</p>
+
+          <div class="hero-stats">
+            <article>
+              <strong id="stat-rooms">2 Rooms</strong>
+              <span>Handpicked comfort</span>
+            </article>
+            <article>
+              <strong>24/7</strong>
+              <span>Support by host team</span>
+            </article>
+            <article>
+              <strong id="stat-location">Kigombe</strong>
+              <span>Prime location</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-intro">
+        <article>
+          <h2>Stay in style with easy direct booking</h2>
+          <p id="about-text">
+            Bomagawani House Rent blends comfort and convenience for guests, families, and business travelers.
+          </p>
+        </article>
+
+        <aside class="info-panel">
+          <div>
+            <i data-lucide="clock-3"></i>
+            <p><strong>Check-in</strong> <span id="check-in-time">14:00</span></p>
+          </div>
+          <div>
+            <i data-lucide="clock-9"></i>
+            <p><strong>Check-out</strong> <span id="check-out-time">11:00</span></p>
+          </div>
+          <div>
+            <i data-lucide="map-pin"></i>
+            <p><strong>Address</strong> <span id="address-text">Kigombe</span></p>
+          </div>
+          <div>
+            <i data-lucide="phone"></i>
+            <p><strong>Contact</strong> <span id="phone-text">+255...</span></p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="rooms-section">
+        <div class="section-head">
+          <h2>Our Rooms</h2>
+          <p>Master Bedroom and Guest Room are available now. Admin can add more later from dashboard.</p>
+        </div>
+        <div class="rooms-grid" id="rooms-grid"></div>
+      </section>
+
+      <section class="section amenities-area">
+        <div class="section-head">
+          <h2>Amenities At A Glance</h2>
+          <p>Quick icon view to reduce text and help guests decide faster.</p>
+        </div>
+        <div class="amenity-wall" id="amenity-wall"></div>
+      </section>
+
+      <section class="section booking-layout" id="booking">
+        <div class="booking-card">
+          <h2>Book Direct on Bomagawani.com</h2>
+          <p>Choose your room, dates, and currency. We will create a booking code and receipt instantly.</p>
+
+          <form id="booking-form">
+            <label>
+              Room
+              <select id="room-select" required></select>
+            </label>
+
+            <div class="date-grid">
+              <label>
+                Check-in
+                <input type="date" id="check-in" required />
+              </label>
+              <label>
+                Check-out
+                <input type="date" id="check-out" required />
+              </label>
+            </div>
+
+            <div class="date-grid">
+              <label>
+                Guests
+                <input type="number" id="guests-count" min="1" value="1" required />
+              </label>
+              <label>
+                Currency
+                <select id="currency-select"></select>
+              </label>
+            </div>
+
+            <div class="quote-box" id="quote-box">Enter dates to see your live quote.</div>
+
+            <hr />
+
+            <label>
+              Full name
+              <input type="text" id="guest-name" required />
+            </label>
+            <div class="date-grid">
+              <label>
+                Email
+                <input type="email" id="guest-email" required />
+              </label>
+              <label>
+                Phone
+                <input type="tel" id="guest-phone" required />
+              </label>
+            </div>
+            <label>
+              Note (optional)
+              <textarea id="guest-note" rows="3" placeholder="Late arrival, special request, etc"></textarea>
+            </label>
+
+            <button type="submit" class="primary-btn wide">Send Booking Request</button>
+            <p class="form-status" id="booking-status"></p>
+          </form>
+        </div>
+
+        <aside class="side-cards">
+          <article class="quick-card">
+            <h3>Check your booking status</h3>
+            <form id="tracking-form">
+              <label>
+                Booking code
+                <input id="tracking-code" placeholder="BOMA-XXXXXX" required />
+              </label>
+              <button type="submit" class="ghost-btn wide">Track Booking</button>
+            </form>
+            <div id="tracking-result"></div>
+          </article>
+
+          <article class="quick-card">
+            <h3>Location & direction</h3>
+            <p id="location-line">Open map directions and find us quickly.</p>
+            <a id="map-link" class="ghost-btn wide" target="_blank" rel="noreferrer">Open Map</a>
+            <button id="use-location" class="ghost-btn wide" type="button">Use my location for route</button>
+            <small id="location-status"></small>
+          </article>
+
+          <article class="quick-card channels-card">
+            <h3>Also listed on travel channels</h3>
+            <div id="channel-list"></div>
+          </article>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong id="footer-brand">Bomagawani House Rent</strong>
+        <p id="footer-domain">Domain: Bomagawani.com</p>
+      </div>
+      <a href="/admin" class="ghost-btn">Admin Portal</a>
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

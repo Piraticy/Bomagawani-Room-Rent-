@@ -1,0 +1,286 @@
+:root {
+  --bg: #f5f8fd;
+  --surface: #ffffff;
+  --ink: #11213e;
+  --muted: #66748a;
+  --line: #d9e4f2;
+  --primary: #125b66;
+  --accent: #e3a34e;
+  --radius: 16px;
+  --shadow: 0 20px 48px rgba(16, 33, 62, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(227, 163, 78, 0.24), transparent 35%),
+    radial-gradient(circle at 7% 88%, rgba(18, 91, 102, 0.2), transparent 30%),
+    var(--bg);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0;
+}
+
+.admin-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 14px 4vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background: rgba(245, 248, 253, 0.8);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+}
+
+.brand-link img {
+  width: 33px;
+  height: 33px;
+}
+
+main {
+  padding: 20px 4vw 30px;
+}
+
+.login-wrap {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 120px);
+}
+
+.login-card {
+  width: min(460px, 94vw);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.login-card p {
+  color: var(--muted);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 10px;
+  font-size: 0.92rem;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid #cad6e6;
+  border-radius: 10px;
+  background: #fbfdff;
+  padding: 10px;
+}
+
+.primary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 11px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.primary-btn {
+  background: linear-gradient(120deg, #125b66, #0f7f71);
+  color: white;
+}
+
+.ghost-btn {
+  background: #edf4fc;
+  color: #1d3457;
+}
+
+.wide {
+  width: 100%;
+}
+
+.dashboard {
+  display: grid;
+  gap: 14px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-grid article {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.summary-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summary-grid strong {
+  margin-top: 8px;
+  display: block;
+  font-size: 1.5rem;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.panel p {
+  color: var(--muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-row {
+  display: flex;
+  gap: 8px;
+}
+
+.stack-form {
+  margin-top: 18px;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+
+.room-list {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 16px;
+}
+
+.room-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #f3f8ff;
+  border: 1px solid #d8e7fa;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.room-item p {
+  margin: 0;
+}
+
+.status {
+  margin-top: 8px;
+  color: #365073;
+  font-size: 0.88rem;
+}
+
+.link-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  padding: 10px 8px;
+  vertical-align: top;
+}
+
+td .small-btn {
+  margin-top: 4px;
+  display: inline-flex;
+  border: 1px solid #c4d4ea;
+  background: #f7fbff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 940px) {
+  .summary-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .link-row {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+}
