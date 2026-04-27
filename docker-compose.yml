@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    container_name: bomagawani-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - TRUST_PROXY=1
+    volumes:
+      - bomagawani_data:/app/data
+      - bomagawani_room_uploads:/app/public/uploads/rooms
+      - bomagawani_site_uploads:/app/public/uploads/site
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: bomagawani-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - bomagawani_room_uploads:/usr/share/nginx/html/uploads/rooms:ro
+      - bomagawani_site_uploads:/usr/share/nginx/html/uploads/site:ro
+
+volumes:
+  bomagawani_data:
+  bomagawani_room_uploads:
+  bomagawani_site_uploads:

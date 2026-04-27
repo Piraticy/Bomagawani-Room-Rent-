@@ -7,6 +7,10 @@ const express = require('express');
 const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const db = require('./db');
 const { requireAdmin } = require('./middleware/auth');
@@ -15,6 +19,7 @@ const { watermarkImage } = require('./services/imageProcessor');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const isProduction = process.env.NODE_ENV === 'production';
 
 const publicDir = path.join(process.cwd(), 'public');
 const roomUploadDir = path.join(publicDir, 'uploads', 'rooms');
@@ -25,10 +30,55 @@ fs.mkdirSync(roomUploadDir, { recursive: true });
 fs.mkdirSync(siteUploadDir, { recursive: true });
 fs.mkdirSync(tempUploadDir, { recursive: true });
 
+if (isProduction || process.env.TRUST_PROXY === '1') {
+  app.set('trust proxy', 1);
+}
+
+app.disable('x-powered-by');
+app.use(morgan(isProduction ? 'combined' : 'dev'));
+app.use(compression());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false
+  })
+);
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again shortly.' }
+});
+
+const bookingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many booking attempts. Please try again in a few minutes.' }
+});
+
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Please wait before trying again.' }
+});
+
 const upload = multer({
   dest: tempUploadDir,
   limits: {
     fileSize: 7 * 1024 * 1024
+  },
+  fileFilter: (req, file, callback) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return callback(new Error('Only image files are allowed.'));
+    }
+
+    return callback(null, true);
   }
 });
 
@@ -41,11 +91,14 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 12,
-      sameSite: 'lax'
+      sameSite: 'lax',
+      secure: isProduction,
+      httpOnly: true
     }
   })
 );
 
+app.use('/api', apiLimiter);
 app.use(express.static(publicDir));
 
 function slugify(value) {
@@ -57,13 +110,6 @@ function slugify(value) {
     .replace(/-+/g, '-');
 }
 
-function nightsBetween(checkIn, checkOut) {
-  const start = new Date(`${checkIn}T00:00:00Z`);
-  const end = new Date(`${checkOut}T00:00:00Z`);
-  const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
-  return diff;
-}
-
 function bookingCode() {
   return `BOMA-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 }
@@ -73,6 +119,55 @@ function normalizeRoom(room) {
     ...room,
     amenities: JSON.parse(room.amenities_json || '[]')
   };
+}
+
+function normalizeCurrency(code) {
+  return String(code || 'USD')
+    .trim()
+    .toUpperCase();
+}
+
+function parseDateOnly(dateString) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateString || ''))) {
+    return null;
+  }
+
+  const date = new Date(`${dateString}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function nightsBetween(checkIn, checkOut) {
+  const start = parseDateOnly(checkIn);
+  const end = parseDateOnly(checkOut);
+  if (!start || !end) return null;
+  return Math.round((end - start) / (1000 * 60 * 60 * 24));
+}
+
+function validateDateRange(checkIn, checkOut) {
+  const start = parseDateOnly(checkIn);
+  const end = parseDateOnly(checkOut);
+  if (!start || !end) return { ok: false, error: 'Invalid date format. Use YYYY-MM-DD.' };
+
+  const nights = nightsBetween(checkIn, checkOut);
+  if (!nights || nights <= 0) return { ok: false, error: 'Check-out must be after check-in.' };
+
+  return { ok: true, nights, start, end };
+}
+
+function isLikelyEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || ''));
+}
+
+function removeFileIfExists(filePath) {
+  if (filePath && fs.existsSync(filePath)) {
+    fs.rmSync(filePath, { force: true });
+  }
+}
+
+function removeUploadByUrl(uploadUrl) {
+  if (!uploadUrl || !uploadUrl.startsWith('/uploads/')) return;
+  const filePath = path.join(publicDir, uploadUrl.replace(/^\//, ''));
+  removeFileIfExists(filePath);
 }
 
 function getSettings() {
@@ -123,16 +218,17 @@ function getConfirmedRanges(roomId) {
     .all(roomId);
 }
 
-function isRoomAvailable(roomId, checkIn, checkOut) {
+function isRoomAvailable(roomId, checkIn, checkOut, ignoreBookingId = null) {
   const overlap = db
     .prepare(
       `SELECT COUNT(*) AS count
        FROM bookings
        WHERE room_id = @roomId
          AND booking_status = 'confirmed'
+         AND (@ignoreBookingId IS NULL OR id != @ignoreBookingId)
          AND NOT (check_out <= @checkIn OR check_in >= @checkOut)`
     )
-    .get({ roomId, checkIn, checkOut });
+    .get({ roomId, checkIn, checkOut, ignoreBookingId });
 
   return overlap.count === 0;
 }
@@ -148,6 +244,44 @@ function adminSummary() {
     revenueUsd: Number(Number(revenue).toFixed(2))
   };
 }
+
+function buildSitemapXml(baseUrl, rooms) {
+  const urls = [
+    `${baseUrl}/`,
+    `${baseUrl}/admin`
+  ];
+
+  rooms.forEach((room) => {
+    urls.push(`${baseUrl}/#room-${room.slug}`);
+  });
+
+  const body = urls
+    .map((loc) => `<url><loc>${loc}</loc><changefreq>weekly</changefreq></url>`)
+    .join('');
+
+  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>`;
+}
+
+app.get('/healthz', (req, res) => {
+  res.json({
+    ok: true,
+    service: 'bomagawani-room-rent',
+    time: new Date().toISOString(),
+    uptimeSeconds: Math.round(process.uptime())
+  });
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: /sitemap.xml\n');
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const settings = getSettings();
+  const base = settings.domain.startsWith('http') ? settings.domain : `https://${settings.domain}`;
+  const rooms = db.prepare('SELECT slug FROM rooms WHERE active = 1').all();
+
+  res.type('application/xml').send(buildSitemapXml(base, rooms));
+});
 
 app.get('/api/public/bootstrap', async (req, res) => {
   try {
@@ -172,9 +306,9 @@ app.get('/api/public/bootstrap', async (req, res) => {
 
 app.get('/api/public/quote', async (req, res) => {
   const roomId = Number(req.query.roomId);
-  const checkIn = req.query.checkIn;
-  const checkOut = req.query.checkOut;
-  const currency = (req.query.currency || 'USD').toUpperCase();
+  const checkIn = String(req.query.checkIn || '').trim();
+  const checkOut = String(req.query.checkOut || '').trim();
+  const currency = normalizeCurrency(req.query.currency);
 
   if (!roomId || !checkIn || !checkOut) {
     return res.status(400).json({ error: 'roomId, checkIn, and checkOut are required.' });
@@ -185,20 +319,20 @@ app.get('/api/public/quote', async (req, res) => {
     return res.status(404).json({ error: 'Room not found.' });
   }
 
-  const nights = nightsBetween(checkIn, checkOut);
-  if (nights <= 0) {
-    return res.status(400).json({ error: 'Check-out must be after check-in.' });
+  const dateCheck = validateDateRange(checkIn, checkOut);
+  if (!dateCheck.ok) {
+    return res.status(400).json({ error: dateCheck.error });
   }
 
   if (!isRoomAvailable(roomId, checkIn, checkOut)) {
     return res.status(409).json({ error: 'Selected dates are not available.' });
   }
 
-  const totalUsd = Number((nights * room.price_per_night_usd).toFixed(2));
+  const totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
   const converted = await convertFromUSD(totalUsd, currency);
 
   return res.json({
-    nights,
+    nights: dateCheck.nights,
     roomName: room.name,
     pricePerNightUsd: room.price_per_night_usd,
     totalUsd,
@@ -208,46 +342,49 @@ app.get('/api/public/quote', async (req, res) => {
   });
 });
 
-app.post('/api/public/bookings', async (req, res) => {
-  const {
-    roomId,
-    guestName,
-    guestEmail,
-    guestPhone,
-    checkIn,
-    checkOut,
-    guestsCount,
-    note,
-    currencyCode
-  } = req.body;
+app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
+  const roomId = Number(req.body.roomId);
+  const guestName = String(req.body.guestName || '').trim();
+  const guestEmail = String(req.body.guestEmail || '').trim();
+  const guestPhone = String(req.body.guestPhone || '').trim();
+  const checkIn = String(req.body.checkIn || '').trim();
+  const checkOut = String(req.body.checkOut || '').trim();
+  const parsedGuests = Number(req.body.guestsCount || 1);
+  const note = String(req.body.note || '').trim();
+  const currencyCode = normalizeCurrency(req.body.currencyCode || 'USD');
 
-  const parsedRoomId = Number(roomId);
-  const parsedGuests = Number(guestsCount || 1);
-
-  if (!parsedRoomId || !guestName || !guestEmail || !guestPhone || !checkIn || !checkOut || !parsedGuests) {
+  if (!roomId || !guestName || !guestEmail || !guestPhone || !checkIn || !checkOut || !parsedGuests) {
     return res.status(400).json({ error: 'Please complete all required fields.' });
   }
 
-  const room = db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(parsedRoomId);
+  if (!isLikelyEmail(guestEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid guest email.' });
+  }
+
+  if (guestName.length < 2 || guestPhone.length < 6) {
+    return res.status(400).json({ error: 'Guest name or phone seems invalid.' });
+  }
+
+  const room = db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(roomId);
   if (!room) {
     return res.status(404).json({ error: 'Room not found.' });
   }
 
-  if (parsedGuests > room.max_guests) {
+  if (parsedGuests > room.max_guests || parsedGuests < 1) {
     return res.status(400).json({ error: `Maximum guests for ${room.name} is ${room.max_guests}.` });
   }
 
-  const nights = nightsBetween(checkIn, checkOut);
-  if (nights <= 0) {
-    return res.status(400).json({ error: 'Check-out must be after check-in.' });
+  const dateCheck = validateDateRange(checkIn, checkOut);
+  if (!dateCheck.ok) {
+    return res.status(400).json({ error: dateCheck.error });
   }
 
-  if (!isRoomAvailable(parsedRoomId, checkIn, checkOut)) {
+  if (!isRoomAvailable(roomId, checkIn, checkOut)) {
     return res.status(409).json({ error: 'These dates are already booked. Please choose different dates.' });
   }
 
-  const totalUsd = Number((nights * room.price_per_night_usd).toFixed(2));
-  const converted = await convertFromUSD(totalUsd, currencyCode || 'USD');
+  const totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
+  const converted = await convertFromUSD(totalUsd, currencyCode);
   const code = bookingCode();
 
   db.prepare(
@@ -262,15 +399,15 @@ app.post('/api/public/bookings', async (req, res) => {
     )`
   ).run({
     booking_code: code,
-    room_id: parsedRoomId,
+    room_id: roomId,
     guest_name: guestName,
     guest_email: guestEmail,
     guest_phone: guestPhone,
     check_in: checkIn,
     check_out: checkOut,
-    nights,
+    nights: dateCheck.nights,
     guests_count: parsedGuests,
-    note: note || '',
+    note,
     price_per_night_usd: room.price_per_night_usd,
     total_usd: totalUsd,
     currency_code: converted.currency,
@@ -293,7 +430,7 @@ app.get('/api/public/bookings/:code', (req, res) => {
        JOIN rooms r ON r.id = b.room_id
        WHERE b.booking_code = ?`
     )
-    .get(req.params.code.toUpperCase());
+    .get(String(req.params.code || '').toUpperCase());
 
   if (!booking) {
     return res.status(404).json({ error: 'Booking not found.' });
@@ -313,7 +450,7 @@ app.get('/api/public/rooms/:roomId/unavailable', (req, res) => {
 
 app.get('/api/public/exchange', async (req, res) => {
   try {
-    const target = (req.query.currency || 'USD').toUpperCase();
+    const target = normalizeCurrency(req.query.currency || 'USD');
     const converted = await convertFromUSD(1, target);
     return res.json({ currency: target, usdRate: converted.rate });
   } catch (error) {
@@ -329,7 +466,7 @@ app.get('/receipt/:code', (req, res) => {
        JOIN rooms r ON r.id = b.room_id
        WHERE b.booking_code = ?`
     )
-    .get(req.params.code.toUpperCase());
+    .get(String(req.params.code || '').toUpperCase());
 
   if (!booking) {
     return res.status(404).send('Receipt not found.');
@@ -389,8 +526,10 @@ app.get('/receipt/:code', (req, res) => {
   `);
 });
 
-app.post('/api/admin/login', (req, res) => {
-  const { email, password } = req.body;
+app.post('/api/admin/login', adminLoginLimiter, (req, res) => {
+  const email = String(req.body.email || '').trim();
+  const password = String(req.body.password || '').trim();
+
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
@@ -449,7 +588,19 @@ app.get('/api/admin/bookings', requireAdmin, (req, res) => {
 
 app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
   const bookingId = Number(req.params.id);
-  const { bookingStatus, paymentStatus } = req.body;
+  const bookingStatus = req.body.bookingStatus;
+  const paymentStatus = req.body.paymentStatus;
+
+  const allowedBookingStatuses = ['pending', 'confirmed', 'cancelled'];
+  const allowedPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+
+  if (bookingStatus && !allowedBookingStatuses.includes(bookingStatus)) {
+    return res.status(400).json({ error: 'Invalid booking status.' });
+  }
+
+  if (paymentStatus && !allowedPaymentStatuses.includes(paymentStatus)) {
+    return res.status(400).json({ error: 'Invalid payment status.' });
+  }
 
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(bookingId);
   if (!booking) {
@@ -457,7 +608,7 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
   }
 
   if (bookingStatus === 'confirmed') {
-    const free = isRoomAvailable(booking.room_id, booking.check_in, booking.check_out);
+    const free = isRoomAvailable(booking.room_id, booking.check_in, booking.check_out, bookingId);
     if (!free) {
       return res.status(409).json({ error: 'Cannot confirm. The room has overlapping confirmed dates.' });
     }
@@ -479,20 +630,22 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
 });
 
 app.post('/api/admin/rooms', requireAdmin, (req, res) => {
-  const {
-    name,
-    shortDescription,
-    longDescription,
-    pricePerNightUsd,
-    maxGuests,
-    sizeLabel,
-    featured,
-    active,
-    amenities
-  } = req.body;
+  const name = String(req.body.name || '').trim();
+  const shortDescription = String(req.body.shortDescription || '').trim();
+  const longDescription = String(req.body.longDescription || '').trim();
+  const pricePerNightUsd = Number(req.body.pricePerNightUsd);
+  const maxGuests = Number(req.body.maxGuests);
+  const sizeLabel = String(req.body.sizeLabel || '').trim();
+  const featured = req.body.featured === true;
+  const active = req.body.active !== false;
+  const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : [];
 
   if (!name || !shortDescription || !longDescription || !pricePerNightUsd || !maxGuests || !sizeLabel) {
     return res.status(400).json({ error: 'Please fill all required room fields.' });
+  }
+
+  if (pricePerNightUsd <= 0 || maxGuests < 1) {
+    return res.status(400).json({ error: 'Price and max guests must be valid positive values.' });
   }
 
   const slugBase = slugify(name);
@@ -503,8 +656,6 @@ app.post('/api/admin/rooms', requireAdmin, (req, res) => {
     i += 1;
     slug = `${slugBase}-${i}`;
   }
-
-  const parsedAmenities = Array.isArray(amenities) ? amenities : [];
 
   const result = db
     .prepare(
@@ -521,12 +672,12 @@ app.post('/api/admin/rooms', requireAdmin, (req, res) => {
       slug,
       short_description: shortDescription,
       long_description: longDescription,
-      price_per_night_usd: Number(pricePerNightUsd),
-      max_guests: Number(maxGuests),
+      price_per_night_usd: pricePerNightUsd,
+      max_guests: maxGuests,
       size_label: sizeLabel,
       featured: featured ? 1 : 0,
-      active: active === false ? 0 : 1,
-      amenities_json: JSON.stringify(parsedAmenities)
+      active: active ? 1 : 0,
+      amenities_json: JSON.stringify(amenities)
     });
 
   return res.status(201).json({ id: result.lastInsertRowid, slug });
@@ -539,18 +690,20 @@ app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
     return res.status(404).json({ error: 'Room not found.' });
   }
 
-  const {
-    name,
-    shortDescription,
-    longDescription,
-    pricePerNightUsd,
-    maxGuests,
-    sizeLabel,
-    featured,
-    active,
-    amenities,
-    coverImage
-  } = req.body;
+  const name = String(req.body.name || room.name).trim();
+  const shortDescription = String(req.body.shortDescription || room.short_description).trim();
+  const longDescription = String(req.body.longDescription || room.long_description).trim();
+  const parsedPrice = req.body.pricePerNightUsd !== undefined ? Number(req.body.pricePerNightUsd) : Number(room.price_per_night_usd);
+  const parsedMaxGuests = req.body.maxGuests !== undefined ? Number(req.body.maxGuests) : Number(room.max_guests);
+  const sizeLabel = String(req.body.sizeLabel || room.size_label).trim();
+  const featured = typeof req.body.featured === 'boolean' ? (req.body.featured ? 1 : 0) : room.featured;
+  const active = typeof req.body.active === 'boolean' ? (req.body.active ? 1 : 0) : room.active;
+  const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : JSON.parse(room.amenities_json || '[]');
+  const coverImage = req.body.coverImage === undefined ? room.cover_image || '' : String(req.body.coverImage || '').trim();
+
+  if (parsedPrice <= 0 || parsedMaxGuests < 1) {
+    return res.status(400).json({ error: 'Price and max guests must be valid positive values.' });
+  }
 
   db.prepare(
     `UPDATE rooms
@@ -568,19 +721,37 @@ app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
      WHERE id = @id`
   ).run({
     id: roomId,
-    name: name || room.name,
-    short_description: shortDescription || room.short_description,
-    long_description: longDescription || room.long_description,
-    price_per_night_usd: Number(pricePerNightUsd || room.price_per_night_usd),
-    max_guests: Number(maxGuests || room.max_guests),
-    size_label: sizeLabel || room.size_label,
-    featured: featured ? 1 : 0,
-    active: active === false ? 0 : 1,
-    amenities_json: JSON.stringify(Array.isArray(amenities) ? amenities : JSON.parse(room.amenities_json || '[]')),
-    cover_image: coverImage || room.cover_image || ''
+    name,
+    short_description: shortDescription,
+    long_description: longDescription,
+    price_per_night_usd: parsedPrice,
+    max_guests: parsedMaxGuests,
+    size_label: sizeLabel,
+    featured,
+    active,
+    amenities_json: JSON.stringify(amenities),
+    cover_image: coverImage
   });
 
   return res.json({ ok: true });
+});
+
+app.put('/api/admin/rooms/:roomId/cover', requireAdmin, (req, res) => {
+  const roomId = Number(req.params.roomId);
+  const imageId = Number(req.body.imageId);
+
+  if (!roomId || !imageId) {
+    return res.status(400).json({ error: 'roomId and imageId are required.' });
+  }
+
+  const image = db.prepare('SELECT * FROM room_images WHERE id = ? AND room_id = ?').get(imageId, roomId);
+  if (!image) {
+    return res.status(404).json({ error: 'Image not found in this room.' });
+  }
+
+  db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(image.image_url, roomId);
+
+  return res.json({ ok: true, coverImage: image.image_url });
 });
 
 app.delete('/api/admin/rooms/:id', requireAdmin, (req, res) => {
@@ -590,6 +761,9 @@ app.delete('/api/admin/rooms/:id', requireAdmin, (req, res) => {
   if (hasBookings > 0) {
     return res.status(400).json({ error: 'Room has bookings. Set it as inactive instead of deleting.' });
   }
+
+  const images = db.prepare('SELECT image_url FROM room_images WHERE room_id = ?').all(roomId);
+  images.forEach((row) => removeUploadByUrl(row.image_url));
 
   db.prepare('DELETE FROM room_images WHERE room_id = ?').run(roomId);
   db.prepare('DELETE FROM rooms WHERE id = ?').run(roomId);
@@ -601,7 +775,7 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
   const roomId = Number(req.params.id);
   const room = db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId);
   if (!room) {
-    if (req.file?.path) fs.rmSync(req.file.path, { force: true });
+    removeFileIfExists(req.file?.path);
     return res.status(404).json({ error: 'Room not found.' });
   }
 
@@ -623,17 +797,17 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
         `INSERT INTO room_images (room_id, image_url, caption, sort_order)
          VALUES (?, ?, ?, ?)`
       )
-      .run(roomId, imageUrl, req.body.caption || '', Number(req.body.sortOrder || 0));
+      .run(roomId, imageUrl, String(req.body.caption || '').trim(), Number(req.body.sortOrder || 0));
 
     if (!room.cover_image) {
       db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(imageUrl, roomId);
     }
 
-    fs.rmSync(req.file.path, { force: true });
+    removeFileIfExists(req.file.path);
 
     return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
   } catch (error) {
-    if (req.file?.path) fs.rmSync(req.file.path, { force: true });
+    removeFileIfExists(req.file?.path);
     return res.status(500).json({ error: 'Image upload failed.' });
   }
 });
@@ -646,10 +820,12 @@ app.delete('/api/admin/images/:id', requireAdmin, (req, res) => {
   }
 
   db.prepare('DELETE FROM room_images WHERE id = ?').run(imageId);
+  removeUploadByUrl(image.image_url);
 
-  const filePath = path.join(publicDir, image.image_url.replace(/^\//, ''));
-  if (fs.existsSync(filePath)) {
-    fs.rmSync(filePath, { force: true });
+  const room = db.prepare('SELECT id, cover_image FROM rooms WHERE id = ?').get(image.room_id);
+  if (room && room.cover_image === image.image_url) {
+    const fallback = db.prepare('SELECT image_url FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id DESC LIMIT 1').get(image.room_id);
+    db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(fallback?.image_url || '', image.room_id);
   }
 
   return res.json({ ok: true });
@@ -670,31 +846,38 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
     const imageUrl = `/uploads/site/${filename}`;
     db.prepare('UPDATE site_settings SET hero_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(imageUrl);
 
-    fs.rmSync(req.file.path, { force: true });
+    removeFileIfExists(req.file.path);
+    removeUploadByUrl(settings.hero_image);
 
     return res.json({ imageUrl });
   } catch (error) {
-    if (req.file?.path) fs.rmSync(req.file.path, { force: true });
+    removeFileIfExists(req.file?.path);
     return res.status(500).json({ error: 'Hero image upload failed.' });
   }
 });
 
 app.put('/api/admin/settings', requireAdmin, (req, res) => {
-  const {
-    siteName,
-    domain,
-    headline,
-    subheadline,
-    aboutText,
-    address,
-    mapLink,
-    contactPhone,
-    contactEmail,
-    checkInTime,
-    checkOutTime,
-    baseCurrency,
-    logoText
-  } = req.body;
+  const siteName = String(req.body.siteName || '').trim();
+  const domain = String(req.body.domain || '').trim();
+  const headline = String(req.body.headline || '').trim();
+  const subheadline = String(req.body.subheadline || '').trim();
+  const aboutText = String(req.body.aboutText || '').trim();
+  const address = String(req.body.address || '').trim();
+  const mapLink = String(req.body.mapLink || '').trim();
+  const contactPhone = String(req.body.contactPhone || '').trim();
+  const contactEmail = String(req.body.contactEmail || '').trim();
+  const checkInTime = String(req.body.checkInTime || '').trim();
+  const checkOutTime = String(req.body.checkOutTime || '').trim();
+  const baseCurrency = normalizeCurrency(req.body.baseCurrency || 'USD');
+  const logoText = String(req.body.logoText || '').trim();
+
+  if (!siteName || !domain || !headline || !aboutText || !address || !contactPhone || !contactEmail || !logoText) {
+    return res.status(400).json({ error: 'Please complete all required site settings.' });
+  }
+
+  if (!isLikelyEmail(contactEmail)) {
+    return res.status(400).json({ error: 'Please provide a valid contact email.' });
+  }
 
   db.prepare(
     `UPDATE site_settings
@@ -725,7 +908,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
     contact_email: contactEmail,
     check_in_time: checkInTime,
     check_out_time: checkOutTime,
-    base_currency: (baseCurrency || 'USD').toUpperCase(),
+    base_currency: baseCurrency,
     logo_text: logoText
   });
 
@@ -740,8 +923,11 @@ app.put('/api/admin/platform-links', requireAdmin, (req, res) => {
 
     const insert = db.prepare('INSERT INTO platform_links (platform_name, url, icon, sort_order) VALUES (?, ?, ?, ?)');
     links.forEach((link, index) => {
-      if (link.platformName && link.url) {
-        insert.run(link.platformName, link.url, link.icon || 'link', Number(link.sortOrder ?? index + 1));
+      const platformName = String(link.platformName || '').trim();
+      const url = String(link.url || '').trim();
+      const icon = String(link.icon || 'link').trim();
+      if (platformName && /^https?:\/\//.test(url)) {
+        insert.run(platformName, url, icon, Number(link.sortOrder ?? index + 1));
       }
     });
   });
@@ -756,6 +942,19 @@ app.get('/admin', (req, res) => {
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+app.use((error, req, res, next) => {
+  if (req.file?.path) {
+    removeFileIfExists(req.file.path);
+  }
+
+  if (error?.message === 'Only image files are allowed.') {
+    return res.status(400).json({ error: error.message });
+  }
+
+  console.error(error);
+  return res.status(500).json({ error: 'Unexpected server error.' });
 });
 
 app.listen(port, () => {

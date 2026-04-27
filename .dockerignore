@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.env
+data/*.db
+data/*.db-*
+public/uploads/rooms/*
+public/uploads/site/*
+!public/uploads/rooms/.gitkeep
+!public/uploads/site/.gitkeep
+tmp-uploads
+.git
+.gitignore
+.DS_Store

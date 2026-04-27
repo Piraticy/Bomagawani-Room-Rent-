@@ -3,7 +3,8 @@ const state = {
   rooms: [],
   links: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
-  currentQuote: null
+  currentQuote: null,
+  deferredInstallPrompt: null
 };
 
 const dom = {
@@ -36,7 +37,9 @@ const dom = {
   trackingResult: document.getElementById('tracking-result'),
   statRooms: document.getElementById('stat-rooms'),
   statLocation: document.getElementById('stat-location'),
-  useLocation: document.getElementById('use-location')
+  useLocation: document.getElementById('use-location'),
+  installApp: document.getElementById('install-app'),
+  structuredData: document.getElementById('seo-structured-data')
 };
 
 const amenityIconMap = {
@@ -59,18 +62,17 @@ function normalizeDate(dateString) {
   return dateString ? new Date(`${dateString}T00:00:00`) : null;
 }
 
+function refreshIcons() {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
 function isDateRangeAvailable(roomId, checkIn, checkOut) {
   const room = state.rooms.find((r) => r.id === Number(roomId));
   if (!room || !checkIn || !checkOut) return true;
 
-  const start = checkIn;
-  const end = checkOut;
-
-  const hasConflict = (room.unavailable || []).some((range) => {
-    return !(end <= range.check_in || start >= range.check_out);
-  });
-
-  return !hasConflict;
+  return !(room.unavailable || []).some((range) => !(checkOut <= range.check_in || checkIn >= range.check_out));
 }
 
 function formatAmount(value, currency) {
@@ -90,11 +92,13 @@ function renderLinks() {
   dom.channelList.innerHTML = '';
 
   state.links.forEach((link) => {
+    const icon = link.icon || 'external-link';
+
     const top = document.createElement('a');
     top.href = link.url;
     top.target = '_blank';
     top.rel = 'noreferrer';
-    top.textContent = link.platform_name;
+    top.innerHTML = `<i data-lucide="${icon}"></i> ${link.platform_name}`;
     dom.platformLinks.appendChild(top);
 
     const channel = document.createElement('a');
@@ -102,9 +106,11 @@ function renderLinks() {
     channel.className = 'channel-item';
     channel.target = '_blank';
     channel.rel = 'noreferrer';
-    channel.innerHTML = `<span>${link.platform_name}</span><i data-lucide="external-link"></i>`;
+    channel.innerHTML = `<span><i data-lucide="${icon}"></i> ${link.platform_name}</span><i data-lucide="external-link"></i>`;
     dom.channelList.appendChild(channel);
   });
+
+  refreshIcons();
 }
 
 function renderRooms() {
@@ -115,6 +121,7 @@ function renderRooms() {
     const imageUrl = room.cover_image || room.images?.[0]?.image_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
     const card = document.createElement('article');
     card.className = 'room-card';
+    card.id = `room-${room.slug}`;
 
     const badges = [
       `<span class="badge">${room.size_label}</span>`,
@@ -125,8 +132,13 @@ function renderRooms() {
       badges.unshift('<span class="badge">Featured</span>');
     }
 
+    const unavailableCount = room.unavailable?.length || 0;
+    if (unavailableCount > 0) {
+      badges.push(`<span class="badge">${unavailableCount} date range(s) booked</span>`);
+    }
+
     card.innerHTML = `
-      <img class="room-image" src="${imageUrl}" alt="${room.name}" />
+      <img class="room-image" src="${imageUrl}" alt="${room.name}" loading="lazy" />
       <div class="room-content">
         <div class="room-top">
           <h3>${room.name}</h3>
@@ -173,6 +185,8 @@ function renderAmenities() {
     item.innerHTML = `<i data-lucide="${iconName}"></i><span>${amenity.label}</span>`;
     dom.amenityWall.appendChild(item);
   });
+
+  refreshIcons();
 }
 
 function renderCurrencies() {
@@ -202,11 +216,46 @@ function applySettings() {
   dom.locationLine.textContent = settings.address;
   dom.statRooms.textContent = `${state.rooms.length} Rooms`;
   dom.statLocation.textContent = settings.address.split(',')[0] || settings.address;
+  document.title = `${settings.domain} | Coastal Room Booking`;
 
   const hero = document.getElementById('hero');
   if (settings.hero_image) {
     hero.style.background = `linear-gradient(120deg, rgba(9, 23, 38, 0.75), rgba(18, 91, 102, 0.62)), url('${settings.hero_image}') center/cover no-repeat`;
   }
+}
+
+function updateStructuredData() {
+  const domain = state.settings.domain.startsWith('http') ? state.settings.domain : `https://${state.settings.domain}`;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'LodgingBusiness',
+    name: state.settings.site_name,
+    url: domain,
+    telephone: state.settings.contact_phone,
+    email: state.settings.contact_email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: state.settings.address
+    },
+    amenityFeature: [...new Set(state.rooms.flatMap((room) => (room.amenities || []).map((item) => item.label)))].map((name) => ({
+      '@type': 'LocationFeatureSpecification',
+      name,
+      value: true
+    })),
+    sameAs: state.links.map((link) => link.url),
+    makesOffer: state.rooms.map((room) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Room',
+        name: room.name,
+        description: room.short_description
+      },
+      priceCurrency: 'USD',
+      price: room.price_per_night_usd
+    }))
+  };
+
+  dom.structuredData.textContent = JSON.stringify(schema);
 }
 
 async function requestQuote() {
@@ -291,6 +340,8 @@ async function submitBooking(event) {
     dom.bookingForm.reset();
     state.currentQuote = null;
     dom.quoteBox.textContent = 'Enter dates to see your live quote.';
+
+    await boot();
   } catch (error) {
     dom.bookingStatus.textContent = 'Booking service is currently unavailable.';
   }
@@ -369,6 +420,35 @@ function configureLocationRoute() {
   });
 }
 
+function configureInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    state.deferredInstallPrompt = event;
+    dom.installApp.hidden = false;
+  });
+
+  dom.installApp.addEventListener('click', async () => {
+    if (!state.deferredInstallPrompt) return;
+
+    state.deferredInstallPrompt.prompt();
+    await state.deferredInstallPrompt.userChoice;
+    state.deferredInstallPrompt = null;
+    dom.installApp.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    dom.installApp.hidden = true;
+  });
+}
+
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // ignore service worker registration errors
+    });
+  }
+}
+
 async function boot() {
   try {
     const response = await fetch('/api/public/bootstrap');
@@ -384,18 +464,20 @@ async function boot() {
     renderRooms();
     renderAmenities();
     renderCurrencies();
-    configureDateInputs();
-    configureLocationRoute();
+    updateStructuredData();
 
-    dom.bookingForm.addEventListener('submit', submitBooking);
-    dom.trackingForm.addEventListener('submit', trackBooking);
-
-    if (window.lucide) {
-      window.lucide.createIcons();
-    }
+    refreshIcons();
   } catch (error) {
     dom.quoteBox.textContent = 'Failed to load booking data. Refresh this page.';
   }
 }
+
+configureDateInputs();
+configureLocationRoute();
+configureInstallPrompt();
+registerServiceWorker();
+
+dom.bookingForm.addEventListener('submit', submitBooking);
+dom.trackingForm.addEventListener('submit', trackBooking);
 
 boot();

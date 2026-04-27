@@ -52,6 +52,7 @@ const dom = {
   roomImageFile: document.getElementById('room-image-file'),
   roomImageCaption: document.getElementById('room-image-caption'),
   roomImageStatus: document.getElementById('room-image-status'),
+  roomGallery: document.getElementById('room-gallery'),
 
   linksFormWrap: document.getElementById('links-form-wrap'),
   addLinkRow: document.getElementById('add-link-row'),
@@ -138,7 +139,7 @@ function renderRooms() {
       </div>
       <div>
         <button class="small-btn" data-edit-room="${room.id}">Edit</button>
-        <button class="small-btn" data-remove-room="${room.id}">Delete</button>
+        <button class="small-btn warn" data-remove-room="${room.id}">Delete</button>
       </div>
     `;
     dom.roomsAdminList.appendChild(wrapper);
@@ -158,6 +159,60 @@ function renderRooms() {
   });
 }
 
+function renderRoomGallery() {
+  dom.roomGallery.innerHTML = '';
+
+  if (!state.rooms.length) {
+    dom.roomGallery.innerHTML = '<p>No rooms yet.</p>';
+    return;
+  }
+
+  state.rooms.forEach((room) => {
+    const section = document.createElement('section');
+    section.className = 'gallery-room';
+
+    if (!room.images?.length) {
+      section.innerHTML = `<h4>${room.name}</h4><p>No photos uploaded yet.</p>`;
+      dom.roomGallery.appendChild(section);
+      return;
+    }
+
+    const cards = room.images
+      .map((image) => {
+        const isCover = room.cover_image === image.image_url;
+        return `
+          <article class="gallery-item">
+            <img src="${image.image_url}" alt="${room.name}" loading="lazy" />
+            <div class="gallery-meta">
+              <small>${image.caption || 'No caption'}</small>
+              <small>${isCover ? 'Cover image' : 'Gallery image'}</small>
+              <div>
+                <button class="small-btn" data-cover-room="${room.id}" data-cover-image="${image.id}">Set as cover</button>
+                <button class="small-btn warn" data-delete-image="${image.id}">Delete</button>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+
+    section.innerHTML = `<h4>${room.name}</h4><div class="gallery-grid">${cards}</div>`;
+    dom.roomGallery.appendChild(section);
+  });
+
+  dom.roomGallery.querySelectorAll('[data-cover-image]').forEach((button) => {
+    button.addEventListener('click', () => {
+      setCoverImage(Number(button.dataset.coverRoom), Number(button.dataset.coverImage));
+    });
+  });
+
+  dom.roomGallery.querySelectorAll('[data-delete-image]').forEach((button) => {
+    button.addEventListener('click', () => {
+      deleteRoomImage(Number(button.dataset.deleteImage));
+    });
+  });
+}
+
 function addLinkRow(data = { platform_name: '', url: '', icon: 'link', sort_order: 0 }) {
   const row = document.createElement('div');
   row.className = 'link-row';
@@ -165,7 +220,7 @@ function addLinkRow(data = { platform_name: '', url: '', icon: 'link', sort_orde
     <input placeholder="Platform name" value="${data.platform_name || ''}" data-link="name" />
     <input placeholder="URL" value="${data.url || ''}" data-link="url" />
     <input placeholder="Icon name" value="${data.icon || 'link'}" data-link="icon" />
-    <button type="button" class="small-btn" data-link-remove>Remove</button>
+    <button type="button" class="small-btn warn" data-link-remove>Remove</button>
   `;
 
   row.querySelector('[data-link-remove]').addEventListener('click', () => row.remove());
@@ -195,7 +250,7 @@ function renderBookings() {
         <td>${booking.booking_status}<br/><small>${booking.payment_status}</small></td>
         <td>
           <button class="small-btn" data-status="confirm" data-booking-id="${booking.id}">Confirm</button>
-          <button class="small-btn" data-status="cancel" data-booking-id="${booking.id}">Cancel</button>
+          <button class="small-btn warn" data-status="cancel" data-booking-id="${booking.id}">Cancel</button>
           <button class="small-btn" data-status="paid" data-booking-id="${booking.id}">Mark Paid</button>
         </td>
       </tr>
@@ -264,6 +319,34 @@ async function removeRoom(roomId) {
   }
 }
 
+async function setCoverImage(roomId, imageId) {
+  try {
+    await api(`/api/admin/rooms/${roomId}/cover`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageId })
+    });
+
+    await loadDashboard();
+    setStatus(dom.roomImageStatus, 'Cover image updated.');
+  } catch (error) {
+    setStatus(dom.roomImageStatus, error.message, false);
+  }
+}
+
+async function deleteRoomImage(imageId) {
+  const yes = window.confirm('Remove this photo permanently?');
+  if (!yes) return;
+
+  try {
+    await api(`/api/admin/images/${imageId}`, { method: 'DELETE' });
+    await loadDashboard();
+    setStatus(dom.roomImageStatus, 'Photo removed.');
+  } catch (error) {
+    setStatus(dom.roomImageStatus, error.message, false);
+  }
+}
+
 async function updateBookingStatus(bookingId, action) {
   let payload = {};
   if (action === 'confirm') payload = { bookingStatus: 'confirmed' };
@@ -293,6 +376,7 @@ async function loadDashboard() {
   renderSummary(data.summary);
   populateSettings(data.settings);
   renderRooms();
+  renderRoomGallery();
   renderLinks();
   renderBookings();
 }
@@ -502,7 +586,3 @@ dom.saveLinks.addEventListener('click', async () => {
 });
 
 checkSessionAndInit();
-
-if (window.lucide) {
-  window.lucide.createIcons();
-}

@@ -1,57 +1,98 @@
 # Bomagawani House Rent Platform
 
-A complete booking platform for **Bomagawani.com** with:
+Complete booking platform for **Bomagawani.com** with production-ready backend, frontend, and deployment files.
+
+## What Is Included
 
 - Professional mobile-friendly landing page
-- Direct booking flow with booking code + receipt page
-- Currency conversion (live rates with local fallback cache)
-- Location route support (guest can use current location for map direction)
-- Channel links (Booking.com, Tripadvisor, Google Travel, Book Direct)
-- Admin portal to manage everything without code edits
-- Room photo uploads with automatic **Bomagawani.com** watermark/logo caption
-- Booking confirmation controls (confirmed dates become unavailable)
-- Room, amenities, pricing, details, and hero content management
+- Direct booking with live availability checks
+- Currency conversion for quote and booking totals
+- Booking status tracking with booking code
+- Printable receipt page per booking
+- Installable web app support (PWA)
+- SEO support (`sitemap.xml`, `robots.txt`, structured data)
+- Admin dashboard for no-code updates:
+  - Site details and content
+  - Room details, pricing, amenities, active/inactive
+  - Photo upload with automatic logo watermark
+  - Set room cover image and remove old photos
+  - Travel platform links (Booking.com, Tripadvisor, etc.)
+  - Booking confirmation/cancel/payment status updates
+- Confirmed booking dates are blocked instantly for new bookings
+- Security hardening:
+  - Helmet headers
+  - Rate limiting
+  - Session protection
+  - Upload validation
 
 ## Default Admin Login
 
 - Email: `admin@bomagawani.com`
 - Password: `Admin@12345`
 
-Change these values in `.env` before production.
+Change these in `.env` before production.
 
-## Quick Start
+## Local Run
 
 ```bash
 npm install
+cp .env.example .env
 npm start
 ```
 
 Open:
 
 - Public site: `http://localhost:3000`
-- Admin portal: `http://localhost:3000/admin`
+- Admin: `http://localhost:3000/admin`
+
+## Deployment Ready Files
+
+- `Dockerfile`
+- `docker-compose.yml`
+- `nginx/default.conf`
+- `ecosystem.config.cjs` (PM2 option)
+- `.github/workflows/ci.yml` (automatic checks)
+
+## Deploy With Docker
+
+```bash
+cp .env.example .env
+# update secrets in .env
+
+docker compose up -d --build
+```
+
+This starts:
+
+- `app` (Node.js booking platform)
+- `nginx` (reverse proxy on port 80)
 
 ## Environment Variables
 
-Create `.env` in the project root:
-
 ```env
+NODE_ENV=development
 PORT=3000
+TRUST_PROXY=0
 SESSION_SECRET=replace-with-long-random-secret
 ADMIN_EMAIL=admin@bomagawani.com
 ADMIN_PASSWORD=Admin@12345
 ```
 
-## Main Business Flow
+## Quick Health Check
 
-1. Guest visits landing page and checks room options.
-2. Guest selects room + dates + currency and submits booking request.
-3. Admin reviews booking in dashboard and confirms/cancels.
-4. Once confirmed, selected dates are blocked instantly for that room.
-5. Guest can track booking using booking code and open receipt page.
+- `GET /healthz`
+- `GET /api/public/bootstrap`
 
-## Notes for Production Rollout
+## Business Flow
 
-- Domain target is set as `Bomagawani.com` in site settings.
-- Online payment can be integrated in next phase (Stripe/Flutterwave/PayPal).
-- External booking channel APIs (Booking.com/Tripadvisor sync) require official partner credentials and can be connected as a follow-up integration.
+1. Guest opens landing page and chooses room + dates + currency.
+2. Guest sends booking request and receives booking code + receipt link.
+3. Admin reviews request and confirms/cancels from dashboard.
+4. Confirmed dates are no longer selectable for that room.
+5. Guest can track booking by booking code.
+
+## Next Phase (When You Are Ready)
+
+- Online payment gateway integration
+- Official API integration with Booking.com / Tripadvisor partner systems
+- Email and WhatsApp automated notifications
