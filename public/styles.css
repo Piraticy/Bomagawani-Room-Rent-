@@ -477,9 +477,22 @@ textarea {
   gap: 10px;
 }
 
+.contact-grid {
+  align-items: start;
+}
+
+.contact-grid .contact-phone,
+.contact-grid .contact-email {
+  min-width: 0;
+}
+
+.contact-grid .contact-phone {
+  grid-column: 1 / -1;
+}
+
 .phone-input-wrap {
   display: grid;
-  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+  grid-template-columns: minmax(230px, 340px) minmax(0, 1fr);
   gap: 10px;
   align-items: center;
 }
@@ -488,6 +501,12 @@ textarea {
 .phone-input-wrap input {
   width: 100%;
   min-width: 0;
+}
+
+.phone-help {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 .quote-box {

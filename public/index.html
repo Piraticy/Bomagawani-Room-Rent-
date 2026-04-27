@@ -141,12 +141,12 @@
               <span data-i18n="form.fullName">Full name</span>
               <input type="text" id="guest-name" required />
             </label>
-            <div class="date-grid">
-              <label>
+            <div class="date-grid contact-grid">
+              <label class="contact-email">
                 <span data-i18n="form.email">Email</span>
                 <input type="email" id="guest-email" required />
               </label>
-              <label>
+              <label class="contact-phone">
                 <span data-i18n="form.phone">Phone</span>
                 <div class="phone-input-wrap">
                   <select id="phone-country" aria-label="Country code" required>
@@ -159,10 +159,11 @@
                     pattern="[0-9]+"
                     maxlength="12"
                     minlength="6"
-                    placeholder="700000000"
+                    placeholder="Local number"
                     required
                   />
                 </div>
+                <small class="phone-help">Select country code, then enter local number only.</small>
               </label>
             </div>
             <label>

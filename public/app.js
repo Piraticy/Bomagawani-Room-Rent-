@@ -662,7 +662,8 @@ function updatePhoneInputRules() {
 
   dom.guestPhoneLocal.minLength = minLocalLength;
   dom.guestPhoneLocal.maxLength = maxLocalLength;
-  dom.guestPhoneLocal.placeholder = `${minLocalLength}-${maxLocalLength} digits`;
+  dom.guestPhoneLocal.placeholder = 'Local number';
+  dom.guestPhoneLocal.title = t('status.phoneLengthRange', { min: minLocalLength, max: maxLocalLength });
   dom.guestPhoneLocal.setCustomValidity('');
 }
 
