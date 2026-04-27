@@ -479,8 +479,15 @@ textarea {
 
 .phone-input-wrap {
   display: grid;
-  grid-template-columns: 138px 1fr;
+  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
   gap: 10px;
+  align-items: center;
+}
+
+.phone-input-wrap select,
+.phone-input-wrap input {
+  width: 100%;
+  min-width: 0;
 }
 
 .quote-box {

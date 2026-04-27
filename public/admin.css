@@ -95,6 +95,20 @@ main {
   color: var(--muted);
 }
 
+#login-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+#login-form label {
+  margin-top: 0;
+}
+
+#login-form .primary-btn {
+  margin-top: 4px;
+}
+
 .dashboard {
   display: grid;
   gap: 14px;
