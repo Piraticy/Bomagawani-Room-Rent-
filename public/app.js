@@ -19,6 +19,9 @@ const translations = {
     'form.checkOut': 'Check-out',
     'form.guests': 'Guests',
     'form.currency': 'Currency',
+    'form.paymentOption': 'Payment option',
+    'form.payOnArrival': 'Pay on arrival',
+    'form.payOnlineLater': 'Pay online later',
     'form.fullName': 'Full name',
     'form.email': 'Email',
     'form.phone': 'Phone',
@@ -52,6 +55,9 @@ const translations = {
     'tracking.room': 'Room',
     'tracking.dates': 'Dates',
     'tracking.payment': 'Payment',
+    'tracking.paymentOption': 'Payment option',
+    'payment.pay_on_arrival': 'Pay on arrival',
+    'payment.pay_online': 'Pay online',
     'location.noSupport': 'Geolocation is not supported on this device.',
     'location.reading': 'Reading your location...',
     'location.ready': 'Route link is ready. Tap Open Map.',
@@ -83,6 +89,9 @@ const translations = {
     'form.checkOut': 'Kutoka',
     'form.guests': 'Wageni',
     'form.currency': 'Sarafu',
+    'form.paymentOption': 'Namna ya malipo',
+    'form.payOnArrival': 'Lipa unapofika',
+    'form.payOnlineLater': 'Lipa online baadaye',
     'form.fullName': 'Jina kamili',
     'form.email': 'Barua pepe',
     'form.phone': 'Simu',
@@ -116,6 +125,9 @@ const translations = {
     'tracking.room': 'Chumba',
     'tracking.dates': 'Tarehe',
     'tracking.payment': 'Malipo',
+    'tracking.paymentOption': 'Njia ya malipo',
+    'payment.pay_on_arrival': 'Lipa unapofika',
+    'payment.pay_online': 'Lipa online',
     'location.noSupport': 'Kifaa hiki hakiungi mkono geolocation.',
     'location.reading': 'Inasoma eneo lako...',
     'location.ready': 'Njia ipo tayari. Bonyeza Fungua Ramani.',
@@ -135,11 +147,14 @@ const state = {
   settings: null,
   rooms: [],
   links: [],
+  heroSlides: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
   currentQuote: null,
   deferredInstallPrompt: null,
   language: localStorage.getItem('preferred_language') || 'en',
-  roomSlideIntervals: {}
+  roomSlideIntervals: {},
+  heroInterval: null,
+  heroIndex: 0
 };
 
 if (!SUPPORTED_LANGUAGES.includes(state.language)) {
@@ -147,6 +162,11 @@ if (!SUPPORTED_LANGUAGES.includes(state.language)) {
 }
 
 const dom = {
+  hero: document.getElementById('hero'),
+  heroSlider: document.getElementById('hero-slider'),
+  heroPrev: document.getElementById('hero-prev'),
+  heroNext: document.getElementById('hero-next'),
+  heroDots: document.getElementById('hero-dots'),
   headline: document.getElementById('headline'),
   subheadline: document.getElementById('subheadline'),
   aboutText: document.getElementById('about-text'),
@@ -165,6 +185,7 @@ const dom = {
   checkOut: document.getElementById('check-out'),
   guestsCount: document.getElementById('guests-count'),
   currencySelect: document.getElementById('currency-select'),
+  paymentOption: document.getElementById('payment-option'),
   quoteBox: document.getElementById('quote-box'),
   bookingForm: document.getElementById('booking-form'),
   bookingStatus: document.getElementById('booking-status'),
@@ -208,9 +229,18 @@ function t(key, vars = {}) {
   return phrase.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 }
 
+function refreshIcons() {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
 function languageLabel(code) {
-  if (code === 'sw') return 'Kiswahili';
-  return 'English';
+  return code === 'sw' ? 'Kiswahili' : 'English';
+}
+
+function paymentLabel(code) {
+  return t(`payment.${code || 'pay_on_arrival'}`);
 }
 
 function applyTranslations() {
@@ -231,9 +261,9 @@ function applyTranslations() {
 }
 
 function setLanguage(languageCode) {
-  const next = SUPPORTED_LANGUAGES.includes(languageCode) ? languageCode : 'en';
-  state.language = next;
-  localStorage.setItem('preferred_language', next);
+  const nextLanguage = SUPPORTED_LANGUAGES.includes(languageCode) ? languageCode : 'en';
+  state.language = nextLanguage;
+  localStorage.setItem('preferred_language', nextLanguage);
   applyTranslations();
 
   if (state.currentQuote) {
@@ -243,19 +273,6 @@ function setLanguage(languageCode) {
 
 function normalizeDate(dateString) {
   return dateString ? new Date(`${dateString}T00:00:00`) : null;
-}
-
-function refreshIcons() {
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
-}
-
-function isDateRangeAvailable(roomId, checkIn, checkOut) {
-  const room = state.rooms.find((r) => r.id === Number(roomId));
-  if (!room || !checkIn || !checkOut) return true;
-
-  return !(room.unavailable || []).some((range) => !(checkOut <= range.check_in || checkIn >= range.check_out));
 }
 
 function formatAmount(value, currency) {
@@ -270,6 +287,89 @@ function formatAmount(value, currency) {
   }
 }
 
+function isDateRangeAvailable(roomId, checkIn, checkOut) {
+  const room = state.rooms.find((item) => item.id === Number(roomId));
+  if (!room || !checkIn || !checkOut) return true;
+  return !(room.unavailable || []).some((range) => !(checkOut <= range.check_in || checkIn >= range.check_out));
+}
+
+function setupHeroSlider(images) {
+  const fallback = 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1800&q=80';
+  const unique = [...new Set((images || []).filter(Boolean))];
+  state.heroSlides = unique.length ? unique : [fallback];
+  state.heroIndex = 0;
+
+  dom.heroSlider.innerHTML = state.heroSlides
+    .map(
+      (src, index) => `
+      <div class="hero-slide ${index === 0 ? 'is-active' : ''}">
+        <img src="${src}" alt="Bomagawani hero slide" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" />
+      </div>
+    `
+    )
+    .join('');
+
+  dom.heroDots.innerHTML = state.heroSlides
+    .map(
+      (_, index) => `<button type="button" class="hero-dot ${index === 0 ? 'is-active' : ''}" data-hero-dot="${index}" aria-label="Hero image ${index + 1}"></button>`
+    )
+    .join('');
+
+  dom.heroDots.querySelectorAll('[data-hero-dot]').forEach((button) => {
+    button.addEventListener('click', () => {
+      showHeroSlide(Number(button.dataset.heroDot));
+      restartHeroAutoSlide();
+    });
+  });
+
+  showHeroSlide(0);
+  restartHeroAutoSlide();
+}
+
+function showHeroSlide(index) {
+  if (!state.heroSlides.length) return;
+
+  state.heroIndex = (index + state.heroSlides.length) % state.heroSlides.length;
+
+  dom.heroSlider.querySelectorAll('.hero-slide').forEach((slide, slideIndex) => {
+    slide.classList.toggle('is-active', slideIndex === state.heroIndex);
+  });
+
+  dom.heroDots.querySelectorAll('.hero-dot').forEach((dot, dotIndex) => {
+    dot.classList.toggle('is-active', dotIndex === state.heroIndex);
+  });
+}
+
+function restartHeroAutoSlide() {
+  if (state.heroInterval) {
+    clearInterval(state.heroInterval);
+  }
+
+  if (state.heroSlides.length > 1) {
+    state.heroInterval = setInterval(() => {
+      showHeroSlide(state.heroIndex + 1);
+    }, 5500);
+  }
+}
+
+function configureHeroControls() {
+  dom.heroPrev.addEventListener('click', () => {
+    showHeroSlide(state.heroIndex - 1);
+    restartHeroAutoSlide();
+  });
+
+  dom.heroNext.addEventListener('click', () => {
+    showHeroSlide(state.heroIndex + 1);
+    restartHeroAutoSlide();
+  });
+
+  dom.hero.addEventListener('mouseenter', () => {
+    if (state.heroInterval) clearInterval(state.heroInterval);
+  });
+
+  dom.hero.addEventListener('mouseleave', restartHeroAutoSlide);
+}
+
 function clearRoomSlideIntervals() {
   Object.values(state.roomSlideIntervals).forEach((timerId) => clearInterval(timerId));
   state.roomSlideIntervals = {};
@@ -280,6 +380,7 @@ function initRoomSlides() {
 
   dom.roomsGrid.querySelectorAll('.room-slider').forEach((slider) => {
     const slides = [...slider.querySelectorAll('.room-image')];
+    const dots = [...slider.querySelectorAll('.slide-dot')];
     if (slides.length <= 1) return;
 
     const sliderKey = slider.dataset.sliderKey;
@@ -287,13 +388,13 @@ function initRoomSlides() {
 
     const show = (index) => {
       current = (index + slides.length) % slides.length;
-      slides.forEach((slide, idx) => {
-        slide.classList.toggle('is-active', idx === current);
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('is-active', slideIndex === current);
+      });
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle('is-active', dotIndex === current);
       });
     };
-
-    const nextButton = slider.querySelector('[data-slide="next"]');
-    const prevButton = slider.querySelector('[data-slide="prev"]');
 
     const stopTimer = () => {
       if (state.roomSlideIntervals[sliderKey]) {
@@ -303,22 +404,30 @@ function initRoomSlides() {
 
     const startTimer = () => {
       stopTimer();
-      state.roomSlideIntervals[sliderKey] = setInterval(() => show(current + 1), 4500);
+      state.roomSlideIntervals[sliderKey] = setInterval(() => show(current + 1), 5000);
     };
 
-    nextButton?.addEventListener('click', () => {
+    slider.querySelector('[data-slide="next"]')?.addEventListener('click', () => {
       show(current + 1);
       startTimer();
     });
 
-    prevButton?.addEventListener('click', () => {
+    slider.querySelector('[data-slide="prev"]')?.addEventListener('click', () => {
       show(current - 1);
       startTimer();
+    });
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        show(Number(dot.dataset.slideDot || 0));
+        startTimer();
+      });
     });
 
     slider.addEventListener('mouseenter', stopTimer);
     slider.addEventListener('mouseleave', startTimer);
 
+    show(0);
     startTimer();
   });
 }
@@ -352,13 +461,9 @@ function renderRooms() {
   dom.roomSelect.innerHTML = '';
 
   state.rooms.forEach((room) => {
-    const roomImages = (room.images || []).map((item) => item.image_url).filter(Boolean);
-    const fallback = 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
-    const imageSources = roomImages.length ? roomImages : [room.cover_image || fallback];
-
-    const card = document.createElement('article');
-    card.className = 'room-card';
-    card.id = `room-${room.slug}`;
+    const gallery = (room.images || []).map((image) => image.image_url).filter(Boolean);
+    const fallback = room.cover_image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
+    const imageSources = gallery.length ? gallery : [fallback];
 
     const badges = [`<span class="badge">${room.size_label}</span>`, `<span class="badge">Up to ${room.max_guests} guests</span>`];
 
@@ -371,25 +476,31 @@ function renderRooms() {
       badges.push(`<span class="badge">${unavailableCount} booked range(s)</span>`);
     }
 
-    const slides = imageSources
+    const slidesHtml = imageSources
       .map(
-        (src, index) =>
-          `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${src}" alt="${room.name}" loading="lazy" />`
+        (src, index) => `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${src}" alt="${room.name}" loading="lazy" decoding="async" />`
       )
       .join('');
 
-    const controls =
-      imageSources.length > 1
-        ? `
-      <button class="slide-control prev" type="button" data-slide="prev" aria-label="Previous image">‹</button>
-      <button class="slide-control next" type="button" data-slide="next" aria-label="Next image">›</button>
-    `
-        : '';
+    const controlsHtml = imageSources.length > 1
+      ? `
+        <button class="slide-control prev" type="button" data-slide="prev" aria-label="Previous image">‹</button>
+        <button class="slide-control next" type="button" data-slide="next" aria-label="Next image">›</button>
+        <div class="slide-dots">
+          ${imageSources
+            .map((_, index) => `<button class="slide-dot ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="Room image ${index + 1}"></button>`)
+            .join('')}
+        </div>
+      `
+      : '';
 
+    const card = document.createElement('article');
+    card.className = 'room-card';
+    card.id = `room-${room.slug}`;
     card.innerHTML = `
       <div class="room-slider" data-slider-key="room-${room.id}">
-        ${slides}
-        ${controls}
+        ${slidesHtml}
+        ${controlsHtml}
       </div>
       <div class="room-content">
         <div class="room-top">
@@ -422,18 +533,18 @@ function renderRooms() {
 }
 
 function renderAmenities() {
-  const seen = new Map();
+  const seenAmenities = new Map();
   state.rooms.forEach((room) => {
     (room.amenities || []).forEach((amenity) => {
       const key = `${amenity.icon}:${amenity.label}`;
-      if (!seen.has(key)) {
-        seen.set(key, amenity);
+      if (!seenAmenities.has(key)) {
+        seenAmenities.set(key, amenity);
       }
     });
   });
 
   dom.amenityWall.innerHTML = '';
-  [...seen.values()].forEach((amenity) => {
+  [...seenAmenities.values()].forEach((amenity) => {
     const iconName = amenityIconMap[amenity.icon] || 'sparkles';
     const item = document.createElement('article');
     item.innerHTML = `<i data-lucide="${iconName}"></i><span>${amenity.label}</span>`;
@@ -454,26 +565,28 @@ function renderCurrencies() {
 }
 
 function applySettings() {
-  const settings = state.settings;
-  dom.headline.textContent = settings.headline;
-  dom.subheadline.textContent = settings.subheadline;
-  dom.aboutText.textContent = settings.about_text;
-  dom.footerBrand.textContent = settings.site_name;
-  dom.footerDomain.textContent = `Domain: ${settings.domain}`;
-  dom.locationLine.textContent = settings.address;
-  dom.mapLink.href = settings.map_link;
+  dom.headline.textContent = state.settings.headline;
+  dom.subheadline.textContent = state.settings.subheadline;
+  dom.aboutText.textContent = state.settings.about_text;
+  dom.footerBrand.textContent = state.settings.site_name;
+  dom.footerDomain.textContent = `Domain: ${state.settings.domain}`;
+  dom.locationLine.textContent = state.settings.address;
+  dom.mapLink.href = state.settings.map_link;
 
-  const mapQuery = encodeURIComponent(settings.address || 'Kigombe, Tanga, Tanzania');
+  const mapQuery = encodeURIComponent(state.settings.address || 'Kigombe, Tanga, Tanzania');
   dom.mapEmbed.src = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
 
   dom.statRooms.textContent = `${state.rooms.length} Rooms`;
-  dom.statLocation.textContent = settings.address.split(',')[0] || settings.address;
-  document.title = `${settings.domain} | Coastal Room Booking`;
+  dom.statLocation.textContent = state.settings.address.split(',')[0] || state.settings.address;
+  document.title = `${state.settings.domain} | Coastal Room Booking`;
 
-  const hero = document.getElementById('hero');
-  if (settings.hero_image) {
-    hero.style.background = `linear-gradient(120deg, rgba(9, 23, 38, 0.75), rgba(18, 91, 102, 0.62)), url('${settings.hero_image}') center/cover no-repeat`;
-  }
+  const heroImages = [
+    ...(state.heroSlides || []).map((slide) => slide.image_url),
+    state.settings.hero_image,
+    ...state.rooms.map((room) => room.cover_image)
+  ];
+
+  setupHeroSlider(heroImages.filter(Boolean));
 }
 
 function updateStructuredData() {
@@ -581,7 +694,8 @@ async function submitBooking(event) {
     checkOut: dom.checkOut.value,
     guestsCount: Number(dom.guestsCount.value),
     note: document.getElementById('guest-note').value.trim(),
-    currencyCode: dom.currencySelect.value
+    currencyCode: dom.currencySelect.value,
+    paymentOption: dom.paymentOption.value
   };
 
   try {
@@ -601,6 +715,7 @@ async function submitBooking(event) {
 
     dom.bookingStatus.innerHTML = `${t('status.bookingSuccessPrefix')} <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>.`;
     dom.bookingForm.reset();
+    dom.paymentOption.value = 'pay_on_arrival';
     state.currentQuote = null;
     renderQuote(null);
 
@@ -631,6 +746,7 @@ async function trackBooking(event) {
       <strong>${t('tracking.room')}:</strong> ${result.room_name}<br/>
       <strong>${t('tracking.dates')}:</strong> ${result.check_in} to ${result.check_out}<br/>
       <strong>${t('tracking.payment')}:</strong> ${result.payment_status}<br/>
+      <strong>${t('tracking.paymentOption')}:</strong> ${paymentLabel(result.payment_option)}<br/>
       <a href="/receipt/${result.booking_code}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>
     `;
   } catch (error) {
@@ -684,9 +800,9 @@ function configureLocationRoute() {
 }
 
 function getSuggestedLanguage() {
-  const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
-  if (SUPPORTED_LANGUAGES.includes(browserLang) && browserLang !== state.language) {
-    return browserLang;
+  const browserLanguage = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  if (SUPPORTED_LANGUAGES.includes(browserLanguage) && browserLanguage !== state.language) {
+    return browserLanguage;
   }
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
@@ -704,14 +820,14 @@ function configureLanguagePreference() {
   });
 
   const promptAlreadyShown = localStorage.getItem('language_prompt_seen') === '1';
-  const suggested = getSuggestedLanguage();
+  const suggestedLanguage = getSuggestedLanguage();
 
-  if (!promptAlreadyShown && suggested) {
-    dom.languagePromptText.textContent = t('languagePrompt.body', { language: languageLabel(suggested) });
+  if (!promptAlreadyShown && suggestedLanguage) {
+    dom.languagePromptText.textContent = t('languagePrompt.body', { language: languageLabel(suggestedLanguage) });
     dom.languagePrompt.hidden = false;
 
     dom.languageYes.onclick = () => {
-      setLanguage(suggested);
+      setLanguage(suggestedLanguage);
       dom.languagePrompt.hidden = true;
       localStorage.setItem('language_prompt_seen', '1');
     };
@@ -725,7 +841,6 @@ function configureLanguagePreference() {
 
 function configureInstallPrompt() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
   if (isStandalone) {
     localStorage.setItem('install_prompt_seen', '1');
   }
@@ -781,6 +896,7 @@ async function boot() {
     state.settings = data.settings;
     state.rooms = data.rooms;
     state.links = data.links;
+    state.heroSlides = data.heroSlides || [];
     state.currencies = data.currencies?.length ? data.currencies : state.currencies;
 
     applySettings();
@@ -797,6 +913,7 @@ async function boot() {
 }
 
 applyTranslations();
+configureHeroControls();
 configureLanguagePreference();
 configureDateInputs();
 configureLocationRoute();

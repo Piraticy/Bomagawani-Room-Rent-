@@ -1,4 +1,5 @@
 const dom = {
+  loading: document.getElementById('admin-loading'),
   loginWrap: document.getElementById('login-wrap'),
   dashboard: document.getElementById('dashboard'),
   loginForm: document.getElementById('login-form'),
@@ -6,10 +7,13 @@ const dom = {
   loginPassword: document.getElementById('login-password'),
   loginStatus: document.getElementById('login-status'),
   logoutBtn: document.getElementById('logout-btn'),
+  tabs: document.getElementById('admin-tabs'),
 
   sumPending: document.getElementById('sum-pending'),
   sumConfirmed: document.getElementById('sum-confirmed'),
   sumRevenue: document.getElementById('sum-revenue'),
+
+  overviewBookings: document.getElementById('overview-bookings'),
 
   settingsForm: document.getElementById('settings-form'),
   settingsStatus: document.getElementById('settings-status'),
@@ -54,6 +58,12 @@ const dom = {
   roomImageStatus: document.getElementById('room-image-status'),
   roomGallery: document.getElementById('room-gallery'),
 
+  heroSlideForm: document.getElementById('hero-slide-form'),
+  heroSlideFile: document.getElementById('hero-slide-file'),
+  heroSlideCaption: document.getElementById('hero-slide-caption'),
+  heroSlideStatus: document.getElementById('hero-slide-status'),
+  heroSlideList: document.getElementById('hero-slide-list'),
+
   linksFormWrap: document.getElementById('links-form-wrap'),
   addLinkRow: document.getElementById('add-link-row'),
   saveLinks: document.getElementById('save-links'),
@@ -65,10 +75,12 @@ const dom = {
 const state = {
   rooms: [],
   links: [],
-  bookings: []
+  bookings: [],
+  heroSlides: []
 };
 
 function setStatus(element, message, ok = true) {
+  if (!element) return;
   element.textContent = message;
   element.style.color = ok ? '#245f45' : '#8d1f31';
 }
@@ -100,7 +112,24 @@ function parseAmenitiesText(text) {
 }
 
 function amenitiesToText(amenities) {
-  return (amenities || []).map((a) => `${a.icon}:${a.label}`).join(', ');
+  return (amenities || []).map((item) => `${item.icon}:${item.label}`).join(', ');
+}
+
+function paymentOptionLabel(option) {
+  if (option === 'pay_online') return 'Pay Online';
+  return 'Pay On Arrival';
+}
+
+function setActiveTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.tab === tabName);
+  });
+
+  document.querySelectorAll('.tab-panel').forEach((panel) => {
+    panel.classList.toggle('is-active', panel.dataset.tabPanel === tabName);
+  });
+
+  localStorage.setItem('admin_active_tab', tabName);
 }
 
 function populateSettings(settings) {
@@ -125,24 +154,62 @@ function renderSummary(summary) {
   dom.sumRevenue.textContent = Number(summary.revenueUsd).toFixed(2);
 }
 
+function renderOverviewBookings() {
+  const latest = state.bookings.slice(0, 5);
+
+  if (!latest.length) {
+    dom.overviewBookings.innerHTML = '<p>No bookings yet.</p>';
+    return;
+  }
+
+  const rows = latest
+    .map(
+      (booking) => `
+      <tr>
+        <td>${booking.booking_code}</td>
+        <td>${booking.guest_name}</td>
+        <td>${booking.room_name}</td>
+        <td>${booking.check_in} to ${booking.check_out}</td>
+        <td>${booking.booking_status}</td>
+      </tr>
+    `
+    )
+    .join('');
+
+  dom.overviewBookings.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Guest</th>
+          <th>Room</th>
+          <th>Dates</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
 function renderRooms() {
   dom.roomsAdminList.innerHTML = '';
   dom.uploadRoomId.innerHTML = '';
 
   state.rooms.forEach((room) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'room-item';
-    wrapper.innerHTML = `
+    const item = document.createElement('div');
+    item.className = 'room-item';
+    item.innerHTML = `
       <div>
         <p><strong>${room.name}</strong> ${room.active ? '' : '(Inactive)'}</p>
         <p>${room.price_per_night_usd} USD/night • Max ${room.max_guests}</p>
       </div>
-      <div>
+      <div class="action-row">
         <button class="small-btn" data-edit-room="${room.id}">Edit</button>
         <button class="small-btn warn" data-remove-room="${room.id}">Delete</button>
       </div>
     `;
-    dom.roomsAdminList.appendChild(wrapper);
+    dom.roomsAdminList.appendChild(item);
 
     const option = document.createElement('option');
     option.value = String(room.id);
@@ -186,8 +253,8 @@ function renderRoomGallery() {
             <div class="gallery-meta">
               <small>${image.caption || 'No caption'}</small>
               <small>${isCover ? 'Cover image' : 'Gallery image'}</small>
-              <div>
-                <button class="small-btn" data-cover-room="${room.id}" data-cover-image="${image.id}">Set as cover</button>
+              <div class="action-row">
+                <button class="small-btn" data-cover-room="${room.id}" data-cover-image="${image.id}">Set Cover</button>
                 <button class="small-btn warn" data-delete-image="${image.id}">Delete</button>
               </div>
             </div>
@@ -210,6 +277,44 @@ function renderRoomGallery() {
     button.addEventListener('click', () => {
       deleteRoomImage(Number(button.dataset.deleteImage));
     });
+  });
+}
+
+function renderHeroSlides() {
+  dom.heroSlideList.innerHTML = '';
+
+  if (!state.heroSlides.length) {
+    dom.heroSlideList.innerHTML = '<p>No top slides yet.</p>';
+    return;
+  }
+
+  state.heroSlides.forEach((slide, index) => {
+    const card = document.createElement('article');
+    card.className = 'hero-slide-item';
+    card.innerHTML = `
+      <img src="${slide.image_url}" alt="Hero slide ${index + 1}" loading="lazy" />
+      <div class="hero-slide-meta">
+        <small>${slide.caption || 'No caption'}</small>
+        <div class="action-row">
+          <button class="small-btn" data-slide-up="${slide.id}" ${index === 0 ? 'disabled' : ''}>Up</button>
+          <button class="small-btn" data-slide-down="${slide.id}" ${index === state.heroSlides.length - 1 ? 'disabled' : ''}>Down</button>
+          <button class="small-btn warn" data-slide-delete="${slide.id}">Delete</button>
+        </div>
+      </div>
+    `;
+    dom.heroSlideList.appendChild(card);
+  });
+
+  dom.heroSlideList.querySelectorAll('[data-slide-delete]').forEach((button) => {
+    button.addEventListener('click', () => deleteHeroSlide(Number(button.dataset.slideDelete)));
+  });
+
+  dom.heroSlideList.querySelectorAll('[data-slide-up]').forEach((button) => {
+    button.addEventListener('click', () => moveHeroSlide(Number(button.dataset.slideUp), -1));
+  });
+
+  dom.heroSlideList.querySelectorAll('[data-slide-down]').forEach((button) => {
+    button.addEventListener('click', () => moveHeroSlide(Number(button.dataset.slideDown), 1));
   });
 }
 
@@ -247,11 +352,14 @@ function renderBookings() {
         <td>${booking.guest_name}<br/><small>${booking.guest_email}</small></td>
         <td>${booking.check_in}<br/>to<br/>${booking.check_out}</td>
         <td>${Number(booking.total_in_currency).toFixed(2)} ${booking.currency_code}</td>
-        <td>${booking.booking_status}<br/><small>${booking.payment_status}</small></td>
+        <td>${paymentOptionLabel(booking.payment_option || 'pay_on_arrival')}<br/><small>${booking.payment_status}</small></td>
+        <td>${booking.booking_status}</td>
         <td>
-          <button class="small-btn" data-status="confirm" data-booking-id="${booking.id}">Confirm</button>
-          <button class="small-btn warn" data-status="cancel" data-booking-id="${booking.id}">Cancel</button>
-          <button class="small-btn" data-status="paid" data-booking-id="${booking.id}">Mark Paid</button>
+          <div class="action-row">
+            <button class="small-btn" data-status="confirm" data-booking-id="${booking.id}">Confirm</button>
+            <button class="small-btn warn" data-status="cancel" data-booking-id="${booking.id}">Cancel</button>
+            <button class="small-btn" data-status="paid" data-booking-id="${booking.id}">Mark Paid</button>
+          </div>
         </td>
       </tr>
     `
@@ -267,6 +375,7 @@ function renderBookings() {
           <th>Guest</th>
           <th>Dates</th>
           <th>Total</th>
+          <th>Payment</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
@@ -281,7 +390,7 @@ function renderBookings() {
 }
 
 function startRoomEdit(roomId) {
-  const room = state.rooms.find((r) => r.id === roomId);
+  const room = state.rooms.find((item) => item.id === roomId);
   if (!room) return;
 
   dom.roomFormTitle.textContent = `Edit Room: ${room.name}`;
@@ -296,7 +405,8 @@ function startRoomEdit(roomId) {
   dom.roomFeatured.checked = Boolean(room.featured);
   dom.roomActive.checked = Boolean(room.active);
 
-  window.scrollTo({ top: dom.roomForm.offsetTop - 90, behavior: 'smooth' });
+  setActiveTab('rooms');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function clearRoomForm() {
@@ -347,6 +457,42 @@ async function deleteRoomImage(imageId) {
   }
 }
 
+async function deleteHeroSlide(slideId) {
+  const yes = window.confirm('Remove this top slide?');
+  if (!yes) return;
+
+  try {
+    await api(`/api/admin/hero-slides/${slideId}`, { method: 'DELETE' });
+    await loadDashboard();
+    setStatus(dom.heroSlideStatus, 'Top slide removed.');
+  } catch (error) {
+    setStatus(dom.heroSlideStatus, error.message, false);
+  }
+}
+
+async function moveHeroSlide(slideId, direction) {
+  const index = state.heroSlides.findIndex((slide) => slide.id === slideId);
+  if (index < 0) return;
+
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= state.heroSlides.length) return;
+
+  const reordered = [...state.heroSlides];
+  const [item] = reordered.splice(index, 1);
+  reordered.splice(nextIndex, 0, item);
+
+  try {
+    await api('/api/admin/hero-slides/order', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slideIds: reordered.map((slide) => slide.id) })
+    });
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.heroSlideStatus, error.message, false);
+  }
+}
+
 async function updateBookingStatus(bookingId, action) {
   let payload = {};
   if (action === 'confirm') payload = { bookingStatus: 'confirmed' };
@@ -371,14 +517,17 @@ async function loadDashboard() {
 
   state.rooms = data.rooms;
   state.links = data.links;
+  state.heroSlides = data.heroSlides || [];
   state.bookings = bookingsPayload.bookings;
 
   renderSummary(data.summary);
   populateSettings(data.settings);
   renderRooms();
   renderRoomGallery();
+  renderHeroSlides();
   renderLinks();
   renderBookings();
+  renderOverviewBookings();
 }
 
 async function handleLogin(event) {
@@ -400,24 +549,39 @@ async function handleLogin(event) {
     setStatus(dom.loginStatus, 'Login successful.');
 
     await loadDashboard();
+    const savedTab = localStorage.getItem('admin_active_tab') || 'overview';
+    setActiveTab(savedTab);
   } catch (error) {
     setStatus(dom.loginStatus, error.message, false);
   }
 }
 
 async function checkSessionAndInit() {
+  dom.loading.hidden = false;
+  dom.loginWrap.hidden = true;
+  dom.dashboard.hidden = true;
+
   try {
     await api('/api/admin/session');
+    dom.loading.hidden = true;
     dom.loginWrap.hidden = true;
     dom.dashboard.hidden = false;
     dom.logoutBtn.hidden = false;
+
     await loadDashboard();
+    const savedTab = localStorage.getItem('admin_active_tab') || 'overview';
+    setActiveTab(savedTab);
   } catch (error) {
+    dom.loading.hidden = true;
     dom.loginWrap.hidden = false;
     dom.dashboard.hidden = true;
     dom.logoutBtn.hidden = true;
   }
 }
+
+dom.tabs.querySelectorAll('[data-tab]').forEach((button) => {
+  button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+});
 
 dom.loginForm.addEventListener('submit', handleLogin);
 
@@ -428,6 +592,7 @@ dom.logoutBtn.addEventListener('click', async () => {
     // ignore logout errors
   }
 
+  localStorage.removeItem('admin_active_tab');
   window.location.reload();
 });
 
@@ -479,7 +644,7 @@ dom.heroUploadForm.addEventListener('submit', async (event) => {
       body: formData
     });
 
-    setStatus(dom.heroStatus, 'Hero image uploaded with logo watermark.');
+    setStatus(dom.heroStatus, 'Hero image uploaded.');
     dom.heroUploadForm.reset();
   } catch (error) {
     setStatus(dom.heroStatus, error.message, false);
@@ -548,11 +713,38 @@ dom.roomImageForm.addEventListener('submit', async (event) => {
       body: formData
     });
 
-    setStatus(dom.roomImageStatus, 'Room photo uploaded and watermarked.');
+    setStatus(dom.roomImageStatus, 'Room photo uploaded.');
     dom.roomImageForm.reset();
     await loadDashboard();
   } catch (error) {
     setStatus(dom.roomImageStatus, error.message, false);
+  }
+});
+
+dom.heroSlideForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  if (!dom.heroSlideFile.files.length) {
+    setStatus(dom.heroSlideStatus, 'Select a top slide image.', false);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', dom.heroSlideFile.files[0]);
+  formData.append('caption', dom.heroSlideCaption.value.trim());
+  formData.append('sortOrder', String(Date.now()));
+
+  try {
+    await api('/api/admin/hero-slides', {
+      method: 'POST',
+      body: formData
+    });
+
+    setStatus(dom.heroSlideStatus, 'Top slide added.');
+    dom.heroSlideForm.reset();
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.heroSlideStatus, error.message, false);
   }
 });
 

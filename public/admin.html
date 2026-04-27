@@ -20,6 +20,10 @@
     </header>
 
     <main>
+      <section class="loading-wrap" id="admin-loading">
+        <div class="loading-card">Loading admin dashboard...</div>
+      </section>
+
       <section class="login-wrap" id="login-wrap" hidden>
         <div class="login-card">
           <h1>Admin Login</h1>
@@ -55,8 +59,23 @@
           </article>
         </div>
 
-        <div class="panel-grid">
-          <section class="panel">
+        <nav class="admin-tabs" id="admin-tabs">
+          <button type="button" class="tab-btn is-active" data-tab="overview">Overview</button>
+          <button type="button" class="tab-btn" data-tab="site">Site</button>
+          <button type="button" class="tab-btn" data-tab="rooms">Rooms</button>
+          <button type="button" class="tab-btn" data-tab="media">Media</button>
+          <button type="button" class="tab-btn" data-tab="channels">Channels</button>
+          <button type="button" class="tab-btn" data-tab="bookings">Bookings</button>
+        </nav>
+
+        <div class="tab-panels">
+          <section class="panel tab-panel is-active" data-tab-panel="overview">
+            <h2>Overview</h2>
+            <p>Use tabs to edit exactly what you need. Changes appear on landing page instantly.</p>
+            <div id="overview-bookings" class="table-wrap"></div>
+          </section>
+
+          <section class="panel tab-panel" data-tab-panel="site">
             <h2>Site Settings</h2>
             <form id="settings-form" class="form-grid">
               <label>Site name <input id="set-site-name" required /></label>
@@ -77,19 +96,19 @@
             </form>
 
             <form id="hero-upload-form" class="stack-form">
-              <h3>Hero Image Upload</h3>
+              <h3>Main Hero Image</h3>
               <input type="file" id="hero-image" accept="image/*" required />
               <button type="submit" class="ghost-btn">Upload Hero Image</button>
               <p class="status" id="hero-status"></p>
             </form>
           </section>
 
-          <section class="panel">
+          <section class="panel tab-panel" data-tab-panel="rooms">
             <h2>Rooms Manager</h2>
             <div id="rooms-admin-list" class="room-list"></div>
 
             <form id="room-form" class="form-grid">
-              <h3 id="room-form-title">Add New Room</h3>
+              <h3 class="full" id="room-form-title">Add New Room</h3>
               <input type="hidden" id="room-id" />
               <label>Name <input id="room-name" required /></label>
               <label>Short Description <input id="room-short" required /></label>
@@ -97,7 +116,7 @@
               <label>Price per Night (USD) <input id="room-price" type="number" step="0.01" required /></label>
               <label>Max Guests <input id="room-max" type="number" min="1" required /></label>
               <label>Room Size <input id="room-size" required /></label>
-              <label>Amenities (example: wifi:Fast Wi-Fi, bath:Private Bathroom)
+              <label class="full">Amenities (example: wifi:Fast Wi-Fi, bath:Private Bathroom)
                 <textarea id="room-amenities" rows="2" required></textarea>
               </label>
               <label class="inline"><input type="checkbox" id="room-featured" /> Featured Room</label>
@@ -108,35 +127,54 @@
               </div>
               <p class="status full" id="room-status"></p>
             </form>
+          </section>
 
-            <form id="room-image-form" class="stack-form">
-              <h3>Upload Room Photo (with auto logo watermark)</h3>
+          <section class="panel tab-panel" data-tab-panel="media">
+            <h2>Media Manager</h2>
+
+            <form id="room-image-form" class="stack-form first-stack">
+              <h3>Room Photos</h3>
               <label>Select room
                 <select id="upload-room-id" required></select>
               </label>
               <input type="file" id="room-image-file" accept="image/*" required />
               <label>Caption <input id="room-image-caption" /></label>
-              <button type="submit" class="ghost-btn">Upload Photo</button>
+              <button type="submit" class="ghost-btn">Upload Room Photo</button>
               <p class="status" id="room-image-status"></p>
             </form>
 
             <div class="stack-form">
-              <h3>Room Media Manager</h3>
-              <p>Set any uploaded photo as cover image or remove outdated images.</p>
+              <h3>Room Media Gallery</h3>
+              <p>Set cover image, remove old photos, and update room slides.</p>
               <div id="room-gallery" class="room-gallery"></div>
+            </div>
+
+            <form id="hero-slide-form" class="stack-form">
+              <h3>Top Slideshow Images</h3>
+              <input type="file" id="hero-slide-file" accept="image/*" required />
+              <label>Caption <input id="hero-slide-caption" /></label>
+              <button type="submit" class="ghost-btn">Add Top Slide</button>
+              <p class="status" id="hero-slide-status"></p>
+            </form>
+
+            <div class="stack-form">
+              <h3>Top Slideshow List</h3>
+              <div id="hero-slide-list" class="hero-slide-list"></div>
             </div>
           </section>
 
-          <section class="panel">
+          <section class="panel tab-panel" data-tab-panel="channels">
             <h2>Platform Links</h2>
             <p>These links appear on the landing page so guests can find you everywhere.</p>
             <div id="links-form-wrap"></div>
-            <button id="add-link-row" class="ghost-btn">Add Link Row</button>
-            <button id="save-links" class="primary-btn">Save Platform Links</button>
+            <div class="action-row">
+              <button id="add-link-row" class="ghost-btn" type="button">Add Link Row</button>
+              <button id="save-links" class="primary-btn" type="button">Save Platform Links</button>
+            </div>
             <p class="status" id="links-status"></p>
           </section>
 
-          <section class="panel">
+          <section class="panel tab-panel" data-tab-panel="bookings">
             <h2>Booking Requests</h2>
             <p>Confirm or cancel bookings. Confirmed dates become unavailable instantly.</p>
             <div id="bookings-table-wrap" class="table-wrap"></div>

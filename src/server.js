@@ -128,6 +128,12 @@ function normalizeCurrency(code) {
     .toUpperCase();
 }
 
+function normalizePaymentOption(value) {
+  const option = String(value || 'pay_on_arrival').trim().toLowerCase();
+  if (option === 'pay_online') return 'pay_online';
+  return 'pay_on_arrival';
+}
+
 function parseDateOnly(dateString) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateString || ''))) {
     return null;
@@ -205,6 +211,10 @@ function getAllRooms() {
 
 function getPlatformLinks() {
   return db.prepare('SELECT * FROM platform_links ORDER BY sort_order ASC, id ASC').all();
+}
+
+function getHeroSlides() {
+  return db.prepare('SELECT id, image_url, caption, sort_order FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
 }
 
 function getConfirmedRanges(roomId) {
@@ -298,6 +308,7 @@ app.get('/api/public/bootstrap', async (req, res) => {
       settings,
       rooms,
       links: getPlatformLinks(),
+      heroSlides: getHeroSlides(),
       currencies: Object.keys(rates).filter((c) => ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'].includes(c))
     });
   } catch (error) {
@@ -353,6 +364,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   const parsedGuests = Number(req.body.guestsCount || 1);
   const note = String(req.body.note || '').trim();
   const currencyCode = normalizeCurrency(req.body.currencyCode || 'USD');
+  const paymentOption = normalizePaymentOption(req.body.paymentOption || 'pay_on_arrival');
 
   if (!roomId || !guestName || !guestEmail || !guestPhone || !checkIn || !checkOut || !parsedGuests) {
     return res.status(400).json({ error: 'Please complete all required fields.' });
@@ -392,11 +404,11 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     `INSERT INTO bookings (
       booking_code, room_id, guest_name, guest_email, guest_phone, check_in, check_out,
       nights, guests_count, note, price_per_night_usd, total_usd, currency_code,
-      exchange_rate, total_in_currency, payment_status, booking_status
+      exchange_rate, total_in_currency, payment_option, payment_status, booking_status
     ) VALUES (
       @booking_code, @room_id, @guest_name, @guest_email, @guest_phone, @check_in, @check_out,
       @nights, @guests_count, @note, @price_per_night_usd, @total_usd, @currency_code,
-      @exchange_rate, @total_in_currency, 'pending', 'pending'
+      @exchange_rate, @total_in_currency, @payment_option, 'pending', 'pending'
     )`
   ).run({
     booking_code: code,
@@ -413,7 +425,8 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     total_usd: totalUsd,
     currency_code: converted.currency,
     exchange_rate: converted.rate,
-    total_in_currency: converted.total
+    total_in_currency: converted.total,
+    payment_option: paymentOption
   });
 
   return res.status(201).json({
@@ -516,6 +529,7 @@ app.get('/receipt/:code', (req, res) => {
             <div><div class="label">Nights</div><div class="value">${booking.nights}</div></div>
             <div><div class="label">Guests</div><div class="value">${booking.guests_count}</div></div>
             <div><div class="label">Contact</div><div class="value">${booking.guest_email}<br/>${booking.guest_phone}</div></div>
+            <div><div class="label">Payment Option</div><div class="value">${booking.payment_option === 'pay_online' ? 'Pay Online' : 'Pay On Arrival'}</div></div>
             <div><div class="label">Payment Status</div><div class="value">${booking.payment_status}</div></div>
           </div>
 
@@ -570,7 +584,8 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     summary: adminSummary(),
     settings: getSettings(),
     rooms: getAllRooms(),
-    links: getPlatformLinks()
+    links: getPlatformLinks(),
+    heroSlides: getHeroSlides()
   });
 });
 
@@ -855,6 +870,71 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
     removeFileIfExists(req.file?.path);
     return res.status(500).json({ error: 'Hero image upload failed.' });
   }
+});
+
+app.post('/api/admin/hero-slides', requireAdmin, upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Image file is required.' });
+  }
+
+  try {
+    const settings = getSettings();
+    const filename = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.jpg`;
+    const outputPath = path.join(siteUploadDir, filename);
+    await watermarkImage(req.file.path, outputPath, settings.logo_text);
+
+    const imageUrl = `/uploads/site/${filename}`;
+    const sortOrder = Number(req.body.sortOrder || Date.now());
+    const caption = String(req.body.caption || '').trim();
+
+    const result = db
+      .prepare('INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (?, ?, ?)')
+      .run(imageUrl, caption, sortOrder);
+
+    removeFileIfExists(req.file.path);
+    return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
+  } catch (error) {
+    removeFileIfExists(req.file?.path);
+    return res.status(500).json({ error: 'Hero slide upload failed.' });
+  }
+});
+
+app.put('/api/admin/hero-slides/order', requireAdmin, (req, res) => {
+  const slideIds = Array.isArray(req.body.slideIds) ? req.body.slideIds.map((id) => Number(id)).filter(Boolean) : [];
+  if (!slideIds.length) {
+    return res.status(400).json({ error: 'slideIds is required.' });
+  }
+
+  const updateSort = db.prepare('UPDATE hero_slides SET sort_order = ? WHERE id = ?');
+  const trx = db.transaction(() => {
+    slideIds.forEach((id, index) => {
+      updateSort.run(index + 1, id);
+    });
+  });
+
+  trx();
+  return res.json({ ok: true });
+});
+
+app.delete('/api/admin/hero-slides/:id', requireAdmin, (req, res) => {
+  const slideId = Number(req.params.id);
+  const slide = db.prepare('SELECT * FROM hero_slides WHERE id = ?').get(slideId);
+  if (!slide) {
+    return res.status(404).json({ error: 'Hero slide not found.' });
+  }
+
+  db.prepare('DELETE FROM hero_slides WHERE id = ?').run(slideId);
+
+  const usedByRoom = db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(slide.image_url).count > 0;
+  const usedByCover = db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(slide.image_url).count > 0;
+  const usedBySettings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get().hero_image === slide.image_url;
+  const usedByOtherSlides = db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(slide.image_url).count > 0;
+
+  if (!usedByRoom && !usedByCover && !usedBySettings && !usedByOtherSlides) {
+    removeUploadByUrl(slide.image_url);
+  }
+
+  return res.json({ ok: true });
 });
 
 app.put('/api/admin/settings', requireAdmin, (req, res) => {

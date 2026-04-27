@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   currency_code TEXT NOT NULL,
   exchange_rate REAL NOT NULL,
   total_in_currency REAL NOT NULL,
+  payment_option TEXT NOT NULL DEFAULT 'pay_on_arrival',
   payment_status TEXT NOT NULL DEFAULT 'pending',
   booking_status TEXT NOT NULL DEFAULT 'pending',
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -105,7 +106,23 @@ CREATE TABLE IF NOT EXISTS exchange_cache (
   rates_json TEXT NOT NULL,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  image_url TEXT NOT NULL,
+  caption TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 `);
+
+function hasColumn(tableName, columnName) {
+  return db.prepare(`PRAGMA table_info(${tableName})`).all().some((column) => column.name === columnName);
+}
+
+if (!hasColumn('bookings', 'payment_option')) {
+  db.exec("ALTER TABLE bookings ADD COLUMN payment_option TEXT NOT NULL DEFAULT 'pay_on_arrival'");
+}
 
 const settingsCount = db.prepare('SELECT COUNT(*) AS count FROM site_settings').get().count;
 if (!settingsCount) {
@@ -134,10 +151,10 @@ if (!settingsCount) {
     site_name: 'Bomagawani House Rent',
     domain: 'Bomagawani.com',
     headline: 'Beautiful Coastal Stays in Kigombe',
-    subheadline: 'Book the Master Bedroom or Guest Room in minutes with instant availability.',
+    subheadline: 'Book your room in minutes with instant availability.',
     about_text: 'Bomagawani House Rent combines warm hospitality, modern comfort, and simple digital booking for travelers and families.',
     address: 'Kigombe, Tanga, Tanzania',
-    map_link: 'https://maps.google.com/?q=Kigombe%20Tanga%20Tanzania',
+    map_link: 'https://www.google.com/maps?q=Kigombe,+Tanga,+Tanzania',
     contact_phone: '+255 700 000 000',
     contact_email: 'stay@bomagawani.com',
     check_in_time: '14:00',
@@ -162,7 +179,7 @@ if (!roomsCount) {
     long_description: 'The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.',
     price_per_night_usd: 120,
     max_guests: 2,
-    size_label: '38 m²',
+    size_label: '38 m2',
     featured: 1,
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
@@ -180,7 +197,7 @@ if (!roomsCount) {
     long_description: 'The Guest Room offers a calm, clean, and budget-friendly option while still giving access to the full property experience.',
     price_per_night_usd: 75,
     max_guests: 2,
-    size_label: '24 m²',
+    size_label: '24 m2',
     featured: 0,
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
@@ -233,6 +250,29 @@ if (masterRoom) {
       masterRoom.id
     );
   }
+}
+
+const heroSlidesCount = db.prepare('SELECT COUNT(*) AS count FROM hero_slides').get().count;
+if (!heroSlidesCount) {
+  const insertSlide = db.prepare('INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (?, ?, ?)');
+  const settings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get();
+  const roomCovers = db.prepare("SELECT cover_image FROM rooms WHERE cover_image IS NOT NULL AND cover_image != '' ORDER BY featured DESC, id ASC").all();
+
+  const uniqueImages = [];
+  const seen = new Set();
+
+  const pushImage = (imageUrl) => {
+    if (!imageUrl || seen.has(imageUrl)) return;
+    seen.add(imageUrl);
+    uniqueImages.push(imageUrl);
+  };
+
+  pushImage(settings?.hero_image);
+  roomCovers.forEach((row) => pushImage(row.cover_image));
+
+  uniqueImages.forEach((imageUrl, index) => {
+    insertSlide.run(imageUrl, '', index + 1);
+  });
 }
 
 module.exports = db;

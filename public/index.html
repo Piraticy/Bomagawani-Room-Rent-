@@ -40,7 +40,10 @@
 
     <main>
       <section class="hero" id="hero">
+        <div class="hero-slider" id="hero-slider"></div>
         <div class="hero-overlay"></div>
+        <button class="hero-control prev" id="hero-prev" type="button" aria-label="Previous hero image">‹</button>
+        <button class="hero-control next" id="hero-next" type="button" aria-label="Next hero image">›</button>
         <div class="hero-content">
           <p class="hero-kicker">Kigombe, Tanzania</p>
           <h1 id="headline">Beautiful Coastal Stays</h1>
@@ -61,6 +64,7 @@
             </article>
           </div>
         </div>
+        <div class="hero-dots" id="hero-dots" aria-label="Hero image navigation"></div>
       </section>
 
       <section class="section section-intro">
@@ -120,6 +124,14 @@
                 <select id="currency-select"></select>
               </label>
             </div>
+
+            <label>
+              <span data-i18n="form.paymentOption">Payment option</span>
+              <select id="payment-option" required>
+                <option value="pay_on_arrival" data-i18n="form.payOnArrival">Pay on arrival</option>
+                <option value="pay_online" data-i18n="form.payOnlineLater">Pay online later</option>
+              </select>
+            </label>
 
             <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to see your live quote.</div>
 

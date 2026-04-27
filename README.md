@@ -6,6 +6,7 @@ Complete booking platform for **Bomagawani.com** with production-ready backend, 
 
 - Professional mobile-friendly landing page
 - Direct booking with live availability checks
+- Payment option support (including **Pay on Arrival**)
 - Currency conversion for quote and booking totals
 - Booking status tracking with booking code
 - Printable receipt page per booking
@@ -14,9 +15,11 @@ Complete booking platform for **Bomagawani.com** with production-ready backend, 
 - Language suggestion prompt based on visitor locale
 - SEO support (`sitemap.xml`, `robots.txt`, structured data)
 - Admin dashboard for no-code updates:
+- Organized admin tabs/subpages (Overview, Site, Rooms, Media, Channels, Bookings)
   - Site details and content
-- Room details, pricing, amenities, active/inactive
-- Photo upload with automatic logo watermark
+  - Room details, pricing, amenities, active/inactive
+  - Photo upload with automatic logo watermark
+- Top hero slideshow image manager (add/remove/reorder)
 - Landing page room slideshow driven by admin-uploaded photos
 - Set room cover image and remove old photos
   - Travel platform links (Booking.com, Tripadvisor, etc.)
