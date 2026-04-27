@@ -100,6 +100,13 @@ main {
   gap: 14px;
 }
 
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -126,17 +133,20 @@ main {
 
 .admin-tabs {
   padding: 8px;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
+  position: sticky;
+  top: 78px;
 }
 
 .tab-btn {
+  width: 100%;
+  text-align: left;
   border: 1px solid #c8d8ec;
   background: #f2f7ff;
   color: #294367;
-  border-radius: 999px;
-  padding: 8px 14px;
+  border-radius: 12px;
+  padding: 10px 14px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -148,16 +158,19 @@ main {
 }
 
 .tab-panels {
-  display: grid;
-  gap: 14px;
+  display: block;
 }
 
 .tab-panel {
-  display: none;
+  display: block;
 }
 
 .tab-panel.is-active {
   display: block;
+}
+
+.tab-panel + .tab-panel {
+  margin-top: 14px;
 }
 
 .panel {
@@ -381,8 +394,12 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
   .admin-tabs {
-    display: grid;
+    position: static;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

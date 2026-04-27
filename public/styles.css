@@ -477,6 +477,12 @@ textarea {
   gap: 10px;
 }
 
+.phone-input-wrap {
+  display: grid;
+  grid-template-columns: 138px 1fr;
+  gap: 10px;
+}
+
 .quote-box {
   margin-top: 12px;
   background: #f2f7fc;
@@ -543,20 +549,17 @@ textarea {
 
 .footer {
   margin: 24px 5vw;
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 14px 18px;
+  padding: 10px 0 18px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
 }
 
 .footer p {
-  margin: 4px 0 0;
-  color: #475b79;
+  margin: 0;
+  color: #2b3e5a;
+  font-weight: 700;
+  text-align: center;
 }
 
 .floating-prompt {
@@ -649,6 +652,10 @@ textarea {
   }
 
   .date-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .phone-input-wrap {
     grid-template-columns: 1fr;
   }
 

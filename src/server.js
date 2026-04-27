@@ -165,6 +165,20 @@ function isLikelyEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || ''));
 }
 
+function normalizeGuestPhone(value) {
+  const raw = String(value || '').trim();
+  const cleaned = raw
+    .replace(/[^+\d]/g, '')
+    .replace(/(?!^)\+/g, '');
+
+  if (!cleaned) return '';
+  return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
+}
+
+function isLikelyPhone(value) {
+  return /^\+[1-9]\d{7,14}$/.test(String(value || ''));
+}
+
 function removeFileIfExists(filePath) {
   if (filePath && fs.existsSync(filePath)) {
     fs.rmSync(filePath, { force: true });
@@ -358,7 +372,9 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   const roomId = Number(req.body.roomId);
   const guestName = String(req.body.guestName || '').trim();
   const guestEmail = String(req.body.guestEmail || '').trim();
-  const guestPhone = String(req.body.guestPhone || '').trim();
+  const guestPhone = normalizeGuestPhone(
+    req.body.guestPhone || `${String(req.body.phoneCountryCode || '').trim()}${String(req.body.phoneLocal || '').trim()}`
+  );
   const checkIn = String(req.body.checkIn || '').trim();
   const checkOut = String(req.body.checkOut || '').trim();
   const parsedGuests = Number(req.body.guestsCount || 1);
@@ -374,7 +390,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Please enter a valid guest email.' });
   }
 
-  if (guestName.length < 2 || guestPhone.length < 6) {
+  if (guestName.length < 2 || !isLikelyPhone(guestPhone)) {
     return res.status(400).json({ error: 'Guest name or phone seems invalid.' });
   }
 

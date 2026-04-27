@@ -46,6 +46,7 @@ const translations = {
     'status.submittingBooking': 'Submitting booking request...',
     'status.bookingFailed': 'Booking failed.',
     'status.bookingServiceDown': 'Booking service is currently unavailable.',
+    'status.phoneInvalid': 'Please enter a valid phone number for selected country code.',
     'status.bookingSuccessPrefix': 'Booking submitted. Your code is',
     'status.openReceipt': 'Open receipt',
     'tracking.checking': 'Checking status...',
@@ -116,6 +117,7 @@ const translations = {
     'status.submittingBooking': 'Inatuma ombi la booking...',
     'status.bookingFailed': 'Booking imekataa.',
     'status.bookingServiceDown': 'Huduma ya booking haipatikani sasa.',
+    'status.phoneInvalid': 'Tafadhali weka namba sahihi kulingana na country code uliyochagua.',
     'status.bookingSuccessPrefix': 'Booking imetumwa. Namba yako ni',
     'status.openReceipt': 'Fungua risiti',
     'tracking.checking': 'Inaangalia hali...',
@@ -170,8 +172,7 @@ const dom = {
   headline: document.getElementById('headline'),
   subheadline: document.getElementById('subheadline'),
   aboutText: document.getElementById('about-text'),
-  footerBrand: document.getElementById('footer-brand'),
-  footerDomain: document.getElementById('footer-domain'),
+  footerText: document.getElementById('footer-text'),
   mapLink: document.getElementById('map-link'),
   mapEmbed: document.getElementById('map-embed'),
   locationLine: document.getElementById('location-line'),
@@ -189,6 +190,8 @@ const dom = {
   quoteBox: document.getElementById('quote-box'),
   bookingForm: document.getElementById('booking-form'),
   bookingStatus: document.getElementById('booking-status'),
+  phoneCountry: document.getElementById('phone-country'),
+  guestPhoneLocal: document.getElementById('guest-phone-local'),
   trackingForm: document.getElementById('tracking-form'),
   trackingCode: document.getElementById('tracking-code'),
   trackingResult: document.getElementById('tracking-result'),
@@ -241,6 +244,10 @@ function languageLabel(code) {
 
 function paymentLabel(code) {
   return t(`payment.${code || 'pay_on_arrival'}`);
+}
+
+function setFooterYear() {
+  dom.footerText.textContent = `Bomagawani ${new Date().getFullYear()}`;
 }
 
 function applyTranslations() {
@@ -568,8 +575,7 @@ function applySettings() {
   dom.headline.textContent = state.settings.headline;
   dom.subheadline.textContent = state.settings.subheadline;
   dom.aboutText.textContent = state.settings.about_text;
-  dom.footerBrand.textContent = state.settings.site_name;
-  dom.footerDomain.textContent = `Domain: ${state.settings.domain}`;
+  setFooterYear();
   dom.locationLine.textContent = state.settings.address;
   dom.mapLink.href = state.settings.map_link;
 
@@ -587,6 +593,41 @@ function applySettings() {
   ];
 
   setupHeroSlider(heroImages.filter(Boolean));
+}
+
+function updatePhoneInputRules() {
+  const selected = dom.phoneCountry.selectedOptions[0];
+  const expectedLength = Number(selected?.dataset.len || 9);
+  const example = String(selected?.dataset.example || '').trim();
+
+  dom.guestPhoneLocal.minLength = expectedLength;
+  dom.guestPhoneLocal.maxLength = expectedLength;
+  dom.guestPhoneLocal.placeholder = example || `${'0'.repeat(Math.max(expectedLength, 1))}`;
+  dom.guestPhoneLocal.setCustomValidity('');
+}
+
+function normalizeLocalPhoneInput() {
+  const selected = dom.phoneCountry.selectedOptions[0];
+  const expectedLength = Number(selected?.dataset.len || 9);
+  const digitsOnly = dom.guestPhoneLocal.value.replace(/\D/g, '');
+  dom.guestPhoneLocal.value = digitsOnly.slice(0, expectedLength);
+  dom.guestPhoneLocal.setCustomValidity('');
+}
+
+function getValidatedGuestPhone() {
+  const selected = dom.phoneCountry.selectedOptions[0];
+  const expectedLength = Number(selected?.dataset.len || 9);
+  const countryCode = String(dom.phoneCountry.value || '').trim();
+  const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');
+
+  if (localDigits.length !== expectedLength) {
+    dom.guestPhoneLocal.setCustomValidity(t('status.phoneInvalid'));
+    dom.guestPhoneLocal.reportValidity();
+    return null;
+  }
+
+  dom.guestPhoneLocal.setCustomValidity('');
+  return `${countryCode}${localDigits}`;
 }
 
 function updateStructuredData() {
@@ -685,11 +726,17 @@ async function submitBooking(event) {
     return;
   }
 
+  const fullGuestPhone = getValidatedGuestPhone();
+  if (!fullGuestPhone) {
+    dom.bookingStatus.textContent = t('status.phoneInvalid');
+    return;
+  }
+
   const payload = {
     roomId: Number(dom.roomSelect.value),
     guestName: document.getElementById('guest-name').value.trim(),
     guestEmail: document.getElementById('guest-email').value.trim(),
-    guestPhone: document.getElementById('guest-phone').value.trim(),
+    guestPhone: fullGuestPhone,
     checkIn: dom.checkIn.value,
     checkOut: dom.checkOut.value,
     guestsCount: Number(dom.guestsCount.value),
@@ -716,6 +763,7 @@ async function submitBooking(event) {
     dom.bookingStatus.innerHTML = `${t('status.bookingSuccessPrefix')} <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>.`;
     dom.bookingForm.reset();
     dom.paymentOption.value = 'pay_on_arrival';
+    updatePhoneInputRules();
     state.currentQuote = null;
     renderQuote(null);
 
@@ -773,6 +821,29 @@ function configureDateInputs() {
   dom.checkOut.addEventListener('change', requestQuote);
   dom.roomSelect.addEventListener('change', requestQuote);
   dom.currencySelect.addEventListener('change', requestQuote);
+}
+
+function configurePhoneInput() {
+  dom.phoneCountry.addEventListener('change', () => {
+    updatePhoneInputRules();
+    normalizeLocalPhoneInput();
+  });
+
+  dom.guestPhoneLocal.addEventListener('input', normalizeLocalPhoneInput);
+  dom.guestPhoneLocal.addEventListener('blur', () => {
+    const selected = dom.phoneCountry.selectedOptions[0];
+    const expectedLength = Number(selected?.dataset.len || 9);
+    const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');
+    if (localDigits.length && localDigits.length !== expectedLength) {
+      dom.guestPhoneLocal.setCustomValidity(t('status.phoneInvalid'));
+      dom.guestPhoneLocal.reportValidity();
+      return;
+    }
+
+    dom.guestPhoneLocal.setCustomValidity('');
+  });
+
+  updatePhoneInputRules();
 }
 
 function configureLocationRoute() {
@@ -913,9 +984,11 @@ async function boot() {
 }
 
 applyTranslations();
+setFooterYear();
 configureHeroControls();
 configureLanguagePreference();
 configureDateInputs();
+configurePhoneInput();
 configureLocationRoute();
 configureInstallPrompt();
 registerServiceWorker();

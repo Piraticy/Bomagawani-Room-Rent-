@@ -13,8 +13,6 @@ const dom = {
   sumConfirmed: document.getElementById('sum-confirmed'),
   sumRevenue: document.getElementById('sum-revenue'),
 
-  overviewBookings: document.getElementById('overview-bookings'),
-
   settingsForm: document.getElementById('settings-form'),
   settingsStatus: document.getElementById('settings-status'),
   setSiteName: document.getElementById('set-site-name'),
@@ -121,15 +119,24 @@ function paymentOptionLabel(option) {
 }
 
 function setActiveTab(tabName) {
+  const availableTabs = new Set(
+    [...document.querySelectorAll('.tab-btn')]
+      .map((button) => button.dataset.tab)
+      .filter(Boolean)
+  );
+  const nextTab = availableTabs.has(tabName) ? tabName : 'site';
+
   document.querySelectorAll('.tab-btn').forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.tab === tabName);
+    button.classList.toggle('is-active', button.dataset.tab === nextTab);
   });
 
   document.querySelectorAll('.tab-panel').forEach((panel) => {
-    panel.classList.toggle('is-active', panel.dataset.tabPanel === tabName);
+    const isActive = panel.dataset.tabPanel === nextTab;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
   });
 
-  localStorage.setItem('admin_active_tab', tabName);
+  localStorage.setItem('admin_active_tab', nextTab);
 }
 
 function populateSettings(settings) {
@@ -152,44 +159,6 @@ function renderSummary(summary) {
   dom.sumPending.textContent = summary.pending;
   dom.sumConfirmed.textContent = summary.confirmed;
   dom.sumRevenue.textContent = Number(summary.revenueUsd).toFixed(2);
-}
-
-function renderOverviewBookings() {
-  const latest = state.bookings.slice(0, 5);
-
-  if (!latest.length) {
-    dom.overviewBookings.innerHTML = '<p>No bookings yet.</p>';
-    return;
-  }
-
-  const rows = latest
-    .map(
-      (booking) => `
-      <tr>
-        <td>${booking.booking_code}</td>
-        <td>${booking.guest_name}</td>
-        <td>${booking.room_name}</td>
-        <td>${booking.check_in} to ${booking.check_out}</td>
-        <td>${booking.booking_status}</td>
-      </tr>
-    `
-    )
-    .join('');
-
-  dom.overviewBookings.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Guest</th>
-          <th>Room</th>
-          <th>Dates</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
 }
 
 function renderRooms() {
@@ -527,7 +496,6 @@ async function loadDashboard() {
   renderHeroSlides();
   renderLinks();
   renderBookings();
-  renderOverviewBookings();
 }
 
 async function handleLogin(event) {
@@ -549,7 +517,7 @@ async function handleLogin(event) {
     setStatus(dom.loginStatus, 'Login successful.');
 
     await loadDashboard();
-    const savedTab = localStorage.getItem('admin_active_tab') || 'overview';
+    const savedTab = localStorage.getItem('admin_active_tab') || 'site';
     setActiveTab(savedTab);
   } catch (error) {
     setStatus(dom.loginStatus, error.message, false);
@@ -569,7 +537,7 @@ async function checkSessionAndInit() {
     dom.logoutBtn.hidden = false;
 
     await loadDashboard();
-    const savedTab = localStorage.getItem('admin_active_tab') || 'overview';
+    const savedTab = localStorage.getItem('admin_active_tab') || 'site';
     setActiveTab(savedTab);
   } catch (error) {
     dom.loading.hidden = true;

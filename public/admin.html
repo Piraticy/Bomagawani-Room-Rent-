@@ -59,23 +59,17 @@
           </article>
         </div>
 
-        <nav class="admin-tabs" id="admin-tabs">
-          <button type="button" class="tab-btn is-active" data-tab="overview">Overview</button>
-          <button type="button" class="tab-btn" data-tab="site">Site</button>
-          <button type="button" class="tab-btn" data-tab="rooms">Rooms</button>
-          <button type="button" class="tab-btn" data-tab="media">Media</button>
-          <button type="button" class="tab-btn" data-tab="channels">Channels</button>
-          <button type="button" class="tab-btn" data-tab="bookings">Bookings</button>
-        </nav>
+        <div class="admin-layout">
+          <aside class="admin-tabs" id="admin-tabs">
+            <button type="button" class="tab-btn is-active" data-tab="site">Site Settings</button>
+            <button type="button" class="tab-btn" data-tab="rooms">Room Manager</button>
+            <button type="button" class="tab-btn" data-tab="media">Room Media Manager</button>
+            <button type="button" class="tab-btn" data-tab="channels">Platform Links</button>
+            <button type="button" class="tab-btn" data-tab="bookings">Booking Requests</button>
+          </aside>
 
-        <div class="tab-panels">
-          <section class="panel tab-panel is-active" data-tab-panel="overview">
-            <h2>Overview</h2>
-            <p>Use tabs to edit exactly what you need. Changes appear on landing page instantly.</p>
-            <div id="overview-bookings" class="table-wrap"></div>
-          </section>
-
-          <section class="panel tab-panel" data-tab-panel="site">
+          <div class="tab-panels">
+            <section class="panel tab-panel is-active" data-tab-panel="site">
             <h2>Site Settings</h2>
             <form id="settings-form" class="form-grid">
               <label>Site name <input id="set-site-name" required /></label>
@@ -101,9 +95,9 @@
               <button type="submit" class="ghost-btn">Upload Hero Image</button>
               <p class="status" id="hero-status"></p>
             </form>
-          </section>
+            </section>
 
-          <section class="panel tab-panel" data-tab-panel="rooms">
+            <section class="panel tab-panel" data-tab-panel="rooms" hidden>
             <h2>Rooms Manager</h2>
             <div id="rooms-admin-list" class="room-list"></div>
 
@@ -127,9 +121,9 @@
               </div>
               <p class="status full" id="room-status"></p>
             </form>
-          </section>
+            </section>
 
-          <section class="panel tab-panel" data-tab-panel="media">
+            <section class="panel tab-panel" data-tab-panel="media" hidden>
             <h2>Media Manager</h2>
 
             <form id="room-image-form" class="stack-form first-stack">
@@ -161,9 +155,9 @@
               <h3>Top Slideshow List</h3>
               <div id="hero-slide-list" class="hero-slide-list"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="panel tab-panel" data-tab-panel="channels">
+            <section class="panel tab-panel" data-tab-panel="channels" hidden>
             <h2>Platform Links</h2>
             <p>These links appear on the landing page so guests can find you everywhere.</p>
             <div id="links-form-wrap"></div>
@@ -172,13 +166,14 @@
               <button id="save-links" class="primary-btn" type="button">Save Platform Links</button>
             </div>
             <p class="status" id="links-status"></p>
-          </section>
+            </section>
 
-          <section class="panel tab-panel" data-tab-panel="bookings">
+            <section class="panel tab-panel" data-tab-panel="bookings" hidden>
             <h2>Booking Requests</h2>
             <p>Confirm or cancel bookings. Confirmed dates become unavailable instantly.</p>
             <div id="bookings-table-wrap" class="table-wrap"></div>
-          </section>
+            </section>
+          </div>
         </div>
       </section>
     </main>

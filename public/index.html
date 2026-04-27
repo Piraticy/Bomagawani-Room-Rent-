@@ -148,7 +148,26 @@
               </label>
               <label>
                 <span data-i18n="form.phone">Phone</span>
-                <input type="tel" id="guest-phone" required />
+                <div class="phone-input-wrap">
+                  <select id="phone-country" aria-label="Country code" required>
+                    <option value="+255" data-len="9" data-example="700000000">🇹🇿 +255</option>
+                    <option value="+254" data-len="9" data-example="712345678">🇰🇪 +254</option>
+                    <option value="+256" data-len="9" data-example="701234567">🇺🇬 +256</option>
+                    <option value="+1" data-len="10" data-example="2125551234">🇺🇸 +1</option>
+                    <option value="+44" data-len="10" data-example="7400123456">🇬🇧 +44</option>
+                    <option value="+971" data-len="9" data-example="501234567">🇦🇪 +971</option>
+                  </select>
+                  <input
+                    type="tel"
+                    id="guest-phone-local"
+                    inputmode="numeric"
+                    pattern="[0-9]+"
+                    maxlength="9"
+                    minlength="9"
+                    placeholder="700000000"
+                    required
+                  />
+                </div>
               </label>
             </div>
             <label>
@@ -200,10 +219,7 @@
     </main>
 
     <footer class="footer">
-      <div>
-        <strong id="footer-brand">Bomagawani House Rent</strong>
-        <p id="footer-domain">Domain: Bomagawani.com</p>
-      </div>
+      <p id="footer-text">Bomagawani</p>
     </footer>
 
     <section class="floating-prompt" id="language-prompt" hidden>
