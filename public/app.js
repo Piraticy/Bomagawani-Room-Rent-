@@ -271,7 +271,8 @@ function populatePhoneCountries(countries) {
     const option = document.createElement('option');
     option.value = country.dial;
     option.dataset.iso2 = country.iso2;
-    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.name} (${country.dial})`;
+    option.title = `${country.name} (${country.dial})`;
+    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial}`;
     fragment.appendChild(option);
   });
 
@@ -662,7 +663,7 @@ function updatePhoneInputRules() {
 
   dom.guestPhoneLocal.minLength = minLocalLength;
   dom.guestPhoneLocal.maxLength = maxLocalLength;
-  dom.guestPhoneLocal.placeholder = 'Local number';
+  dom.guestPhoneLocal.placeholder = '00 000 0000';
   dom.guestPhoneLocal.title = t('status.phoneLengthRange', { min: minLocalLength, max: maxLocalLength });
   dom.guestPhoneLocal.setCustomValidity('');
 }
