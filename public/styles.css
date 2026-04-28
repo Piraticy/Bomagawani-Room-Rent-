@@ -499,6 +499,12 @@ textarea {
   min-width: 0;
 }
 
+#phone-country {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .quote-box {
   margin-top: 12px;
   background: #f2f7fc;

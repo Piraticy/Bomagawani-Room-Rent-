@@ -264,21 +264,29 @@ function countryFlagFromIso2(iso2) {
 }
 
 function populatePhoneCountries(countries) {
-  const currentValue = dom.phoneCountry.value || '+255';
+  const currentIso = String(dom.phoneCountry.value || '').toUpperCase();
+  const currentDial = dom.phoneCountry.selectedOptions[0]?.dataset.dial || '+255';
   const fragment = document.createDocumentFragment();
 
   countries.forEach((country) => {
     const option = document.createElement('option');
-    option.value = country.dial;
+    option.value = country.iso2;
     option.dataset.iso2 = country.iso2;
+    option.dataset.dial = country.dial;
     option.title = `${country.name} (${country.dial})`;
-    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial}`;
+    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial} ${country.name}`;
     fragment.appendChild(option);
   });
 
   dom.phoneCountry.innerHTML = '';
   dom.phoneCountry.appendChild(fragment);
-  dom.phoneCountry.value = countries.some((country) => country.dial === currentValue) ? currentValue : '+255';
+  if (countries.some((country) => country.iso2 === currentIso)) {
+    dom.phoneCountry.value = currentIso;
+    return;
+  }
+
+  const preferredIso = countries.find((country) => country.dial === currentDial)?.iso2;
+  dom.phoneCountry.value = preferredIso || (countries.some((country) => country.iso2 === 'TZ') ? 'TZ' : countries[0]?.iso2 || '');
 }
 
 async function loadPhoneCountries() {
@@ -657,7 +665,7 @@ function applySettings() {
 
 function updatePhoneInputRules() {
   const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.value || '').replace(/\D/g, '');
+  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
   const maxLocalLength = Math.max(6, 15 - dialDigits.length);
   const minLocalLength = Math.min(6, maxLocalLength);
 
@@ -670,7 +678,7 @@ function updatePhoneInputRules() {
 
 function normalizeLocalPhoneInput() {
   const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.value || '').replace(/\D/g, '');
+  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
   const maxLocalLength = Math.max(6, 15 - dialDigits.length);
   const digitsOnly = dom.guestPhoneLocal.value.replace(/\D/g, '');
   dom.guestPhoneLocal.value = digitsOnly.slice(0, maxLocalLength);
@@ -679,10 +687,10 @@ function normalizeLocalPhoneInput() {
 
 function getValidatedGuestPhone() {
   const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.value || '').replace(/\D/g, '');
+  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
   const maxLocalLength = Math.max(6, 15 - dialDigits.length);
   const minLocalLength = Math.min(6, maxLocalLength);
-  const countryCode = String(dom.phoneCountry.value || '').trim();
+  const countryCode = String(selected?.dataset.dial || '').trim();
   const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');
 
   if (localDigits.length < minLocalLength || localDigits.length > maxLocalLength) {
@@ -897,7 +905,7 @@ function configurePhoneInput() {
   dom.guestPhoneLocal.addEventListener('input', normalizeLocalPhoneInput);
   dom.guestPhoneLocal.addEventListener('blur', () => {
     const selected = dom.phoneCountry.selectedOptions[0];
-    const dialDigits = String(selected?.value || '').replace(/\D/g, '');
+    const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
     const maxLocalLength = Math.max(6, 15 - dialDigits.length);
     const minLocalLength = Math.min(6, maxLocalLength);
     const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');

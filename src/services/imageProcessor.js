@@ -1,4 +1,6 @@
 const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 
 function createWatermarkSvg(width, height, logoText) {
   const boxWidth = Math.max(210, Math.floor(width * 0.32));
@@ -17,28 +19,92 @@ function createWatermarkSvg(width, height, logoText) {
   `;
 }
 
-async function watermarkImage(filePath, outputPath, logoText) {
-  const image = sharp(filePath).rotate();
-  const metadata = await image.metadata();
+function safeLogoText(value) {
+  return String(value || 'Bomagawani.com').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+}
+
+function normalizeTarget(mode) {
+  if (mode === 'hero') return { width: 1920, height: 1080, quality: 90 };
+  if (mode === 'slide') return { width: 1920, height: 1080, quality: 90 };
+  return { width: 1400, height: 960, quality: 88 };
+}
+
+function ensureDir(filePath) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+}
+
+async function saveOriginalCopy(filePath, outputPath) {
+  ensureDir(outputPath);
+  await sharp(filePath).rotate().withMetadata().toFile(outputPath);
+}
+
+async function watermarkImage(filePath, outputPath, logoText, mode = 'room') {
+  const target = normalizeTarget(mode);
+  const base = sharp(filePath).rotate();
+  const metadata = await base.metadata();
 
   const width = metadata.width || 1200;
   const height = metadata.height || 800;
 
-  const watermarkSvg = createWatermarkSvg(width, height, logoText);
+  const sourceBuffer = await base.toBuffer();
 
-  await image
-    .resize({ width: Math.min(width, 1800), withoutEnlargement: true })
+  const background = await sharp(sourceBuffer)
+    .resize(target.width, target.height, { fit: 'cover', position: 'centre', kernel: sharp.kernel.lanczos3 })
+    .modulate({ brightness: 0.94, saturation: 0.96 })
+    .blur(18)
+    .toBuffer();
+
+  const foreground = await sharp(sourceBuffer)
+    .resize(target.width, target.height, { fit: 'inside', withoutEnlargement: false, kernel: sharp.kernel.lanczos3 })
+    .sharpen({ sigma: 1.15, m1: 0.9, m2: 1.3 })
+    .toBuffer({ resolveWithObject: true });
+
+  const fgWidth = foreground.info.width || target.width;
+  const fgHeight = foreground.info.height || target.height;
+  const left = Math.max(0, Math.round((target.width - fgWidth) / 2));
+  const top = Math.max(0, Math.round((target.height - fgHeight) / 2));
+  const watermarkSvg = createWatermarkSvg(target.width, target.height, safeLogoText(logoText));
+
+  ensureDir(outputPath);
+
+  await sharp({
+    create: {
+      width: target.width,
+      height: target.height,
+      channels: 3,
+      background: '#101b2f'
+    }
+  })
     .composite([
+      {
+        input: background,
+        top: 0,
+        left: 0
+      },
+      {
+        input: foreground.data,
+        top,
+        left
+      },
       {
         input: Buffer.from(watermarkSvg),
         top: 0,
         left: 0
       }
     ])
-    .jpeg({ quality: 86, mozjpeg: true })
+    .jpeg({ quality: target.quality, mozjpeg: true, progressive: true })
     .toFile(outputPath);
+
+  return {
+    originalWidth: width,
+    originalHeight: height,
+    outputWidth: target.width,
+    outputHeight: target.height,
+    mode
+  };
 }
 
 module.exports = {
-  watermarkImage
+  watermarkImage,
+  saveOriginalCopy
 };

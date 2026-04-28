@@ -612,7 +612,7 @@ dom.heroUploadForm.addEventListener('submit', async (event) => {
       body: formData
     });
 
-    setStatus(dom.heroStatus, 'Hero image uploaded.');
+    setStatus(dom.heroStatus, 'Hero image uploaded and auto-optimized for quality and size.');
     dom.heroUploadForm.reset();
   } catch (error) {
     setStatus(dom.heroStatus, error.message, false);
@@ -681,7 +681,7 @@ dom.roomImageForm.addEventListener('submit', async (event) => {
       body: formData
     });
 
-    setStatus(dom.roomImageStatus, 'Room photo uploaded.');
+    setStatus(dom.roomImageStatus, 'Room photo uploaded and auto-optimized for quality and size.');
     dom.roomImageForm.reset();
     await loadDashboard();
   } catch (error) {
@@ -708,7 +708,7 @@ dom.heroSlideForm.addEventListener('submit', async (event) => {
       body: formData
     });
 
-    setStatus(dom.heroSlideStatus, 'Top slide added.');
+    setStatus(dom.heroSlideStatus, 'Top slide added and auto-optimized for quality and size.');
     dom.heroSlideForm.reset();
     await loadDashboard();
   } catch (error) {

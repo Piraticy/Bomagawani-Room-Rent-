@@ -15,7 +15,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('./db');
 const { requireAdmin } = require('./middleware/auth');
 const { convertFromUSD, fetchRates } = require('./services/currency');
-const { watermarkImage } = require('./services/imageProcessor');
+const { watermarkImage, saveOriginalCopy } = require('./services/imageProcessor');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -25,10 +25,14 @@ const forceSecureCookie = process.env.COOKIE_SECURE === '1';
 const publicDir = path.join(process.cwd(), 'public');
 const roomUploadDir = path.join(publicDir, 'uploads', 'rooms');
 const siteUploadDir = path.join(publicDir, 'uploads', 'site');
+const roomOriginalDir = path.join(publicDir, 'uploads', 'originals', 'rooms');
+const siteOriginalDir = path.join(publicDir, 'uploads', 'originals', 'site');
 const tempUploadDir = path.join(process.cwd(), 'tmp-uploads');
 
 fs.mkdirSync(roomUploadDir, { recursive: true });
 fs.mkdirSync(siteUploadDir, { recursive: true });
+fs.mkdirSync(roomOriginalDir, { recursive: true });
+fs.mkdirSync(siteOriginalDir, { recursive: true });
 fs.mkdirSync(tempUploadDir, { recursive: true });
 
 if (isProduction || process.env.TRUST_PROXY === '1') {
@@ -189,6 +193,27 @@ function removeUploadByUrl(uploadUrl) {
   if (!uploadUrl || !uploadUrl.startsWith('/uploads/')) return;
   const filePath = path.join(publicDir, uploadUrl.replace(/^\//, ''));
   removeFileIfExists(filePath);
+}
+
+function removeRelatedOriginalByProcessedUrl(processedUrl) {
+  if (!processedUrl || !processedUrl.startsWith('/uploads/')) return;
+
+  const absoluteProcessedPath = path.join(publicDir, processedUrl.replace(/^\//, ''));
+  const directory = path.dirname(absoluteProcessedPath);
+  const extension = path.extname(absoluteProcessedPath);
+  const baseName = path.basename(absoluteProcessedPath, extension);
+  const folderType = directory.includes(`${path.sep}rooms`) ? 'rooms' : 'site';
+  const originalsDir = folderType === 'rooms' ? roomOriginalDir : siteOriginalDir;
+
+  if (!fs.existsSync(originalsDir)) return;
+
+  const relatedOriginal = fs
+    .readdirSync(originalsDir)
+    .find((filename) => filename.startsWith(`${baseName}-orig.`));
+
+  if (relatedOriginal) {
+    removeFileIfExists(path.join(originalsDir, relatedOriginal));
+  }
 }
 
 function getSettings() {
@@ -795,7 +820,10 @@ app.delete('/api/admin/rooms/:id', requireAdmin, (req, res) => {
   }
 
   const images = db.prepare('SELECT image_url FROM room_images WHERE room_id = ?').all(roomId);
-  images.forEach((row) => removeUploadByUrl(row.image_url));
+  images.forEach((row) => {
+    removeUploadByUrl(row.image_url);
+    removeRelatedOriginalByProcessedUrl(row.image_url);
+  });
 
   db.prepare('DELETE FROM room_images WHERE room_id = ?').run(roomId);
   db.prepare('DELETE FROM rooms WHERE id = ?').run(roomId);
@@ -817,12 +845,17 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
 
   try {
     const settings = getSettings();
-    const filename = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.jpg`;
-    const outputPath = path.join(roomUploadDir, filename);
+    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const outputFilename = `${baseName}.jpg`;
+    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
+    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
+    const outputPath = path.join(roomUploadDir, outputFilename);
+    const originalCopyPath = path.join(roomOriginalDir, `${baseName}-orig${safeExtension}`);
 
-    await watermarkImage(req.file.path, outputPath, settings.logo_text);
+    await saveOriginalCopy(req.file.path, originalCopyPath);
+    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'room');
 
-    const imageUrl = `/uploads/rooms/${filename}`;
+    const imageUrl = `/uploads/rooms/${outputFilename}`;
 
     const result = db
       .prepare(
@@ -853,6 +886,7 @@ app.delete('/api/admin/images/:id', requireAdmin, (req, res) => {
 
   db.prepare('DELETE FROM room_images WHERE id = ?').run(imageId);
   removeUploadByUrl(image.image_url);
+  removeRelatedOriginalByProcessedUrl(image.image_url);
 
   const room = db.prepare('SELECT id, cover_image FROM rooms WHERE id = ?').get(image.room_id);
   if (room && room.cover_image === image.image_url) {
@@ -870,16 +904,22 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
 
   try {
     const settings = getSettings();
-    const filename = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.jpg`;
-    const outputPath = path.join(siteUploadDir, filename);
+    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const outputFilename = `${baseName}.jpg`;
+    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
+    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
+    const outputPath = path.join(siteUploadDir, outputFilename);
+    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
 
-    await watermarkImage(req.file.path, outputPath, settings.logo_text);
+    await saveOriginalCopy(req.file.path, originalCopyPath);
+    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'hero');
 
-    const imageUrl = `/uploads/site/${filename}`;
+    const imageUrl = `/uploads/site/${outputFilename}`;
     db.prepare('UPDATE site_settings SET hero_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(imageUrl);
 
     removeFileIfExists(req.file.path);
     removeUploadByUrl(settings.hero_image);
+    removeRelatedOriginalByProcessedUrl(settings.hero_image);
 
     return res.json({ imageUrl });
   } catch (error) {
@@ -895,11 +935,17 @@ app.post('/api/admin/hero-slides', requireAdmin, upload.single('image'), async (
 
   try {
     const settings = getSettings();
-    const filename = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.jpg`;
-    const outputPath = path.join(siteUploadDir, filename);
-    await watermarkImage(req.file.path, outputPath, settings.logo_text);
+    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const outputFilename = `${baseName}.jpg`;
+    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
+    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
+    const outputPath = path.join(siteUploadDir, outputFilename);
+    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
 
-    const imageUrl = `/uploads/site/${filename}`;
+    await saveOriginalCopy(req.file.path, originalCopyPath);
+    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
+
+    const imageUrl = `/uploads/site/${outputFilename}`;
     const sortOrder = Number(req.body.sortOrder || Date.now());
     const caption = String(req.body.caption || '').trim();
 
@@ -948,6 +994,7 @@ app.delete('/api/admin/hero-slides/:id', requireAdmin, (req, res) => {
 
   if (!usedByRoom && !usedByCover && !usedBySettings && !usedByOtherSlides) {
     removeUploadByUrl(slide.image_url);
+    removeRelatedOriginalByProcessedUrl(slide.image_url);
   }
 
   return res.json({ ok: true });
