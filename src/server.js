@@ -23,11 +23,16 @@ const isProduction = process.env.NODE_ENV === 'production';
 const forceSecureCookie = process.env.COOKIE_SECURE === '1';
 
 const publicDir = path.join(process.cwd(), 'public');
-const roomUploadDir = path.join(publicDir, 'uploads', 'rooms');
-const siteUploadDir = path.join(publicDir, 'uploads', 'site');
-const roomOriginalDir = path.join(publicDir, 'uploads', 'originals', 'rooms');
-const siteOriginalDir = path.join(publicDir, 'uploads', 'originals', 'site');
+const uploadRootDir = path.resolve(process.env.UPLOAD_ROOT_DIR || path.join(publicDir, 'uploads'));
+const roomUploadDir = path.join(uploadRootDir, 'rooms');
+const siteUploadDir = path.join(uploadRootDir, 'site');
+const roomOriginalDir = path.join(uploadRootDir, 'originals', 'rooms');
+const siteOriginalDir = path.join(uploadRootDir, 'originals', 'site');
 const tempUploadDir = path.join(process.cwd(), 'tmp-uploads');
+const uploadRootRelativeToPublic = path.relative(publicDir, uploadRootDir);
+const uploadsInsidePublic =
+  (uploadRootRelativeToPublic === '' ||
+    (!uploadRootRelativeToPublic.startsWith('..') && !path.isAbsolute(uploadRootRelativeToPublic)));
 
 fs.mkdirSync(roomUploadDir, { recursive: true });
 fs.mkdirSync(siteUploadDir, { recursive: true });
@@ -104,6 +109,9 @@ app.use(
 );
 
 app.use('/api', apiLimiter);
+if (!uploadsInsidePublic) {
+  app.use('/uploads', express.static(uploadRootDir));
+}
 app.use(express.static(publicDir));
 
 function slugify(value) {
@@ -189,16 +197,21 @@ function removeFileIfExists(filePath) {
   }
 }
 
+function uploadUrlToAbsolutePath(uploadUrl) {
+  if (!uploadUrl || !uploadUrl.startsWith('/uploads/')) return '';
+  const relativeUploadPath = uploadUrl.replace(/^\/uploads\/?/, '');
+  return path.join(uploadRootDir, relativeUploadPath);
+}
+
 function removeUploadByUrl(uploadUrl) {
-  if (!uploadUrl || !uploadUrl.startsWith('/uploads/')) return;
-  const filePath = path.join(publicDir, uploadUrl.replace(/^\//, ''));
+  const filePath = uploadUrlToAbsolutePath(uploadUrl);
+  if (!filePath) return;
   removeFileIfExists(filePath);
 }
 
 function removeRelatedOriginalByProcessedUrl(processedUrl) {
-  if (!processedUrl || !processedUrl.startsWith('/uploads/')) return;
-
-  const absoluteProcessedPath = path.join(publicDir, processedUrl.replace(/^\//, ''));
+  const absoluteProcessedPath = uploadUrlToAbsolutePath(processedUrl);
+  if (!absoluteProcessedPath) return;
   const directory = path.dirname(absoluteProcessedPath);
   const extension = path.extname(absoluteProcessedPath);
   const baseName = path.basename(absoluteProcessedPath, extension);

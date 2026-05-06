@@ -3,7 +3,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const Database = require('better-sqlite3');
 
-const dataDir = path.join(process.cwd(), 'data');
+const dataDir = path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'data'));
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }

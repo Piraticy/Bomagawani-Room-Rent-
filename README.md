@@ -58,6 +58,7 @@ Open:
 - `nginx/default.conf`
 - `ecosystem.config.cjs` (PM2 option)
 - `.github/workflows/ci.yml` (automatic checks)
+- `render.yaml` (always-on cloud deploy blueprint)
 
 ## Deploy With Docker
 
@@ -73,6 +74,27 @@ This starts:
 - `app` (Node.js booking platform)
 - `nginx` (reverse proxy on port 80)
 
+## Always-On Deploy (Render + GitHub)
+
+1. Push this repository to GitHub (main branch).
+2. Open Render dashboard and click **New > Blueprint**.
+3. Select this repo. Render will detect `render.yaml`.
+4. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` when asked.
+5. Deploy.
+
+After deploy:
+
+- You get a permanent public URL ending in `.onrender.com`.
+- Database and uploaded images are saved on persistent disk.
+- Every `git push` to `main` auto-updates the live site.
+
+### Connect Bomagawani.com
+
+1. In Render service, open **Settings > Custom Domains**.
+2. Add `bomagawani.com` and `www.bomagawani.com`.
+3. In your domain DNS panel, point records to Render values shown there.
+4. Wait for SSL to become active automatically.
+
 ## Environment Variables
 
 ```env
@@ -80,6 +102,8 @@ NODE_ENV=development
 PORT=3000
 TRUST_PROXY=0
 COOKIE_SECURE=0
+DATA_DIR=./data
+UPLOAD_ROOT_DIR=./public/uploads
 SESSION_SECRET=replace-with-long-random-secret
 ADMIN_EMAIL=admin@bomagawani.com
 ADMIN_PASSWORD=Admin@12345
