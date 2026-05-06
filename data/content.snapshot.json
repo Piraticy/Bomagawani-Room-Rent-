@@ -1,0 +1,114 @@
+{
+  "exportedAt": "2026-05-06T10:29:48.958Z",
+  "siteSettings": {
+    "siteName": "Bomagawani House Rent",
+    "domain": "Bomagawani.com",
+    "headline": "Beautiful Coastal Stays in Kigombe",
+    "subheadline": "Book the Master Bedroom or Guest Room in minutes with instant availability.",
+    "aboutText": "Bomagawani House Rent combines warm hospitality, modern comfort, and simple digital booking for travelers and families.",
+    "address": "Kigombe, Tanga, Tanzania",
+    "mapLink": "https://maps.google.com/?q=Kigombe%20Tanga%20Tanzania",
+    "contactPhone": "+255 700 000 000",
+    "contactEmail": "stay@bomagawani.com",
+    "checkInTime": "14:00",
+    "checkOutTime": "11:00",
+    "baseCurrency": "USD",
+    "logoText": "Bomagawani.com",
+    "heroImage": ""
+  },
+  "rooms": [
+    {
+      "name": "Master Bedroom",
+      "slug": "master-bedroom",
+      "shortDescription": "Premium private suite with balcony and ocean breeze.",
+      "longDescription": "The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.",
+      "pricePerNightUsd": 120,
+      "maxGuests": 2,
+      "sizeLabel": "38 m²",
+      "featured": true,
+      "active": true,
+      "coverImage": "",
+      "amenities": [
+        {
+          "icon": "wifi",
+          "label": "Fast Wi-Fi"
+        },
+        {
+          "icon": "waves",
+          "label": "Beach View"
+        },
+        {
+          "icon": "bath",
+          "label": "Private Bathroom"
+        },
+        {
+          "icon": "coffee",
+          "label": "Coffee Station"
+        },
+        {
+          "icon": "tv",
+          "label": "Smart TV"
+        }
+      ],
+      "images": []
+    },
+    {
+      "name": "Guest Room",
+      "slug": "guest-room",
+      "shortDescription": "Comfortable and affordable room for short or long stays.",
+      "longDescription": "The Guest Room offers a calm, clean, and budget-friendly option while still giving access to the full property experience.",
+      "pricePerNightUsd": 75,
+      "maxGuests": 2,
+      "sizeLabel": "24 m²",
+      "featured": false,
+      "active": true,
+      "coverImage": "",
+      "amenities": [
+        {
+          "icon": "wifi",
+          "label": "Fast Wi-Fi"
+        },
+        {
+          "icon": "fan",
+          "label": "Ceiling Fan"
+        },
+        {
+          "icon": "bath",
+          "label": "Private Bathroom"
+        },
+        {
+          "icon": "shirt",
+          "label": "Wardrobe"
+        }
+      ],
+      "images": []
+    }
+  ],
+  "platformLinks": [
+    {
+      "platformName": "Book Direct",
+      "url": "https://bomagawani.com",
+      "icon": "calendar-check",
+      "sortOrder": 1
+    },
+    {
+      "platformName": "Booking.com",
+      "url": "https://www.booking.com",
+      "icon": "hotel",
+      "sortOrder": 2
+    },
+    {
+      "platformName": "Tripadvisor",
+      "url": "https://www.tripadvisor.com",
+      "icon": "map-pin",
+      "sortOrder": 3
+    },
+    {
+      "platformName": "Google Travel",
+      "url": "https://www.google.com/travel/",
+      "icon": "plane",
+      "sortOrder": 4
+    }
+  ],
+  "heroSlides": []
+}

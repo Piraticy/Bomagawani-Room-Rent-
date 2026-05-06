@@ -93,6 +93,20 @@ Free tier note:
 - Uploaded photos and local SQLite data can reset after restarts/redeploys.
 - For full persistence later, switch to paid plan + disk.
 
+### Keep Admin Updates On Free Tier (Git Sync Workflow)
+
+Use this workflow whenever you update rooms/photos/content from admin and want it to stay after redeploy:
+
+1. Make your changes in admin on your local project.
+2. Export content snapshot:
+   - `npm run content:export`
+3. Commit changed files:
+   - `data/content.snapshot.json`
+   - `public/uploads/rooms/*`
+   - `public/uploads/site/*`
+4. Push to `main`.
+5. Render auto-redeploys and restores those updates from Git.
+
 ### Connect Bomagawani.com
 
 1. In Render service, open **Settings > Custom Domains**.

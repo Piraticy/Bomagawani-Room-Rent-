@@ -9,6 +9,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = path.join(dataDir, 'bomagawani.db');
+const contentSnapshotPath = path.resolve(process.env.CONTENT_SNAPSHOT_FILE || path.join(process.cwd(), 'data', 'content.snapshot.json'));
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
@@ -115,6 +116,220 @@ CREATE TABLE IF NOT EXISTS hero_slides (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 `);
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function asString(value, fallback = '') {
+  const normalized = String(value ?? '').trim();
+  return normalized || fallback;
+}
+
+function asNumber(value, fallback = 0) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function asInt(value, fallback = 0) {
+  return Math.round(asNumber(value, fallback));
+}
+
+function asBoolInt(value, fallback = 0) {
+  if (typeof value === 'boolean') return value ? 1 : 0;
+  if (value === 1 || value === '1') return 1;
+  if (value === 0 || value === '0') return 0;
+  return fallback ? 1 : 0;
+}
+
+function readContentSnapshot() {
+  if (!fs.existsSync(contentSnapshotPath)) return null;
+
+  try {
+    const raw = fs.readFileSync(contentSnapshotPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (error) {
+    console.warn('Invalid content snapshot file. Skipping sync.', error.message);
+    return null;
+  }
+}
+
+function applyContentSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return;
+
+  const applyTransaction = db.transaction((payload) => {
+    if (payload.siteSettings && typeof payload.siteSettings === 'object') {
+      const current = db.prepare('SELECT * FROM site_settings WHERE id = 1').get();
+
+      db.prepare(
+        `UPDATE site_settings
+         SET site_name = @site_name,
+             domain = @domain,
+             headline = @headline,
+             subheadline = @subheadline,
+             about_text = @about_text,
+             address = @address,
+             map_link = @map_link,
+             contact_phone = @contact_phone,
+             contact_email = @contact_email,
+             check_in_time = @check_in_time,
+             check_out_time = @check_out_time,
+             base_currency = @base_currency,
+             logo_text = @logo_text,
+             hero_image = @hero_image,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = 1`
+      ).run({
+        site_name: asString(payload.siteSettings.site_name ?? payload.siteSettings.siteName, current.site_name),
+        domain: asString(payload.siteSettings.domain, current.domain),
+        headline: asString(payload.siteSettings.headline, current.headline),
+        subheadline: asString(payload.siteSettings.subheadline, current.subheadline),
+        about_text: asString(payload.siteSettings.about_text ?? payload.siteSettings.aboutText, current.about_text),
+        address: asString(payload.siteSettings.address, current.address),
+        map_link: asString(payload.siteSettings.map_link ?? payload.siteSettings.mapLink, current.map_link),
+        contact_phone: asString(payload.siteSettings.contact_phone ?? payload.siteSettings.contactPhone, current.contact_phone),
+        contact_email: asString(payload.siteSettings.contact_email ?? payload.siteSettings.contactEmail, current.contact_email),
+        check_in_time: asString(payload.siteSettings.check_in_time ?? payload.siteSettings.checkInTime, current.check_in_time),
+        check_out_time: asString(payload.siteSettings.check_out_time ?? payload.siteSettings.checkOutTime, current.check_out_time),
+        base_currency: asString(payload.siteSettings.base_currency ?? payload.siteSettings.baseCurrency, current.base_currency),
+        logo_text: asString(payload.siteSettings.logo_text ?? payload.siteSettings.logoText, current.logo_text),
+        hero_image: asString(payload.siteSettings.hero_image ?? payload.siteSettings.heroImage, current.hero_image || '')
+      });
+    }
+
+    if (Array.isArray(payload.platformLinks)) {
+      db.prepare('DELETE FROM platform_links').run();
+      const insertLink = db.prepare(
+        'INSERT INTO platform_links (platform_name, url, icon, sort_order) VALUES (@platform_name, @url, @icon, @sort_order)'
+      );
+
+      payload.platformLinks.forEach((link, index) => {
+        insertLink.run({
+          platform_name: asString(link.platform_name ?? link.platformName, `Platform ${index + 1}`),
+          url: asString(link.url, '#'),
+          icon: asString(link.icon, 'link'),
+          sort_order: asInt(link.sort_order ?? link.sortOrder, index + 1)
+        });
+      });
+    }
+
+    if (Array.isArray(payload.heroSlides)) {
+      db.prepare('DELETE FROM hero_slides').run();
+      const insertSlide = db.prepare(
+        'INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (@image_url, @caption, @sort_order)'
+      );
+
+      payload.heroSlides.forEach((slide, index) => {
+        const imageUrl = asString(slide.image_url ?? slide.imageUrl);
+        if (!imageUrl) return;
+
+        insertSlide.run({
+          image_url: imageUrl,
+          caption: asString(slide.caption),
+          sort_order: asInt(slide.sort_order ?? slide.sortOrder, index + 1)
+        });
+      });
+    }
+
+    if (Array.isArray(payload.rooms) && payload.rooms.length > 0) {
+      const insertRoom = db.prepare(
+        `INSERT INTO rooms (
+          name, slug, short_description, long_description, price_per_night_usd,
+          max_guests, size_label, featured, amenities_json, cover_image, active, updated_at
+        ) VALUES (
+          @name, @slug, @short_description, @long_description, @price_per_night_usd,
+          @max_guests, @size_label, @featured, @amenities_json, @cover_image, @active, CURRENT_TIMESTAMP
+        )`
+      );
+
+      const updateRoom = db.prepare(
+        `UPDATE rooms
+         SET name = @name,
+             short_description = @short_description,
+             long_description = @long_description,
+             price_per_night_usd = @price_per_night_usd,
+             max_guests = @max_guests,
+             size_label = @size_label,
+             featured = @featured,
+             amenities_json = @amenities_json,
+             cover_image = @cover_image,
+             active = @active,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = @id`
+      );
+
+      const deleteRoomImages = db.prepare('DELETE FROM room_images WHERE room_id = ?');
+      const insertRoomImage = db.prepare(
+        'INSERT INTO room_images (room_id, image_url, caption, sort_order) VALUES (@room_id, @image_url, @caption, @sort_order)'
+      );
+
+      payload.rooms.forEach((room, index) => {
+        const roomName = asString(room.name, `Room ${index + 1}`);
+        const roomSlug = asString(room.slug, slugify(roomName)) || `room-${Date.now()}-${index + 1}`;
+        const existingRoom = db.prepare('SELECT * FROM rooms WHERE slug = ?').get(roomSlug);
+
+        const roomPayload = {
+          name: roomName,
+          slug: roomSlug,
+          short_description: asString(room.short_description ?? room.shortDescription, existingRoom?.short_description || ''),
+          long_description: asString(room.long_description ?? room.longDescription, existingRoom?.long_description || ''),
+          price_per_night_usd: Math.max(1, asNumber(room.price_per_night_usd ?? room.pricePerNightUsd, existingRoom?.price_per_night_usd || 1)),
+          max_guests: Math.max(1, asInt(room.max_guests ?? room.maxGuests, existingRoom?.max_guests || 1)),
+          size_label: asString(room.size_label ?? room.sizeLabel, existingRoom?.size_label || 'Room size'),
+          featured: asBoolInt(room.featured, existingRoom?.featured || 0),
+          amenities_json: JSON.stringify(Array.isArray(room.amenities) ? room.amenities : []),
+          cover_image: asString(room.cover_image ?? room.coverImage, existingRoom?.cover_image || ''),
+          active: asBoolInt(room.active, existingRoom ? existingRoom.active : 1)
+        };
+
+        let roomId = existingRoom?.id || null;
+        if (roomId) {
+          updateRoom.run({ ...roomPayload, id: roomId });
+        } else {
+          const inserted = insertRoom.run(roomPayload);
+          roomId = Number(inserted.lastInsertRowid);
+        }
+
+        deleteRoomImages.run(roomId);
+        const imageRows = Array.isArray(room.images) ? room.images : [];
+
+        imageRows.forEach((image, imageIndex) => {
+          const imageUrl = asString(image.image_url ?? image.imageUrl);
+          if (!imageUrl) return;
+
+          insertRoomImage.run({
+            room_id: roomId,
+            image_url: imageUrl,
+            caption: asString(image.caption),
+            sort_order: asInt(image.sort_order ?? image.sortOrder, imageIndex + 1)
+          });
+        });
+
+        if (!roomPayload.cover_image && imageRows.length > 0) {
+          const firstImage = imageRows.find((image) => asString(image.image_url ?? image.imageUrl));
+          if (firstImage) {
+            db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
+              asString(firstImage.image_url ?? firstImage.imageUrl),
+              roomId
+            );
+          }
+        }
+      });
+    }
+  });
+
+  try {
+    applyTransaction(snapshot);
+  } catch (error) {
+    console.warn('Content snapshot sync failed. Keeping current DB data.', error.message);
+  }
+}
 
 function hasColumn(tableName, columnName) {
   return db.prepare(`PRAGMA table_info(${tableName})`).all().some((column) => column.name === columnName);
@@ -274,5 +489,7 @@ if (!heroSlidesCount) {
     insertSlide.run(imageUrl, '', index + 1);
   });
 }
+
+applyContentSnapshot(readContentSnapshot());
 
 module.exports = db;

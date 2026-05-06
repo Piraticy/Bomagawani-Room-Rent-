@@ -2,9 +2,7 @@ node_modules
 .env
 data/*.db
 data/*.db-*
-public/uploads/rooms/*
-!public/uploads/rooms/.gitkeep
-public/uploads/site/*
-!public/uploads/site/.gitkeep
+public/uploads/originals/*
+!public/uploads/originals/.gitkeep
 tmp-uploads
 .DS_Store

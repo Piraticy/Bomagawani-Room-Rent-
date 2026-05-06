@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
-    "check": "node --check src/server.js && node --check src/db.js && node --check public/app.js && node --check public/admin.js"
+    "check": "node --check src/server.js && node --check src/db.js && node --check public/app.js && node --check public/admin.js",
+    "content:export": "node src/scripts/export-content.js"
   },
   "repository": {
     "type": "git",
