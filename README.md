@@ -74,7 +74,7 @@ This starts:
 - `app` (Node.js booking platform)
 - `nginx` (reverse proxy on port 80)
 
-## Always-On Deploy (Render + GitHub)
+## Free Deploy (Render + GitHub)
 
 1. Push this repository to GitHub (main branch).
 2. Open Render dashboard and click **New > Blueprint**.
@@ -85,8 +85,13 @@ This starts:
 After deploy:
 
 - You get a permanent public URL ending in `.onrender.com`.
-- Database and uploaded images are saved on persistent disk.
 - Every `git push` to `main` auto-updates the live site.
+
+Free tier note:
+
+- On free tier, file storage is not persistent.
+- Uploaded photos and local SQLite data can reset after restarts/redeploys.
+- For full persistence later, switch to paid plan + disk.
 
 ### Connect Bomagawani.com
 

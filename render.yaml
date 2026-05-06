@@ -2,7 +2,7 @@ services:
   - type: web
     name: bomagawani-room-rent
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
     buildCommand: npm ci --omit=dev
     startCommand: npm start
@@ -18,16 +18,12 @@ services:
       - key: COOKIE_SECURE
         value: "1"
       - key: DATA_DIR
-        value: /var/data/data
+        value: ./data
       - key: UPLOAD_ROOT_DIR
-        value: /var/data/uploads
+        value: ./public/uploads
       - key: SESSION_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-    disk:
-      name: bomagawani-storage
-      mountPath: /var/data
-      sizeGB: 10
