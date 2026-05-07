@@ -21,6 +21,8 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const isProduction = process.env.NODE_ENV === 'production';
 const forceSecureCookie = process.env.COOKIE_SECURE === '1';
+const maxUploadSizeMb = Math.max(1, Number(process.env.MAX_UPLOAD_SIZE_MB || 25));
+const maxUploadSizeBytes = maxUploadSizeMb * 1024 * 1024;
 
 const publicDir = path.join(process.cwd(), 'public');
 const uploadRootDir = path.resolve(process.env.UPLOAD_ROOT_DIR || path.join(publicDir, 'uploads'));
@@ -81,7 +83,7 @@ const adminLoginLimiter = rateLimit({
 const upload = multer({
   dest: tempUploadDir,
   limits: {
-    fileSize: 7 * 1024 * 1024
+    fileSize: maxUploadSizeBytes
   },
   fileFilter: (req, file, callback) => {
     if (!file.mimetype.startsWith('image/')) {
@@ -1104,6 +1106,14 @@ app.get('/', (req, res) => {
 app.use((error, req, res, next) => {
   if (req.file?.path) {
     removeFileIfExists(req.file.path);
+  }
+
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ error: `Image is too large. Max allowed size is ${maxUploadSizeMb}MB.` });
+    }
+
+    return res.status(400).json({ error: 'Upload request is invalid. Please try again with one image file.' });
   }
 
   if (error?.message === 'Only image files are allowed.') {

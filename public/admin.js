@@ -85,14 +85,24 @@ function setStatus(element, message, ok = true) {
 
 async function api(path, options = {}) {
   const response = await fetch(path, options);
+  const rawBody = await response.text();
   const contentType = response.headers.get('content-type') || '';
-  const payload = contentType.includes('application/json') ? await response.json() : {};
+  let payload = null;
 
-  if (!response.ok) {
-    throw new Error(payload.error || 'Request failed');
+  if (contentType.includes('application/json') && rawBody) {
+    try {
+      payload = JSON.parse(rawBody);
+    } catch (error) {
+      payload = null;
+    }
   }
 
-  return payload;
+  if (!response.ok) {
+    const message = payload?.error || `Request failed (HTTP ${response.status}).`;
+    throw new Error(message);
+  }
+
+  return payload || {};
 }
 
 function parseAmenitiesText(text) {

@@ -121,6 +121,7 @@ NODE_ENV=development
 PORT=3000
 TRUST_PROXY=0
 COOKIE_SECURE=0
+MAX_UPLOAD_SIZE_MB=25
 DATA_DIR=./data
 UPLOAD_ROOT_DIR=./public/uploads
 SESSION_SECRET=replace-with-long-random-secret
