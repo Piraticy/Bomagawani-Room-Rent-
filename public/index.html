@@ -235,6 +235,24 @@
       </div>
     </section>
 
+    <section class="chatbot-widget" id="chatbot-widget">
+      <button type="button" class="chatbot-toggle" id="chatbot-toggle" aria-label="Open chat assistant">
+        <i data-lucide="message-circle"></i>
+        <span>Chat</span>
+      </button>
+
+      <div class="chatbot-panel" id="chatbot-panel" hidden>
+        <div class="chatbot-head">
+          <h4 id="chatbot-title">Quick Help</h4>
+          <button type="button" id="chatbot-close" class="chatbot-close" aria-label="Close chat">×</button>
+        </div>
+        <p id="chatbot-greeting">Hi. Ask me anything about rooms, prices, check-in, or booking.</p>
+        <div class="chatbot-faq-list" id="chatbot-faq-list"></div>
+        <div class="chatbot-answer" id="chatbot-answer"></div>
+        <a class="primary-btn wide" id="chatbot-whatsapp" target="_blank" rel="noreferrer">Chat with human on WhatsApp</a>
+      </div>
+    </section>
+
     <script id="seo-structured-data" type="application/ld+json">
       {}
     </script>

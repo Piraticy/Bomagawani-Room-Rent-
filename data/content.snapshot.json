@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-05-06T10:29:48.958Z",
+  "exportedAt": "2026-05-27T12:08:53.786Z",
   "siteSettings": {
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
@@ -38,16 +38,28 @@
           "label": "Beach View"
         },
         {
-          "icon": "bath",
-          "label": "Private Bathroom"
-        },
-        {
-          "icon": "coffee",
-          "label": "Coffee Station"
-        },
-        {
           "icon": "tv",
           "label": "Smart TV"
+        },
+        {
+          "icon": "utensils",
+          "label": "Sea Food"
+        },
+        {
+          "icon": "wind",
+          "label": "Fresh Air"
+        },
+        {
+          "icon": "waves",
+          "label": "Swimming"
+        },
+        {
+          "icon": "zap",
+          "label": "Electricity 24hrs"
+        },
+        {
+          "icon": "glass-water",
+          "label": "Drinks"
         }
       ],
       "images": []
@@ -73,12 +85,32 @@
           "label": "Ceiling Fan"
         },
         {
-          "icon": "bath",
-          "label": "Private Bathroom"
-        },
-        {
           "icon": "shirt",
           "label": "Wardrobe"
+        },
+        {
+          "icon": "waves",
+          "label": "Beach View"
+        },
+        {
+          "icon": "utensils",
+          "label": "Sea Food"
+        },
+        {
+          "icon": "wind",
+          "label": "Fresh Air"
+        },
+        {
+          "icon": "waves",
+          "label": "Swimming"
+        },
+        {
+          "icon": "zap",
+          "label": "Electricity 24hrs"
+        },
+        {
+          "icon": "glass-water",
+          "label": "Drinks"
         }
       ],
       "images": []
@@ -110,5 +142,29 @@
       "sortOrder": 4
     }
   ],
-  "heroSlides": []
+  "heroSlides": [],
+  "chatbot": {
+    "title": "Quick Help",
+    "greeting": "Hi. Ask me anything about rooms, prices, check-in, or booking.",
+    "whatsappNumber": "255700000000",
+    "whatsappMessage": "Hello Bomagawani, I need help with booking.",
+    "enabled": true
+  },
+  "chatbotFaqs": [
+    {
+      "question": "Which rooms are available?",
+      "answer": "Master Bedroom and Guest Room are available. More can be added by admin.",
+      "sortOrder": 1
+    },
+    {
+      "question": "What time is check-in and check-out?",
+      "answer": "Check-in starts at 14:00 and check-out is 11:00.",
+      "sortOrder": 2
+    },
+    {
+      "question": "How can I confirm my booking?",
+      "answer": "Submit your booking request and our team will confirm quickly. You get a booking code instantly.",
+      "sortOrder": 3
+    }
+  ]
 }

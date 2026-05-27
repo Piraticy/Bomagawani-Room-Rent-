@@ -271,6 +271,14 @@ function getHeroSlides() {
   return db.prepare('SELECT id, image_url, caption, sort_order FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
 }
 
+function getChatbotSettings() {
+  return db.prepare('SELECT id, title, greeting, whatsapp_number, whatsapp_message, enabled FROM chatbot_settings WHERE id = 1').get();
+}
+
+function getChatbotFaqs() {
+  return db.prepare('SELECT id, question, answer, sort_order FROM chatbot_faqs ORDER BY sort_order ASC, id ASC').all();
+}
+
 function getConfirmedRanges(roomId) {
   return db
     .prepare(
@@ -363,6 +371,8 @@ app.get('/api/public/bootstrap', async (req, res) => {
       rooms,
       links: getPlatformLinks(),
       heroSlides: getHeroSlides(),
+      chatbot: getChatbotSettings(),
+      chatbotFaqs: getChatbotFaqs(),
       currencies: Object.keys(rates).filter((c) => ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'].includes(c))
     });
   } catch (error) {
@@ -641,7 +651,9 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     settings: getSettings(),
     rooms: getAllRooms(),
     links: getPlatformLinks(),
-    heroSlides: getHeroSlides()
+    heroSlides: getHeroSlides(),
+    chatbot: getChatbotSettings(),
+    chatbotFaqs: getChatbotFaqs()
   });
 });
 
@@ -1088,6 +1100,61 @@ app.put('/api/admin/platform-links', requireAdmin, (req, res) => {
       if (platformName && /^https?:\/\//.test(url)) {
         insert.run(platformName, url, icon, Number(link.sortOrder ?? index + 1));
       }
+    });
+  });
+
+  trx();
+  return res.json({ ok: true });
+});
+
+app.put('/api/admin/chatbot-settings', requireAdmin, (req, res) => {
+  const title = String(req.body.title || '').trim();
+  const greeting = String(req.body.greeting || '').trim();
+  const whatsappNumber = String(req.body.whatsappNumber || '').replace(/[^\d]/g, '');
+  const whatsappMessage = String(req.body.whatsappMessage || '').trim();
+  const enabled = req.body.enabled === false ? 0 : 1;
+
+  if (!title || !greeting || !whatsappNumber || !whatsappMessage) {
+    return res.status(400).json({ error: 'Please complete chatbot settings fields.' });
+  }
+
+  if (whatsappNumber.length < 8) {
+    return res.status(400).json({ error: 'WhatsApp number is too short.' });
+  }
+
+  db.prepare(
+    `UPDATE chatbot_settings
+     SET title = @title,
+         greeting = @greeting,
+         whatsapp_number = @whatsapp_number,
+         whatsapp_message = @whatsapp_message,
+         enabled = @enabled,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = 1`
+  ).run({
+    title,
+    greeting,
+    whatsapp_number: whatsappNumber,
+    whatsapp_message: whatsappMessage,
+    enabled
+  });
+
+  return res.json({ ok: true });
+});
+
+app.put('/api/admin/chatbot-faqs', requireAdmin, (req, res) => {
+  const faqs = Array.isArray(req.body.faqs) ? req.body.faqs : [];
+
+  const trx = db.transaction(() => {
+    db.prepare('DELETE FROM chatbot_faqs').run();
+
+    const insert = db.prepare('INSERT INTO chatbot_faqs (question, answer, sort_order) VALUES (?, ?, ?)');
+    faqs.forEach((faq, index) => {
+      const question = String(faq.question || '').trim();
+      const answer = String(faq.answer || '').trim();
+      if (!question || !answer) return;
+
+      insert.run(question, answer, Number(faq.sortOrder ?? index + 1));
     });
   });
 

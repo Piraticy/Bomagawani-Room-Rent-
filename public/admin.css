@@ -384,6 +384,18 @@ select {
   margin-bottom: 8px;
 }
 
+.chatbot-faq-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chatbot-faq-row textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -418,6 +430,10 @@ td {
   }
 
   .link-row {
+    grid-template-columns: 1fr;
+  }
+
+  .chatbot-faq-row {
     grid-template-columns: 1fr;
   }
 

@@ -35,6 +35,8 @@ const translations = {
     'location.openMap': 'Open Map',
     'location.route': 'Use my location for route',
     'channels.title': 'Also listed on travel channels',
+    'chatbot.answerPlaceholder': 'Tap a question to get a quick answer.',
+    'chatbot.whatsapp': 'Chat with human on WhatsApp',
     'quote.empty': 'Enter dates to see your live quote.',
     'quote.loading': 'Calculating quote...',
     'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
@@ -107,6 +109,8 @@ const translations = {
     'location.openMap': 'Fungua Ramani',
     'location.route': 'Tumia eneo langu kwa njia',
     'channels.title': 'Pia tupo kwenye majukwaa haya',
+    'chatbot.answerPlaceholder': 'Bonyeza swali kupata jibu la haraka.',
+    'chatbot.whatsapp': 'Ongea na mtu kupitia WhatsApp',
     'quote.empty': 'Weka tarehe kuona bei ya moja kwa moja.',
     'quote.loading': 'Inahesabu bei...',
     'quote.conflict': 'Tarehe hizi tayari zimechukuliwa. Tafadhali chagua tarehe nyingine.',
@@ -152,6 +156,8 @@ const state = {
   rooms: [],
   links: [],
   heroSlides: [],
+  chatbot: null,
+  chatbotFaqs: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
   currentQuote: null,
   deferredInstallPrompt: null,
@@ -208,7 +214,16 @@ const dom = {
   languageNo: document.getElementById('language-no'),
   installPrompt: document.getElementById('install-prompt'),
   installYes: document.getElementById('install-yes'),
-  installNo: document.getElementById('install-no')
+  installNo: document.getElementById('install-no'),
+  chatbotWidget: document.getElementById('chatbot-widget'),
+  chatbotToggle: document.getElementById('chatbot-toggle'),
+  chatbotPanel: document.getElementById('chatbot-panel'),
+  chatbotClose: document.getElementById('chatbot-close'),
+  chatbotTitle: document.getElementById('chatbot-title'),
+  chatbotGreeting: document.getElementById('chatbot-greeting'),
+  chatbotFaqList: document.getElementById('chatbot-faq-list'),
+  chatbotAnswer: document.getElementById('chatbot-answer'),
+  chatbotWhatsapp: document.getElementById('chatbot-whatsapp')
 };
 
 const FALLBACK_PHONE_COUNTRIES = [
@@ -235,7 +250,11 @@ const amenityIconMap = {
   pool: 'waves',
   beach: 'waves',
   waves: 'waves',
-  lock: 'shield-check'
+  lock: 'shield-check',
+  utensils: 'utensils-crossed',
+  wind: 'wind',
+  zap: 'zap',
+  'glass-water': 'glass-water'
 };
 
 function t(key, vars = {}) {
@@ -340,6 +359,7 @@ function setLanguage(languageCode) {
   state.language = nextLanguage;
   localStorage.setItem('preferred_language', nextLanguage);
   applyTranslations();
+  renderChatbot();
 
   if (state.currentQuote) {
     renderQuote(state.currentQuote);
@@ -625,6 +645,45 @@ function renderAmenities() {
     item.innerHTML = `<i data-lucide="${iconName}"></i><span>${amenity.label}</span>`;
     dom.amenityWall.appendChild(item);
   });
+}
+
+function buildWhatsAppLink(number, message) {
+  const digits = String(number || '').replace(/[^\d]/g, '');
+  if (!digits) return '#';
+  return `https://wa.me/${digits}?text=${encodeURIComponent(String(message || '').trim())}`;
+}
+
+function renderChatbotAnswer(answerText = '') {
+  dom.chatbotAnswer.textContent = answerText || t('chatbot.answerPlaceholder');
+}
+
+function renderChatbot() {
+  const chatbot = state.chatbot || {};
+  const enabled = chatbot.enabled !== 0 && chatbot.enabled !== false;
+
+  if (!enabled) {
+    dom.chatbotWidget.hidden = true;
+    return;
+  }
+
+  dom.chatbotWidget.hidden = false;
+  dom.chatbotTitle.textContent = chatbot.title || 'Quick Help';
+  dom.chatbotGreeting.textContent = chatbot.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.';
+  dom.chatbotWhatsapp.textContent = t('chatbot.whatsapp');
+  dom.chatbotWhatsapp.href = buildWhatsAppLink(chatbot.whatsapp_number, chatbot.whatsapp_message);
+
+  dom.chatbotFaqList.innerHTML = '';
+  const faqs = Array.isArray(state.chatbotFaqs) ? state.chatbotFaqs : [];
+  faqs.forEach((faq) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'chatbot-faq-btn';
+    button.textContent = faq.question;
+    button.addEventListener('click', () => renderChatbotAnswer(faq.answer));
+    dom.chatbotFaqList.appendChild(button);
+  });
+
+  renderChatbotAnswer('');
 }
 
 function renderCurrencies() {
@@ -1027,6 +1086,16 @@ function configureInstallPrompt() {
   });
 }
 
+function configureChatbot() {
+  dom.chatbotToggle.addEventListener('click', () => {
+    dom.chatbotPanel.hidden = !dom.chatbotPanel.hidden;
+  });
+
+  dom.chatbotClose.addEventListener('click', () => {
+    dom.chatbotPanel.hidden = true;
+  });
+}
+
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -1044,12 +1113,15 @@ async function boot() {
     state.rooms = data.rooms;
     state.links = data.links;
     state.heroSlides = data.heroSlides || [];
+    state.chatbot = data.chatbot || null;
+    state.chatbotFaqs = data.chatbotFaqs || [];
     state.currencies = data.currencies?.length ? data.currencies : state.currencies;
 
     applySettings();
     renderLinks();
     renderRooms();
     renderAmenities();
+    renderChatbot();
     renderCurrencies();
     updateStructuredData();
     applyTranslations();
@@ -1068,6 +1140,7 @@ configurePhoneInput();
 configureLocationRoute();
 configureInstallPrompt();
 registerServiceWorker();
+configureChatbot();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
 dom.trackingForm.addEventListener('submit', trackBooking);

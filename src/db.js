@@ -115,6 +115,24 @@ CREATE TABLE IF NOT EXISTS hero_slides (
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS chatbot_settings (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  title TEXT NOT NULL,
+  greeting TEXT NOT NULL,
+  whatsapp_number TEXT NOT NULL,
+  whatsapp_message TEXT NOT NULL,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS chatbot_faqs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 `);
 
 function slugify(value) {
@@ -233,6 +251,45 @@ function applyContentSnapshot(snapshot) {
           image_url: imageUrl,
           caption: asString(slide.caption),
           sort_order: asInt(slide.sort_order ?? slide.sortOrder, index + 1)
+        });
+      });
+    }
+
+    if (payload.chatbot && typeof payload.chatbot === 'object') {
+      const current = db.prepare('SELECT * FROM chatbot_settings WHERE id = 1').get();
+      db.prepare(
+        `UPDATE chatbot_settings
+         SET title = @title,
+             greeting = @greeting,
+             whatsapp_number = @whatsapp_number,
+             whatsapp_message = @whatsapp_message,
+             enabled = @enabled,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = 1`
+      ).run({
+        title: asString(payload.chatbot.title, current?.title || 'Quick Help'),
+        greeting: asString(payload.chatbot.greeting, current?.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.'),
+        whatsapp_number: asString(payload.chatbot.whatsapp_number ?? payload.chatbot.whatsappNumber, current?.whatsapp_number || '255700000000'),
+        whatsapp_message: asString(payload.chatbot.whatsapp_message ?? payload.chatbot.whatsappMessage, current?.whatsapp_message || 'Hello Bomagawani, I need help with booking.'),
+        enabled: asBoolInt(payload.chatbot.enabled, current ? current.enabled : 1)
+      });
+    }
+
+    if (Array.isArray(payload.chatbotFaqs)) {
+      db.prepare('DELETE FROM chatbot_faqs').run();
+      const insertFaq = db.prepare(
+        'INSERT INTO chatbot_faqs (question, answer, sort_order) VALUES (@question, @answer, @sort_order)'
+      );
+
+      payload.chatbotFaqs.forEach((item, index) => {
+        const question = asString(item.question);
+        const answer = asString(item.answer);
+        if (!question || !answer) return;
+
+        insertFaq.run({
+          question,
+          answer,
+          sort_order: asInt(item.sort_order ?? item.sortOrder, index + 1)
         });
       });
     }
@@ -399,9 +456,11 @@ if (!roomsCount) {
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
       { icon: 'waves', label: 'Beach View' },
-      { icon: 'bath', label: 'Private Bathroom' },
-      { icon: 'coffee', label: 'Coffee Station' },
-      { icon: 'tv', label: 'Smart TV' }
+      { icon: 'utensils', label: 'Sea Food' },
+      { icon: 'wind', label: 'Fresh Air' },
+      { icon: 'waves', label: 'Swimming' },
+      { icon: 'zap', label: 'Electricity 24hrs' },
+      { icon: 'glass-water', label: 'Drinks' }
     ])
   });
 
@@ -416,9 +475,11 @@ if (!roomsCount) {
     featured: 0,
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
-      { icon: 'fan', label: 'Ceiling Fan' },
-      { icon: 'bath', label: 'Private Bathroom' },
-      { icon: 'shirt', label: 'Wardrobe' }
+      { icon: 'utensils', label: 'Sea Food' },
+      { icon: 'wind', label: 'Fresh Air' },
+      { icon: 'waves', label: 'Swimming' },
+      { icon: 'zap', label: 'Electricity 24hrs' },
+      { icon: 'glass-water', label: 'Drinks' }
     ])
   });
 }
@@ -440,32 +501,73 @@ if (!adminCount) {
   db.prepare('INSERT INTO admins (full_name, email, password_hash) VALUES (?, ?, ?)').run('Main Admin', adminEmail, passwordHash);
 }
 
-const masterRoom = db.prepare("SELECT id, amenities_json FROM rooms WHERE slug = 'master-bedroom'").get();
-if (masterRoom) {
-  const amenities = JSON.parse(masterRoom.amenities_json || '[]');
-  let changed = false;
-
-  const normalizedAmenities = amenities.map((item) => {
-    if (item.label === 'Air Conditioning') {
-      changed = true;
-      return { icon: 'waves', label: 'Beach View' };
-    }
-    return item;
+const chatbotSettingsCount = db.prepare('SELECT COUNT(*) AS count FROM chatbot_settings').get().count;
+if (!chatbotSettingsCount) {
+  db.prepare(
+    `INSERT INTO chatbot_settings (
+      id, title, greeting, whatsapp_number, whatsapp_message, enabled
+    ) VALUES (
+      1, @title, @greeting, @whatsapp_number, @whatsapp_message, @enabled
+    )`
+  ).run({
+    title: 'Quick Help',
+    greeting: 'Hi. Ask me anything about rooms, prices, check-in, or booking.',
+    whatsapp_number: '255700000000',
+    whatsapp_message: 'Hello Bomagawani, I need help with booking.',
+    enabled: 1
   });
-
-  const hasBeachView = normalizedAmenities.some((item) => item.label === 'Beach View');
-  if (!hasBeachView) {
-    changed = true;
-    normalizedAmenities.push({ icon: 'waves', label: 'Beach View' });
-  }
-
-  if (changed) {
-    db.prepare('UPDATE rooms SET amenities_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
-      JSON.stringify(normalizedAmenities),
-      masterRoom.id
-    );
-  }
 }
+
+const chatbotFaqCount = db.prepare('SELECT COUNT(*) AS count FROM chatbot_faqs').get().count;
+if (!chatbotFaqCount) {
+  const insertFaq = db.prepare('INSERT INTO chatbot_faqs (question, answer, sort_order) VALUES (?, ?, ?)');
+  insertFaq.run('Which rooms are available?', 'Master Bedroom and Guest Room are available. More can be added by admin.', 1);
+  insertFaq.run('What time is check-in and check-out?', 'Check-in starts at 14:00 and check-out is 11:00.', 2);
+  insertFaq.run('How can I confirm my booking?', 'Submit your booking request and our team will confirm quickly. You get a booking code instantly.', 3);
+}
+
+function applyAmenityUpgrade() {
+  const masterRoom = db.prepare("SELECT id FROM rooms WHERE slug = 'master-bedroom'").get();
+  if (!masterRoom) return;
+
+  const defaultAmenityPool = [
+    { icon: 'wifi', label: 'Fast Wi-Fi' },
+    { icon: 'waves', label: 'Beach View' },
+    { icon: 'utensils', label: 'Sea Food' },
+    { icon: 'wind', label: 'Fresh Air' },
+    { icon: 'waves', label: 'Swimming' },
+    { icon: 'zap', label: 'Electricity 24hrs' },
+    { icon: 'glass-water', label: 'Drinks' }
+  ];
+
+  const rooms = db.prepare("SELECT id, amenities_json FROM rooms WHERE slug IN ('master-bedroom', 'guest-room')").all();
+  rooms.forEach((room) => {
+    const current = JSON.parse(room.amenities_json || '[]');
+    const hasLegacyAmenities = current.some((item) => ['Private Bathroom', 'Coffee Station', 'Air Conditioning'].includes(item.label));
+    if (!hasLegacyAmenities) return;
+
+    const mergedByLabel = new Map();
+    current.forEach((item) => {
+      if (['Private Bathroom', 'Coffee Station', 'Air Conditioning'].includes(item.label)) return;
+      const label = asString(item.label);
+      if (!label) return;
+      mergedByLabel.set(label.toLowerCase(), { icon: asString(item.icon, 'sparkles'), label });
+    });
+
+    defaultAmenityPool.forEach((item) => {
+      if (!mergedByLabel.has(item.label.toLowerCase())) {
+        mergedByLabel.set(item.label.toLowerCase(), item);
+      }
+    });
+
+    db.prepare('UPDATE rooms SET amenities_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
+      JSON.stringify([...mergedByLabel.values()]),
+      room.id
+    );
+  });
+}
+
+applyAmenityUpgrade();
 
 const heroSlidesCount = db.prepare('SELECT COUNT(*) AS count FROM hero_slides').get().count;
 if (!heroSlidesCount) {
@@ -491,5 +593,6 @@ if (!heroSlidesCount) {
 }
 
 applyContentSnapshot(readContentSnapshot());
+applyAmenityUpgrade();
 
 module.exports = db;

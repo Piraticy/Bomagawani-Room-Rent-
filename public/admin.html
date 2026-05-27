@@ -65,6 +65,7 @@
             <button type="button" class="tab-btn" data-tab="rooms">Room Manager</button>
             <button type="button" class="tab-btn" data-tab="media">Room Media Manager</button>
             <button type="button" class="tab-btn" data-tab="channels">Platform Links</button>
+            <button type="button" class="tab-btn" data-tab="chatbot">Chat Bot</button>
             <button type="button" class="tab-btn" data-tab="bookings">Booking Requests</button>
           </aside>
 
@@ -169,6 +170,33 @@
               <button id="save-links" class="primary-btn" type="button">Save Platform Links</button>
             </div>
             <p class="status" id="links-status"></p>
+            </section>
+
+            <section class="panel tab-panel" data-tab-panel="chatbot" hidden>
+              <h2>Chat Bot</h2>
+              <p>Manage quick answers and WhatsApp handoff for guests.</p>
+
+              <form id="chatbot-settings-form" class="form-grid">
+                <label>Title <input id="chatbot-title" required /></label>
+                <label>WhatsApp Number (digits only, with country code) <input id="chatbot-whatsapp-number" required /></label>
+                <label class="full">Greeting <textarea id="chatbot-greeting" rows="2" required></textarea></label>
+                <label class="full">WhatsApp Prefilled Message <textarea id="chatbot-whatsapp-message" rows="2" required></textarea></label>
+                <label class="inline"><input type="checkbox" id="chatbot-enabled" checked /> Enable chat bot on landing page</label>
+                <div class="action-row full">
+                  <button type="submit" class="primary-btn">Save Chat Bot Settings</button>
+                </div>
+                <p class="status full" id="chatbot-settings-status"></p>
+              </form>
+
+              <div class="stack-form">
+                <h3>Quick Answers</h3>
+                <div id="chatbot-faq-wrap"></div>
+                <div class="action-row">
+                  <button type="button" id="add-chatbot-faq-row" class="ghost-btn">Add Question</button>
+                  <button type="button" id="save-chatbot-faqs" class="primary-btn">Save Quick Answers</button>
+                </div>
+                <p class="status" id="chatbot-faq-status"></p>
+              </div>
             </section>
 
             <section class="panel tab-panel" data-tab-panel="bookings" hidden>

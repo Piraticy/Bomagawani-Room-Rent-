@@ -67,6 +67,18 @@ const dom = {
   saveLinks: document.getElementById('save-links'),
   linksStatus: document.getElementById('links-status'),
 
+  chatbotSettingsForm: document.getElementById('chatbot-settings-form'),
+  chatbotTitle: document.getElementById('chatbot-title'),
+  chatbotGreeting: document.getElementById('chatbot-greeting'),
+  chatbotWhatsappNumber: document.getElementById('chatbot-whatsapp-number'),
+  chatbotWhatsappMessage: document.getElementById('chatbot-whatsapp-message'),
+  chatbotEnabled: document.getElementById('chatbot-enabled'),
+  chatbotSettingsStatus: document.getElementById('chatbot-settings-status'),
+  chatbotFaqWrap: document.getElementById('chatbot-faq-wrap'),
+  addChatbotFaqRow: document.getElementById('add-chatbot-faq-row'),
+  saveChatbotFaqs: document.getElementById('save-chatbot-faqs'),
+  chatbotFaqStatus: document.getElementById('chatbot-faq-status'),
+
   bookingsTableWrap: document.getElementById('bookings-table-wrap')
 };
 
@@ -74,7 +86,9 @@ const state = {
   rooms: [],
   links: [],
   bookings: [],
-  heroSlides: []
+  heroSlides: [],
+  chatbot: null,
+  chatbotFaqs: []
 };
 
 function setStatus(element, message, ok = true) {
@@ -321,6 +335,38 @@ function renderLinks() {
   state.links.forEach((link) => addLinkRow(link));
 }
 
+function populateChatbotSettings(chatbot) {
+  dom.chatbotTitle.value = chatbot?.title || 'Quick Help';
+  dom.chatbotGreeting.value = chatbot?.greeting || '';
+  dom.chatbotWhatsappNumber.value = chatbot?.whatsapp_number || '';
+  dom.chatbotWhatsappMessage.value = chatbot?.whatsapp_message || '';
+  dom.chatbotEnabled.checked = chatbot?.enabled !== 0 && chatbot?.enabled !== false;
+}
+
+function addChatbotFaqRow(data = { question: '', answer: '', sort_order: 0 }) {
+  const row = document.createElement('div');
+  row.className = 'chatbot-faq-row';
+  row.innerHTML = `
+    <input placeholder="Question" value="${data.question || ''}" data-chat-faq="question" />
+    <textarea placeholder="Answer" data-chat-faq="answer">${data.answer || ''}</textarea>
+    <button type="button" class="small-btn warn" data-chat-faq-remove>Remove</button>
+  `;
+
+  row.querySelector('[data-chat-faq-remove]').addEventListener('click', () => row.remove());
+  dom.chatbotFaqWrap.appendChild(row);
+}
+
+function renderChatbotFaqs() {
+  dom.chatbotFaqWrap.innerHTML = '';
+
+  if (!state.chatbotFaqs.length) {
+    addChatbotFaqRow();
+    return;
+  }
+
+  state.chatbotFaqs.forEach((item) => addChatbotFaqRow(item));
+}
+
 function renderBookings() {
   const rows = state.bookings
     .map(
@@ -497,6 +543,8 @@ async function loadDashboard() {
   state.rooms = data.rooms;
   state.links = data.links;
   state.heroSlides = data.heroSlides || [];
+  state.chatbot = data.chatbot || null;
+  state.chatbotFaqs = data.chatbotFaqs || [];
   state.bookings = bookingsPayload.bookings;
 
   renderSummary(data.summary);
@@ -505,6 +553,8 @@ async function loadDashboard() {
   renderRoomGallery();
   renderHeroSlides();
   renderLinks();
+  populateChatbotSettings(state.chatbot);
+  renderChatbotFaqs();
   renderBookings();
 }
 
@@ -752,6 +802,59 @@ dom.saveLinks.addEventListener('click', async () => {
     await loadDashboard();
   } catch (error) {
     setStatus(dom.linksStatus, error.message, false);
+  }
+});
+
+dom.chatbotSettingsForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  try {
+    await api('/api/admin/chatbot-settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: dom.chatbotTitle.value.trim(),
+        greeting: dom.chatbotGreeting.value.trim(),
+        whatsappNumber: dom.chatbotWhatsappNumber.value.trim(),
+        whatsappMessage: dom.chatbotWhatsappMessage.value.trim(),
+        enabled: dom.chatbotEnabled.checked
+      })
+    });
+
+    setStatus(dom.chatbotSettingsStatus, 'Chat bot settings saved.');
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.chatbotSettingsStatus, error.message, false);
+  }
+});
+
+dom.addChatbotFaqRow.addEventListener('click', () => addChatbotFaqRow());
+
+dom.saveChatbotFaqs.addEventListener('click', async () => {
+  const faqs = [...dom.chatbotFaqWrap.querySelectorAll('.chatbot-faq-row')]
+    .map((row, index) => {
+      const question = row.querySelector('[data-chat-faq="question"]')?.value.trim() || '';
+      const answer = row.querySelector('[data-chat-faq="answer"]')?.value.trim() || '';
+
+      return {
+        question,
+        answer,
+        sortOrder: index + 1
+      };
+    })
+    .filter((item) => item.question && item.answer);
+
+  try {
+    await api('/api/admin/chatbot-faqs', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ faqs })
+    });
+
+    setStatus(dom.chatbotFaqStatus, 'Quick answers saved.');
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.chatbotFaqStatus, error.message, false);
   }
 });
 

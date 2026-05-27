@@ -7,6 +7,7 @@ Complete booking platform for **Bomagawani.com** with production-ready backend, 
 - Professional mobile-friendly landing page
 - Direct booking with live availability checks
 - Payment option support (including **Pay on Arrival**)
+- Guest chatbot with quick answers + WhatsApp human handoff
 - Currency conversion for quote and booking totals
 - Booking status tracking with booking code
 - Printable receipt page per booking
@@ -22,6 +23,7 @@ Complete booking platform for **Bomagawani.com** with production-ready backend, 
 - Top hero slideshow image manager (add/remove/reorder)
 - Landing page room slideshow driven by admin-uploaded photos
 - Set room cover image and remove old photos
+- Chat Bot admin section for greeting, WhatsApp number, and quick Q&A management
   - Travel platform links (Booking.com, Tripadvisor, etc.)
   - Booking confirmation/cancel/payment status updates
 - Confirmed booking dates are blocked instantly for new bookings

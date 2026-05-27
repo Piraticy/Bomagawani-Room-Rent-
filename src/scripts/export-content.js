@@ -20,6 +20,8 @@ const settings = db.prepare('SELECT * FROM site_settings WHERE id = 1').get();
 const rooms = db.prepare('SELECT * FROM rooms ORDER BY featured DESC, id ASC').all();
 const platformLinks = db.prepare('SELECT * FROM platform_links ORDER BY sort_order ASC, id ASC').all();
 const heroSlides = db.prepare('SELECT * FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
+const chatbot = db.prepare('SELECT * FROM chatbot_settings WHERE id = 1').get();
+const chatbotFaqs = db.prepare('SELECT * FROM chatbot_faqs ORDER BY sort_order ASC, id ASC').all();
 
 const snapshot = {
   exportedAt: new Date().toISOString(),
@@ -63,6 +65,18 @@ const snapshot = {
     imageUrl: slide.image_url,
     caption: slide.caption || '',
     sortOrder: Number(slide.sort_order || 0)
+  })),
+  chatbot: {
+    title: chatbot?.title || 'Quick Help',
+    greeting: chatbot?.greeting || '',
+    whatsappNumber: chatbot?.whatsapp_number || '',
+    whatsappMessage: chatbot?.whatsapp_message || '',
+    enabled: chatbot?.enabled !== 0
+  },
+  chatbotFaqs: chatbotFaqs.map((item) => ({
+    question: item.question,
+    answer: item.answer,
+    sortOrder: Number(item.sort_order || 0)
   }))
 };
 
