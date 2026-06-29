@@ -1,13 +1,49 @@
-const SUPPORTED_LANGUAGES = ['en', 'sw'];
+const SUPPORTED_LANGUAGES = ['en', 'de'];
 
 const translations = {
   en: {
     'nav.admin': 'Admin',
     'nav.bookNow': 'Book Now',
+    'nav.home': 'Home',
+    'nav.rooms': 'Rooms',
+    'nav.eatSip': 'Eat & Sip',
+    'nav.bomagawani': 'Bomagawani',
+    'nav.contact': 'Contact',
+    'home.heroKicker': 'Private Coastal Stay • Swahili Coast',
+    'home.viewRooms': 'View Rooms',
+    'home.exploreHouse': 'Explore the house',
+    'home.welcome': 'Welcome',
+    'home.welcomeTitle': 'Stay close to the coast with comfort, calm, and local care.',
+    'home.welcomeBody': 'Enjoy quiet mornings, fresh ocean air, shaded veranda space, simple meals on request, and friendly help with arrival, directions, and booking details.',
+    'booking.planStay': 'Plan your stay',
+    'booking.checkAvailability': 'Check availability',
+    'booking.search': 'Search',
+    'form.stayDates': 'Stay dates',
+    'form.adults': 'Adults',
+    'form.children': 'Children',
+    'date.selectRange': 'Select check-in and check-out',
+    'date.selectArrival': 'Select your arrival date.',
+    'date.selectDeparture': 'Now select your departure date.',
+    'shortcut.stay': 'Stay',
+    'shortcut.taste': 'Taste',
+    'shortcut.discover': 'Discover',
+    'shortcut.roomsText': 'Private rooms with photos, prices, amenities, and direct booking.',
+    'shortcut.roomsAction': 'Explore rooms',
+    'shortcut.eatText': 'Fresh coastal foods, drinks, and meal preparation for your stay.',
+    'shortcut.eatAction': 'View menu story',
+    'shortcut.houseText': 'See the house details, location, and guest support.',
+    'shortcut.houseAction': 'See details',
+    'footer.tagline': 'Coastal stays, fresh flavors, easy booking.',
     'hero.roomsLabel': 'Ready to book',
     'hero.supportLabel': 'Guest support',
     'hero.locationLabel': 'Prime location',
     'intro.title': 'Stay in style with easy booking',
+    'experience.rooms': 'Comfortable rooms',
+    'experience.roomsText': 'Clear prices, photos, amenities, and instant booking requests.',
+    'experience.food': 'Coastal food',
+    'experience.foodText': 'Fresh meals and drinks shaped around guest plans.',
+    'experience.place': 'House details',
+    'experience.placeText': 'A property experience that feels personal, practical, and easy.',
     'rooms.title': 'Our Rooms',
     'rooms.subtitle': 'Choose your room and book in minutes.',
     'amenities.title': 'Amenities At A Glance',
@@ -78,10 +114,21 @@ const translations = {
   sw: {
     'nav.admin': 'Admin',
     'nav.bookNow': 'Weka Nafasi',
+    'nav.home': 'Mwanzo',
+    'nav.rooms': 'Vyumba',
+    'nav.eatSip': 'Chakula & Vinywaji',
+    'nav.bomagawani': 'Bomagawani',
+    'nav.contact': 'Mawasiliano',
     'hero.roomsLabel': 'Tayari kupokelewa',
     'hero.supportLabel': 'Huduma ya wageni',
     'hero.locationLabel': 'Eneo zuri',
     'intro.title': 'Furahia ukaaji kwa kuweka nafasi kwa urahisi',
+    'experience.rooms': 'Vyumba vya starehe',
+    'experience.roomsText': 'Bei, picha, huduma na maombi ya booking kwa urahisi.',
+    'experience.food': 'Chakula cha pwani',
+    'experience.foodText': 'Milo na vinywaji safi kulingana na mpango wa mgeni.',
+    'experience.place': 'Maelezo ya nyumba',
+    'experience.placeText': 'Eneo la ukaaji lenye ukarimu, mpangilio, na urahisi.',
     'rooms.title': 'Vyumba Vyetu',
     'rooms.subtitle': 'Chagua chumba na weka nafasi kwa dakika chache.',
     'amenities.title': 'Huduma Muhimu',
@@ -148,23 +195,228 @@ const translations = {
     'installPrompt.body': 'Ongeza kwenye home screen kwa booking ya haraka.',
     'installPrompt.yes': 'Sakinisha',
     'installPrompt.no': 'Baadaye'
+  },
+  de: {
+    'nav.admin': 'Admin',
+    'nav.bookNow': 'Jetzt buchen',
+    'nav.home': 'Start',
+    'nav.rooms': 'Zimmer',
+    'nav.eatSip': 'Essen & Trinken',
+    'nav.bomagawani': 'Bomagawani',
+    'nav.contact': 'Kontakt',
+    'home.heroKicker': 'Privater Küstenaufenthalt • Swahili-Küste',
+    'home.viewRooms': 'Zimmer ansehen',
+    'home.exploreHouse': 'Haus entdecken',
+    'home.welcome': 'Willkommen',
+    'home.welcomeTitle': 'Nah an der Küste wohnen: ruhig, bequem und persönlich betreut.',
+    'home.welcomeBody': 'Genießen Sie ruhige Morgen, frische Meeresluft, schattige Veranda-Bereiche, einfache Mahlzeiten auf Anfrage und freundliche Hilfe bei Ankunft, Wegbeschreibung und Buchungsdetails.',
+    'booking.planStay': 'Aufenthalt planen',
+    'booking.checkAvailability': 'Verfügbarkeit prüfen',
+    'booking.search': 'Suchen',
+    'form.room': 'Zimmer',
+    'form.checkIn': 'Anreise',
+    'form.checkOut': 'Abreise',
+    'form.stayDates': 'Reisedaten',
+    'form.adults': 'Erwachsene',
+    'form.children': 'Kinder',
+    'form.guests': 'Gäste',
+    'form.currency': 'Währung',
+    'form.paymentOption': 'Zahlungsart',
+    'form.payOnArrival': 'Bei Ankunft bezahlen',
+    'form.payOnlineLater': 'Später online bezahlen',
+    'form.fullName': 'Vollständiger Name',
+    'form.email': 'E-Mail',
+    'form.phone': 'Telefon',
+    'form.note': 'Notiz (optional)',
+    'form.notePlaceholder': 'Späte Ankunft, besonderer Wunsch',
+    'form.submit': 'Buchungsanfrage senden',
+    'date.selectRange': 'Anreise und Abreise auswählen',
+    'date.selectArrival': 'Wählen Sie Ihr Anreisedatum.',
+    'date.selectDeparture': 'Wählen Sie jetzt Ihr Abreisedatum.',
+    'shortcut.stay': 'Wohnen',
+    'shortcut.taste': 'Genießen',
+    'shortcut.discover': 'Entdecken',
+    'shortcut.roomsText': 'Private Zimmer mit Fotos, Preisen, Ausstattung und direkter Buchung.',
+    'shortcut.roomsAction': 'Zimmer entdecken',
+    'shortcut.eatText': 'Frische Küstengerichte, Getränke und Mahlzeiten nach Wunsch.',
+    'shortcut.eatAction': 'Speisen ansehen',
+    'shortcut.houseText': 'Hausdetails, Lage und Gästeservice ansehen.',
+    'shortcut.houseAction': 'Details ansehen',
+    'footer.tagline': 'Küstenaufenthalt, frische Küche, einfache Buchung.',
+    'rooms.title': 'Unsere Zimmer',
+    'rooms.subtitle': 'Wählen Sie Ihr Zimmer und buchen Sie in wenigen Minuten.',
+    'amenities.title': 'Ausstattung auf einen Blick',
+    'amenities.subtitle': 'Alles, was Sie für einen angenehmen Aufenthalt brauchen.',
+    'booking.title': 'Direkt auf Bomagawani.com buchen',
+    'booking.subtitle': 'Wählen Sie Zimmer, Datum und Währung. Ihr Buchungscode wird sofort erstellt.',
+    'tracking.title': 'Buchungsstatus prüfen',
+    'tracking.code': 'Buchungscode',
+    'tracking.button': 'Buchung verfolgen',
+    'location.title': 'Lage & Wegbeschreibung',
+    'location.openMap': 'Karte öffnen',
+    'location.route': 'Meinen Standort für Route nutzen',
+    'channels.title': 'Auch auf Reisekanälen gelistet',
+    'chatbot.answerPlaceholder': 'Tippen Sie auf eine Frage für eine schnelle Antwort.',
+    'chatbot.whatsapp': 'Mit uns auf WhatsApp chatten',
+    'quote.empty': 'Reisedaten eingeben, um den Live-Preis zu sehen.',
+    'quote.loading': 'Preis wird berechnet...',
+    'quote.conflict': 'Diese Daten sind für dieses Zimmer bereits bestätigt. Bitte wählen Sie andere Daten.',
+    'quote.unavailable': 'Preis konnte nicht geladen werden.',
+    'quote.serviceDown': 'Preisservice nicht erreichbar. Bitte erneut versuchen.',
+    'quote.nights': '{nights} Nacht/Nächte x {price}',
+    'quote.total': 'Gesamt: {total}',
+    'status.checkQuoteFirst': 'Bitte zuerst Daten und Preis prüfen.',
+    'status.submittingBooking': 'Buchungsanfrage wird gesendet...',
+    'status.bookingFailed': 'Buchung fehlgeschlagen.',
+    'status.bookingServiceDown': 'Der Buchungsservice ist derzeit nicht erreichbar.',
+    'status.phoneInvalid': 'Bitte eine gültige Telefonnummer für die gewählte Ländervorwahl eingeben.',
+    'status.phoneLengthRange': 'Telefonnummer muss zwischen {min} und {max} Ziffern haben.',
+    'status.bookingSuccessPrefix': 'Buchung gesendet. Ihr Code ist',
+    'status.openReceipt': 'Beleg öffnen',
+    'tracking.checking': 'Status wird geprüft...',
+    'tracking.notFound': 'Buchung nicht gefunden.',
+    'tracking.serviceDown': 'Statusservice nicht erreichbar.',
+    'tracking.status': 'Status',
+    'tracking.room': 'Zimmer',
+    'tracking.dates': 'Daten',
+    'tracking.payment': 'Zahlung',
+    'tracking.paymentOption': 'Zahlungsart',
+    'payment.pay_on_arrival': 'Bei Ankunft bezahlen',
+    'payment.pay_online': 'Online bezahlen',
+    'location.noSupport': 'Standortbestimmung wird auf diesem Gerät nicht unterstützt.',
+    'location.reading': 'Standort wird gelesen...',
+    'location.ready': 'Routenlink ist bereit. Tippen Sie auf Karte öffnen.',
+    'location.failed': 'Standort konnte nicht gelesen werden. Bitte Berechtigung erlauben und erneut versuchen.',
+    'languagePrompt.title': 'Sprache wechseln?',
+    'languagePrompt.body': 'Wir haben Ihre Regionalsprache erkannt ({language}). Möchten Sie wechseln?',
+    'languagePrompt.yes': 'Wechseln',
+    'languagePrompt.no': 'Englisch behalten',
+    'installPrompt.title': 'Bomagawani App installieren?',
+    'installPrompt.body': 'Zum Startbildschirm hinzufügen für schnelleres Buchen.',
+    'installPrompt.yes': 'Installieren',
+    'installPrompt.no': 'Nicht jetzt'
   }
 };
+
+const languageConfig = {
+  en: { label: 'English', locale: 'en-US', currency: 'USD' },
+  de: { label: 'Deutsch', locale: 'de-DE', currency: 'EUR' }
+};
+
+const fallbackExchangeRates = {
+  USD: 1,
+  EUR: 0.92
+};
+
+const copyTranslations = {
+  de: {
+    'Bomagawani House Rent': 'Bomagawani Hausvermietung',
+    'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.': 'Ein ruhiger Rückzugsort in Kigombe mit privaten Zimmern, frischen lokalen Mahlzeiten, schattiger Veranda und einfacher Direktbuchung.',
+    'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.': 'Bomagawani House Rent verbindet private Zimmer, herzliche lokale Betreuung, Küstengerichte und klare Direktbuchung für Gäste in Kigombe an Tansanias nördlicher Swahili-Küste.',
+    'Our Rooms': 'Unsere Zimmer',
+    'Master Bedroom': 'Master-Schlafzimmer',
+    'Guest Room': 'Gästezimmer',
+    'Premium private suite with balcony and ocean breeze.': 'Premium-Privatzimmer mit Balkon und Meeresbrise.',
+    'Comfortable and affordable room for short or long stays.': 'Komfortables und bezahlbares Zimmer für kurze oder längere Aufenthalte.',
+    'Private coastal room': 'Privates Küstenzimmer',
+    'Featured stay': 'Empfohlener Aufenthalt',
+    'Direct booking': 'Direktbuchung',
+    'Check dates': 'Daten prüfen',
+    'Fast Wi-Fi': 'Schnelles WLAN',
+    'Beach View': 'Blick Richtung Küste',
+    'Smart TV': 'Smart-TV',
+    'Sea Food': 'Meeresfrüchte',
+    'Fresh Air': 'Frische Luft',
+    'Swimming': 'Schwimmen',
+    'Electricity 24hrs': 'Strom rund um die Uhr',
+    'Drinks': 'Getränke',
+    'Ceiling Fan': 'Deckenventilator',
+    'Wardrobe': 'Kleiderschrank',
+    'Eat & Sip': 'Essen & Trinken',
+    'Bomagawani': 'Bomagawani',
+    'Contact': 'Kontakt',
+    'Quick Help': 'Schnelle Hilfe',
+    'Hi. Ask me anything about rooms, prices, check-in, or booking.': 'Hallo. Fragen Sie mich zu Zimmern, Preisen, Check-in oder Buchung.',
+    'Call Us': 'Anrufen',
+    'Email': 'E-Mail',
+    'Map': 'Karte',
+    'Open Map': 'Karte öffnen',
+    'Property Notes': 'Objektnotizen',
+    'A coastal home shaped by nature, shade, and slow living.': 'Ein Küstenhaus geprägt von Natur, Schatten und ruhigem Leben.',
+    'Bomagawani sits in a peaceful coastal environment near Tanga, with house details suited to warm weather and relaxed stays.': 'Bomagawani liegt in einer ruhigen Küstenumgebung nahe Tanga, mit Hausdetails für warmes Wetter und entspannte Aufenthalte.',
+    'Marine coast setting': 'Lage an der Meeresküste',
+    'Located along Tanzania’s northern Swahili Coast near the protected Coelacanth marine park, with mangroves, clear water, and quiet natural surroundings.': 'An Tansanias nördlicher Swahili-Küste nahe dem geschützten Coelacanth-Meerespark gelegen, mit Mangroven, klarem Wasser und ruhiger Natur.',
+    'Afro-Arabian character': 'Afro-arabischer Charakter',
+    'The house style highlights shaded veranda living, high ceilings, and natural airflow for warm coastal weather.': 'Der Hausstil betont schattige Veranda-Bereiche, hohe Decken und natürliche Luftzirkulation für warmes Küstenklima.',
+    'Easy Tanga access': 'Einfacher Zugang nach Tanga',
+    'Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access for guests and supplies.': 'Tanga ist etwa 30 km entfernt und bietet Märkte, frische Produkte, Banken, Ärzte, Einkaufsmöglichkeiten, Flughafen und Hafen.',
+    'Practical essentials': 'Praktische Grundlagen',
+    'Guest essentials include power support, cooking water, bottled drinking water, simple waste handling, and mobile phone connectivity.': 'Zu den Grundlagen gehören Stromunterstützung, Kochwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
+    'Eat & Sip by the Coast': 'Essen & Trinken an der Küste',
+    'Fresh coastal foods, cool drinks, and flavors prepared with local care.': 'Frische Küstengerichte, kühle Getränke und lokale Aromen mit Sorgfalt zubereitet.',
+    'Request Food Booking': 'Essensanfrage senden',
+    'Ask what is available today': 'Heute verfügbares Essen anfragen',
+    'Coastal Kitchen': 'Küstenküche',
+    'Come for food, drinks, or both.': 'Kommen Sie zum Essen, Trinken oder beides.',
+    'Dine In': 'Vor Ort essen',
+    'Come just to eat': 'Einfach zum Essen kommen',
+    'Guests can visit for a prepared meal without booking a room, depending on kitchen availability.': 'Gäste können je nach Küchenverfügbarkeit auch ohne Zimmerbuchung für eine vorbereitete Mahlzeit vorbeikommen.',
+    'Refreshments': 'Erfrischungen',
+    'Drinks & easy bites': 'Getränke & kleine Speisen',
+    'Fresh juice, tea, coffee, water, soft drinks, and simple snacks can be arranged for relaxed visits.': 'Frischer Saft, Tee, Kaffee, Wasser, Softdrinks und einfache Snacks können für entspannte Besuche arrangiert werden.',
+    'On Request': 'Auf Anfrage',
+    'Meal booking': 'Mahlzeit buchen',
+    'Request breakfast, lunch, dinner, or a small group meal in advance so ingredients are prepared well.': 'Frühstück, Mittagessen, Abendessen oder eine kleine Gruppenmahlzeit bitte vorab anfragen, damit Zutaten gut vorbereitet werden.',
+    'Tanzania Coastal Taste': 'Geschmack der tansanischen Küste',
+    'Simple food with Swahili Coast flavor.': 'Einfache Küche mit Geschmack der Swahili-Küste.',
+    'Food is prepared around local ingredients, clean kitchen care, and what guests want to enjoy that day.': 'Das Essen richtet sich nach lokalen Zutaten, sauberer Küchenarbeit und den Wünschen der Gäste.',
+    'Seafood & grilled plates': 'Meeresfrüchte & Grillgerichte',
+    'Rice, pilau & home meals': 'Reis, Pilau & Hausgerichte',
+    'Breakfast & tea time': 'Frühstück & Teezeit',
+    'Fresh drinks': 'Frische Getränke',
+    'Food Booking': 'Essen buchen',
+    'Tell us what you want to eat or drink.': 'Sagen Sie uns, was Sie essen oder trinken möchten.',
+    'Send a request for dine-in food, guest meals, drinks, or a small group plan. We will confirm what is available and the best preparation time.': 'Senden Sie eine Anfrage für Essen vor Ort, Gästemahlzeiten, Getränke oder eine kleine Gruppe. Wir bestätigen Verfügbarkeit und passende Vorbereitungszeit.',
+    'House For Sale': 'Haus zu verkaufen',
+    'Price on request': 'Preis auf Anfrage',
+    'Book a Viewing': 'Besichtigung buchen',
+    'Ask for sale details': 'Verkaufsdetails anfragen',
+    'Request the full house details, viewing time, photos, and video tour before visiting.': 'Fordern Sie vor dem Besuch vollständige Hausdetails, Besichtigungstermin, Fotos und Videotour an.',
+    'Video Tour': 'Videotour',
+    'Gallery Ready': 'Galerie bereit',
+    'Photos & viewing support': 'Fotos & Besichtigungshilfe',
+    'Contact Bomagawani': 'Bomagawani kontaktieren',
+    'Reach us for room bookings, food requests, directions, and guest support.': 'Kontaktieren Sie uns für Zimmerbuchungen, Essensanfragen, Wegbeschreibung und Gästeservice.',
+    'Best for quick inquiry': 'Ideal für schnelle Anfragen',
+    'Rooms, food, directions, or house viewing.': 'Zimmer, Essen, Wegbeschreibung oder Hausbesichtigung.',
+    'Tell us what you need and when you plan to visit.': 'Sagen Sie uns, was Sie brauchen und wann Sie kommen möchten.',
+    'Stay inquiry': 'Anfrage zum Aufenthalt',
+    'Food inquiry': 'Essensanfrage',
+    'House sale viewing': 'Hausbesichtigung zum Kauf'
+  }
+};
+
+const originalTextNodes = new WeakMap();
 
 const state = {
   settings: null,
   rooms: [],
   links: [],
+  contentPages: [],
+  currentPage: 'home',
   heroSlides: [],
   chatbot: null,
   chatbotFaqs: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
+  exchangeRates: { USD: 1 },
   currentQuote: null,
   deferredInstallPrompt: null,
   language: localStorage.getItem('preferred_language') || 'en',
   roomSlideIntervals: {},
   heroInterval: null,
-  heroIndex: 0
+  heroIndex: 0,
+  heroRangePickerMonth: null,
+  bookingRangePickerMonth: null
 };
 
 if (!SUPPORTED_LANGUAGES.includes(state.language)) {
@@ -189,7 +441,60 @@ const dom = {
   channelList: document.getElementById('channel-list'),
   roomsGrid: document.getElementById('rooms-grid'),
   amenityWall: document.getElementById('amenity-wall'),
+  eatSipSection: document.getElementById('eat-sip-section'),
+  eatSipNav: document.getElementById('eat-sip-nav'),
+  eatSipTitle: document.getElementById('eat-sip-title'),
+  eatSipSubtitle: document.getElementById('eat-sip-subtitle'),
+  eatSipBody: document.getElementById('eat-sip-body'),
+  eatSipHighlights: document.getElementById('eat-sip-highlights'),
+  eatSipImage: document.getElementById('eat-sip-image'),
+  eatSipGalleryMain: document.getElementById('eat-sip-gallery-main'),
+  eatSipRequestLink: document.getElementById('eat-sip-request-link'),
+  propertySection: document.getElementById('property-section'),
+  propertyNav: document.getElementById('property-nav'),
+  propertyTitle: document.getElementById('property-title'),
+  propertySubtitle: document.getElementById('property-subtitle'),
+  propertyBody: document.getElementById('property-body'),
+  propertyHighlights: document.getElementById('property-highlights'),
+  propertyImage: document.getElementById('property-image'),
+  propertySalePrice: document.getElementById('property-sale-price'),
+  aboutSection: document.getElementById('about-section'),
+  aboutNav: document.getElementById('about-nav'),
+  aboutTitle: document.getElementById('about-title'),
+  aboutSubtitle: document.getElementById('about-subtitle'),
+  aboutBody: document.getElementById('about-body'),
+  aboutHighlights: document.getElementById('about-highlights'),
+  contactPhoneLink: document.getElementById('contact-phone-link'),
+  contactEmailLink: document.getElementById('contact-email-link'),
+  contactMapLink: document.getElementById('contact-map-link'),
+  footerPhoneLink: document.getElementById('footer-phone-link'),
+  footerEmailLink: document.getElementById('footer-email-link'),
+  footerMapLink: document.getElementById('footer-map-link'),
+  heroBookingForm: document.getElementById('hero-booking-form'),
+  heroDateRangeTrigger: document.getElementById('hero-date-range-trigger'),
+  heroDateRangeText: document.getElementById('hero-date-range-text'),
+  heroDateRangePicker: document.getElementById('hero-date-range-picker'),
+  dateRangeMonth: document.getElementById('date-range-month'),
+  dateRangePrev: document.getElementById('date-range-prev'),
+  dateRangeNext: document.getElementById('date-range-next'),
+  dateRangeGrid: document.getElementById('date-range-grid'),
+  dateRangeStatus: document.getElementById('date-range-status'),
+  dateRangeClear: document.getElementById('date-range-clear'),
+  heroCheckIn: document.getElementById('hero-check-in'),
+  heroCheckOut: document.getElementById('hero-check-out'),
+  heroAdults: document.getElementById('hero-adults'),
+  heroChildren: document.getElementById('hero-children'),
+  heroRoomCount: document.getElementById('hero-room-count'),
   roomSelect: document.getElementById('room-select'),
+  bookingDateRangeTrigger: document.getElementById('booking-date-range-trigger'),
+  bookingDateRangeText: document.getElementById('booking-date-range-text'),
+  bookingDateRangePicker: document.getElementById('booking-date-range-picker'),
+  bookingDateRangeMonth: document.getElementById('booking-date-range-month'),
+  bookingDateRangePrev: document.getElementById('booking-date-range-prev'),
+  bookingDateRangeNext: document.getElementById('booking-date-range-next'),
+  bookingDateRangeGrid: document.getElementById('booking-date-range-grid'),
+  bookingDateRangeStatus: document.getElementById('booking-date-range-status'),
+  bookingDateRangeClear: document.getElementById('booking-date-range-clear'),
   checkIn: document.getElementById('check-in'),
   checkOut: document.getElementById('check-out'),
   guestsCount: document.getElementById('guests-count'),
@@ -207,7 +512,8 @@ const dom = {
   statLocation: document.getElementById('stat-location'),
   useLocation: document.getElementById('use-location'),
   structuredData: document.getElementById('seo-structured-data'),
-  languageSelect: document.getElementById('language-select'),
+  languageSwitch: document.getElementById('language-switch'),
+  languageButtons: document.querySelectorAll('[data-language-option]'),
   languagePrompt: document.getElementById('language-prompt'),
   languagePromptText: document.getElementById('language-prompt-text'),
   languageYes: document.getElementById('language-yes'),
@@ -224,6 +530,36 @@ const dom = {
   chatbotFaqList: document.getElementById('chatbot-faq-list'),
   chatbotAnswer: document.getElementById('chatbot-answer'),
   chatbotWhatsapp: document.getElementById('chatbot-whatsapp')
+};
+
+const pageRoutes = {
+  '/': 'home',
+  '/rooms': 'rooms',
+  '/eat-sip': 'eat-sip',
+  '/bomagawani': 'bomagawani',
+  '/contact': 'contact',
+  '/about-us': 'contact'
+};
+
+const contentPageToRoute = {
+  'eat-sip': {
+    pageId: 'eat-sip',
+    path: '/eat-sip',
+    menuSelector: '[data-page-link="eat-sip"]',
+    section: () => dom.eatSipSection
+  },
+  property: {
+    pageId: 'bomagawani',
+    path: '/bomagawani',
+    menuSelector: '[data-page-link="bomagawani"]',
+    section: () => dom.propertySection
+  },
+  about: {
+    pageId: 'contact',
+    path: '/contact',
+    menuSelector: '[data-page-link="contact"]',
+    section: () => dom.aboutSection
+  }
 };
 
 const FALLBACK_PHONE_COUNTRIES = [
@@ -262,6 +598,78 @@ function t(key, vars = {}) {
   return phrase.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 }
 
+function currentLanguageConfig() {
+  return languageConfig[state.language] || languageConfig.en;
+}
+
+function currentLocale() {
+  return currentLanguageConfig().locale;
+}
+
+function currentCurrency() {
+  return currentLanguageConfig().currency;
+}
+
+function selectedCurrency() {
+  return dom.currencySelect?.value || currentCurrency();
+}
+
+function translateCopy(value) {
+  const text = String(value || '');
+  return copyTranslations[state.language]?.[text] || text;
+}
+
+function translateList(items = []) {
+  return items.map((item) => translateCopy(item));
+}
+
+function applyCopyTranslations() {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || ['SCRIPT', 'STYLE', 'TEXTAREA', 'OPTION'].includes(parent.tagName) || parent.closest('[data-i18n]')) {
+        return NodeFilter.FILTER_REJECT;
+      }
+
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!originalTextNodes.has(node)) {
+      originalTextNodes.set(node, node.nodeValue);
+    }
+
+    const original = originalTextNodes.get(node);
+    const leading = original.match(/^\s*/)?.[0] || '';
+    const trailing = original.match(/\s*$/)?.[0] || '';
+    const core = original.trim();
+    node.nodeValue = `${leading}${translateCopy(core)}${trailing}`;
+  }
+}
+
+function displayPriceFromUsd(value, currency = currentCurrency()) {
+  const rate = state.exchangeRates[currency] || fallbackExchangeRates[currency] || 1;
+  return Number(value || 0) * rate;
+}
+
+async function loadExchangeRate(currency = currentCurrency()) {
+  if (!currency || currency === 'USD' || state.exchangeRates[currency]) return;
+
+  try {
+    const response = await fetch(`/api/public/exchange?currency=${encodeURIComponent(currency)}`);
+    if (!response.ok) throw new Error('Exchange rate unavailable');
+    const payload = await response.json();
+    const rate = Number(payload.usdRate || payload.rate || payload.exchangeRate || payload.usdToCurrency);
+    if (Number.isFinite(rate) && rate > 0) {
+      state.exchangeRates[currency] = rate;
+    }
+  } catch (error) {
+    state.exchangeRates[currency] = fallbackExchangeRates[currency] || 1;
+  }
+}
+
 function refreshIcons() {
   if (window.lucide) {
     window.lucide.createIcons();
@@ -269,7 +677,7 @@ function refreshIcons() {
 }
 
 function languageLabel(code) {
-  return code === 'sw' ? 'Kiswahili' : 'English';
+  return languageConfig[code]?.label || 'English';
 }
 
 function paymentLabel(code) {
@@ -339,7 +747,11 @@ function setFooterYear() {
 
 function applyTranslations() {
   document.documentElement.lang = state.language;
-  dom.languageSelect.value = state.language;
+  dom.languageButtons.forEach((button) => {
+    const isActive = button.dataset.languageOption === state.language;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
 
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = t(element.dataset.i18n);
@@ -348,6 +760,8 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
     element.setAttribute('placeholder', t(element.dataset.i18nPlaceholder));
   });
+
+  applyCopyTranslations();
 
   if (!state.currentQuote) {
     dom.quoteBox.textContent = t('quote.empty');
@@ -358,6 +772,19 @@ function setLanguage(languageCode) {
   const nextLanguage = SUPPORTED_LANGUAGES.includes(languageCode) ? languageCode : 'en';
   state.language = nextLanguage;
   localStorage.setItem('preferred_language', nextLanguage);
+  if (dom.currencySelect) {
+    dom.currencySelect.value = currentCurrency();
+  }
+  loadExchangeRate(currentCurrency()).then(() => {
+    renderRooms();
+    renderAmenities();
+    renderPageContent();
+    applySettings();
+    requestQuote();
+    updateStructuredData();
+    applyTranslations();
+    refreshIcons();
+  });
   applyTranslations();
   renderChatbot();
 
@@ -370,9 +797,274 @@ function normalizeDate(dateString) {
   return dateString ? new Date(`${dateString}T00:00:00`) : null;
 }
 
+function formatDateIso(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function parseIsoDate(dateString) {
+  if (!dateString) return null;
+  const [year, month, day] = dateString.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function isSameDay(firstDate, secondDate) {
+  return Boolean(
+    firstDate &&
+      secondDate &&
+      firstDate.getFullYear() === secondDate.getFullYear() &&
+      firstDate.getMonth() === secondDate.getMonth() &&
+      firstDate.getDate() === secondDate.getDate()
+  );
+}
+
+function addMonths(date, count) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1);
+}
+
+function formatShortDate(dateString) {
+  const date = parseIsoDate(dateString);
+  if (!date) return '';
+  return date.toLocaleDateString(currentLocale(), {
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function updateHeroDateRangeText() {
+  if (!dom.heroDateRangeText) return;
+  const checkIn = dom.heroCheckIn.value;
+  const checkOut = dom.heroCheckOut.value;
+
+  if (checkIn && checkOut) {
+    dom.heroDateRangeText.textContent = `${formatShortDate(checkIn)} — ${formatShortDate(checkOut)}`;
+    return;
+  }
+
+  if (checkIn) {
+    dom.heroDateRangeText.textContent = `${formatShortDate(checkIn)} — Select check-out`;
+    return;
+  }
+
+  dom.heroDateRangeText.textContent = t('date.selectRange');
+}
+
+function setHeroDateRange(checkIn = '', checkOut = '') {
+  dom.heroCheckIn.value = checkIn;
+  dom.heroCheckOut.value = checkOut;
+  dom.heroCheckOut.min = checkIn || dom.heroCheckIn.min;
+  updateHeroDateRangeText();
+  renderHeroDateRangePicker();
+}
+
+function showHeroDateRangePicker() {
+  if (!state.heroRangePickerMonth) {
+    const selectedDate = parseIsoDate(dom.heroCheckIn.value) || new Date();
+    state.heroRangePickerMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+  }
+
+  dom.heroDateRangePicker.hidden = false;
+  dom.heroDateRangeTrigger.setAttribute('aria-expanded', 'true');
+  renderHeroDateRangePicker();
+}
+
+function hideHeroDateRangePicker() {
+  dom.heroDateRangePicker.hidden = true;
+  dom.heroDateRangeTrigger.setAttribute('aria-expanded', 'false');
+}
+
+function renderHeroDateRangePicker() {
+  if (!dom.dateRangeGrid || dom.heroDateRangePicker.hidden) return;
+
+  const today = startOfLocalDay(new Date());
+  const monthDate = state.heroRangePickerMonth || new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const calendarStart = new Date(monthStart);
+  const mondayOffset = (monthStart.getDay() + 6) % 7;
+  calendarStart.setDate(monthStart.getDate() - mondayOffset);
+
+  const checkIn = parseIsoDate(dom.heroCheckIn.value);
+  const checkOut = parseIsoDate(dom.heroCheckOut.value);
+
+  dom.dateRangeMonth.textContent = monthStart.toLocaleDateString(currentLocale(), {
+    month: 'long',
+    year: 'numeric'
+  });
+
+  dom.dateRangeGrid.innerHTML = '';
+  for (let dayIndex = 0; dayIndex < 42; dayIndex += 1) {
+    const currentDate = new Date(calendarStart);
+    currentDate.setDate(calendarStart.getDate() + dayIndex);
+
+    const currentIso = formatDateIso(currentDate);
+    const isOutsideMonth = currentDate.getMonth() !== monthStart.getMonth();
+    const isPast = startOfLocalDay(currentDate) < today;
+    const isStart = isSameDay(currentDate, checkIn);
+    const isEnd = isSameDay(currentDate, checkOut);
+    const isInRange = checkIn && checkOut && currentDate > checkIn && currentDate < checkOut;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'date-day';
+    button.dataset.date = currentIso;
+    button.textContent = String(currentDate.getDate());
+    button.disabled = isPast;
+    button.classList.toggle('is-muted', isOutsideMonth);
+    button.classList.toggle('is-start', isStart);
+    button.classList.toggle('is-end', isEnd);
+    button.classList.toggle('is-in-range', isInRange);
+    button.classList.toggle('is-today', isSameDay(currentDate, today));
+
+    button.addEventListener('click', () => selectHeroRangeDate(currentIso));
+    dom.dateRangeGrid.appendChild(button);
+  }
+
+  if (!dom.heroCheckIn.value) {
+    dom.dateRangeStatus.textContent = t('date.selectArrival');
+  } else if (!dom.heroCheckOut.value) {
+    dom.dateRangeStatus.textContent = t('date.selectDeparture');
+  } else {
+    dom.dateRangeStatus.textContent = `${formatShortDate(dom.heroCheckIn.value)} to ${formatShortDate(dom.heroCheckOut.value)}`;
+  }
+}
+
+function selectHeroRangeDate(dateString) {
+  const selectedDate = parseIsoDate(dateString);
+  const checkIn = parseIsoDate(dom.heroCheckIn.value);
+  const checkOut = parseIsoDate(dom.heroCheckOut.value);
+
+  if (!checkIn || checkOut || selectedDate <= checkIn) {
+    setHeroDateRange(dateString, '');
+    return;
+  }
+
+  setHeroDateRange(dom.heroCheckIn.value, dateString);
+  setTimeout(hideHeroDateRangePicker, 120);
+}
+
+function updateBookingDateRangeText() {
+  if (!dom.bookingDateRangeText) return;
+  const checkIn = dom.checkIn.value;
+  const checkOut = dom.checkOut.value;
+
+  if (checkIn && checkOut) {
+    dom.bookingDateRangeText.textContent = `${formatShortDate(checkIn)} — ${formatShortDate(checkOut)}`;
+    return;
+  }
+
+  if (checkIn) {
+    dom.bookingDateRangeText.textContent = `${formatShortDate(checkIn)} — Select check-out`;
+    return;
+  }
+
+  dom.bookingDateRangeText.textContent = t('date.selectRange');
+}
+
+function setBookingDateRange(checkIn = '', checkOut = '') {
+  dom.checkIn.value = checkIn;
+  dom.checkOut.value = checkOut;
+  dom.checkOut.min = checkIn || dom.checkIn.min;
+  updateBookingDateRangeText();
+  renderBookingDateRangePicker();
+}
+
+function showBookingDateRangePicker() {
+  if (!state.bookingRangePickerMonth) {
+    const selectedDate = parseIsoDate(dom.checkIn.value) || new Date();
+    state.bookingRangePickerMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+  }
+
+  dom.bookingDateRangePicker.hidden = false;
+  dom.bookingDateRangeTrigger.setAttribute('aria-expanded', 'true');
+  renderBookingDateRangePicker();
+}
+
+function hideBookingDateRangePicker() {
+  dom.bookingDateRangePicker.hidden = true;
+  dom.bookingDateRangeTrigger.setAttribute('aria-expanded', 'false');
+}
+
+function renderBookingDateRangePicker() {
+  if (!dom.bookingDateRangeGrid || dom.bookingDateRangePicker.hidden) return;
+
+  const today = startOfLocalDay(new Date());
+  const monthDate = state.bookingRangePickerMonth || new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const calendarStart = new Date(monthStart);
+  const mondayOffset = (monthStart.getDay() + 6) % 7;
+  calendarStart.setDate(monthStart.getDate() - mondayOffset);
+
+  const checkIn = parseIsoDate(dom.checkIn.value);
+  const checkOut = parseIsoDate(dom.checkOut.value);
+
+  dom.bookingDateRangeMonth.textContent = monthStart.toLocaleDateString(currentLocale(), {
+    month: 'long',
+    year: 'numeric'
+  });
+
+  dom.bookingDateRangeGrid.innerHTML = '';
+  for (let dayIndex = 0; dayIndex < 42; dayIndex += 1) {
+    const currentDate = new Date(calendarStart);
+    currentDate.setDate(calendarStart.getDate() + dayIndex);
+
+    const currentIso = formatDateIso(currentDate);
+    const isOutsideMonth = currentDate.getMonth() !== monthStart.getMonth();
+    const isPast = startOfLocalDay(currentDate) < today;
+    const isStart = isSameDay(currentDate, checkIn);
+    const isEnd = isSameDay(currentDate, checkOut);
+    const isInRange = checkIn && checkOut && currentDate > checkIn && currentDate < checkOut;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'date-day';
+    button.dataset.date = currentIso;
+    button.textContent = String(currentDate.getDate());
+    button.disabled = isPast;
+    button.classList.toggle('is-muted', isOutsideMonth);
+    button.classList.toggle('is-start', isStart);
+    button.classList.toggle('is-end', isEnd);
+    button.classList.toggle('is-in-range', isInRange);
+    button.classList.toggle('is-today', isSameDay(currentDate, today));
+
+    button.addEventListener('click', () => selectBookingRangeDate(currentIso));
+    dom.bookingDateRangeGrid.appendChild(button);
+  }
+
+  if (!dom.checkIn.value) {
+    dom.bookingDateRangeStatus.textContent = t('date.selectArrival');
+  } else if (!dom.checkOut.value) {
+    dom.bookingDateRangeStatus.textContent = t('date.selectDeparture');
+  } else {
+    dom.bookingDateRangeStatus.textContent = `${formatShortDate(dom.checkIn.value)} to ${formatShortDate(dom.checkOut.value)}`;
+  }
+}
+
+function selectBookingRangeDate(dateString) {
+  const selectedDate = parseIsoDate(dateString);
+  const checkIn = parseIsoDate(dom.checkIn.value);
+  const checkOut = parseIsoDate(dom.checkOut.value);
+
+  if (!checkIn || checkOut || selectedDate <= checkIn) {
+    setBookingDateRange(dateString, '');
+    requestQuote();
+    return;
+  }
+
+  setBookingDateRange(dom.checkIn.value, dateString);
+  requestQuote();
+  setTimeout(hideBookingDateRangePicker, 120);
+}
+
 function formatAmount(value, currency) {
   try {
-    return new Intl.NumberFormat(state.language === 'sw' ? 'sw-TZ' : 'en', {
+    return new Intl.NumberFormat(currentLocale(), {
       style: 'currency',
       currency,
       maximumFractionDigits: 2
@@ -475,7 +1167,7 @@ function initRoomSlides() {
 
   dom.roomsGrid.querySelectorAll('.room-slider').forEach((slider) => {
     const slides = [...slider.querySelectorAll('.room-image')];
-    const dots = [...slider.querySelectorAll('.slide-dot')];
+    const dots = [...slider.querySelectorAll('[data-slide-dot]')];
     if (slides.length <= 1) return;
 
     const sliderKey = slider.dataset.sliderKey;
@@ -528,18 +1220,22 @@ function initRoomSlides() {
 }
 
 function renderLinks() {
-  dom.platformLinks.innerHTML = '';
+  if (dom.platformLinks) {
+    dom.platformLinks.innerHTML = '';
+  }
   dom.channelList.innerHTML = '';
 
   state.links.forEach((link) => {
     const icon = link.icon || 'external-link';
 
-    const top = document.createElement('a');
-    top.href = link.url;
-    top.target = '_blank';
-    top.rel = 'noreferrer';
-    top.innerHTML = `<i data-lucide="${icon}"></i> ${link.platform_name}`;
-    dom.platformLinks.appendChild(top);
+    if (dom.platformLinks) {
+      const top = document.createElement('a');
+      top.href = link.url;
+      top.target = '_blank';
+      top.rel = 'noreferrer';
+      top.innerHTML = `<i data-lucide="${icon}"></i> ${link.platform_name}`;
+      dom.platformLinks.appendChild(top);
+    }
 
     const channel = document.createElement('a');
     channel.href = link.url;
@@ -551,25 +1247,65 @@ function renderLinks() {
   });
 }
 
+function getCurrentPage() {
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  return pageRoutes[pathname] || 'home';
+}
+
+function pageTitleForCurrentPage() {
+  if (state.currentPage === 'rooms') return 'Rooms';
+  if (state.currentPage === 'eat-sip') return pageBySlug('eat-sip')?.nav_label || 'Eat & Sip';
+  if (state.currentPage === 'bomagawani') return pageBySlug('property')?.nav_label || 'Bomagawani';
+  if (state.currentPage === 'contact') return 'Contact';
+  return 'Coastal Room Booking';
+}
+
+function applyPageVisibility() {
+  state.currentPage = getCurrentPage();
+
+  document.querySelectorAll('[data-page]').forEach((section) => {
+    section.hidden = section.dataset.page !== state.currentPage;
+  });
+
+  document.querySelectorAll('[data-page-link]').forEach((link) => {
+    link.classList.toggle('is-active', link.dataset.pageLink === state.currentPage);
+  });
+
+  const title = pageTitleForCurrentPage();
+  if (state.settings?.domain) {
+    document.title = `${state.settings.domain} | ${title}`;
+  }
+
+  if (window.location.hash) {
+    setTimeout(() => {
+      document.querySelector(window.location.hash)?.scrollIntoView({ behavior: 'smooth' });
+    }, 80);
+  }
+}
+
 function renderRooms() {
   dom.roomsGrid.innerHTML = '';
   dom.roomSelect.innerHTML = '';
+  const preferredCurrency = selectedCurrency();
 
   state.rooms.forEach((room) => {
-    const gallery = (room.images || []).map((image) => image.image_url).filter(Boolean);
+    const gallery = [room.cover_image, ...(room.images || []).map((image) => image.image_url)].filter(Boolean);
+    const uniqueGallery = [...new Set(gallery)];
     const fallback = room.cover_image || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80';
-    const imageSources = gallery.length ? gallery : [fallback];
+    const imageSources = uniqueGallery.length ? uniqueGallery : [fallback];
 
-    const badges = [`<span class="badge">${room.size_label}</span>`, `<span class="badge">Up to ${room.max_guests} guests</span>`];
+    const badges = [`<span class="badge"><i data-lucide="users"></i> ${state.language === 'de' ? 'Bis zu' : 'Up to'} ${room.max_guests} ${state.language === 'de' ? 'Gäste' : 'guests'}</span>`];
 
     if (room.featured) {
-      badges.unshift('<span class="badge">Featured</span>');
+      badges.unshift(`<span class="badge badge-featured"><i data-lucide="sparkles"></i> ${translateCopy('Featured stay')}</span>`);
     }
 
     const unavailableCount = room.unavailable?.length || 0;
     if (unavailableCount > 0) {
-      badges.push(`<span class="badge">${unavailableCount} booked range(s)</span>`);
+      badges.push(`<span class="badge"><i data-lucide="calendar-check"></i> ${unavailableCount} ${state.language === 'de' ? 'gebuchte Zeiträume' : 'booked range(s)'}</span>`);
     }
+
+    badges.push(`<span class="badge"><i data-lucide="badge-check"></i> ${translateCopy('Direct booking')}</span>`);
 
     const slidesHtml = imageSources
       .map(
@@ -577,17 +1313,28 @@ function renderRooms() {
       )
       .join('');
 
+    const thumbsHtml = imageSources
+      .slice(0, 5)
+      .map(
+        (src, index) => `
+          <button class="room-thumb ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="${room.name} photo ${index + 1}">
+            <img src="${src}" alt="" loading="lazy" decoding="async" />
+          </button>
+        `
+      )
+      .join('');
+
     const controlsHtml = imageSources.length > 1
       ? `
         <button class="slide-control prev" type="button" data-slide="prev" aria-label="Previous image">‹</button>
         <button class="slide-control next" type="button" data-slide="next" aria-label="Next image">›</button>
-        <div class="slide-dots">
-          ${imageSources
-            .map((_, index) => `<button class="slide-dot ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="Room image ${index + 1}"></button>`)
-            .join('')}
-        </div>
       `
       : '';
+
+    const amenityHighlights = (room.amenities || [])
+      .slice(0, 4)
+      .map((amenity) => `<span><i data-lucide="${amenityIconMap[amenity.icon] || 'check'}"></i>${translateCopy(amenity.label)}</span>`)
+      .join('');
 
     const card = document.createElement('article');
     card.className = 'room-card';
@@ -596,15 +1343,22 @@ function renderRooms() {
       <div class="room-slider" data-slider-key="room-${room.id}">
         ${slidesHtml}
         ${controlsHtml}
+        <div class="room-photo-count"><i data-lucide="images"></i> ${imageSources.length} photo${imageSources.length === 1 ? '' : 's'}</div>
+        <div class="room-thumbs">${thumbsHtml}</div>
       </div>
       <div class="room-content">
+        <p class="room-kicker">${translateCopy('Private coastal room')}</p>
         <div class="room-top">
-          <h3>${room.name}</h3>
-          <strong>${formatAmount(room.price_per_night_usd, 'USD')}</strong>
+          <h3>${translateCopy(room.name)}</h3>
+          <strong><span>${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}</span><small>${state.language === 'de' ? '/ Nacht' : '/ night'}</small></strong>
         </div>
-        <p>${room.short_description}</p>
+        <p>${translateCopy(room.short_description)}</p>
         <div class="room-badges">${badges.join('')}</div>
-        <button class="ghost-btn wide" data-book-room="${room.id}">${t('nav.bookNow')} ${room.name}</button>
+        <div class="room-amenity-strip">${amenityHighlights}</div>
+        <div class="room-actions">
+          <button class="primary-btn" data-book-room="${room.id}">${t('nav.bookNow')}</button>
+          <a class="hero-text-link" href="#booking" data-book-room="${room.id}">${translateCopy('Check dates')}</a>
+        </div>
       </div>
     `;
 
@@ -612,12 +1366,13 @@ function renderRooms() {
 
     const option = document.createElement('option');
     option.value = String(room.id);
-    option.textContent = `${room.name} - ${formatAmount(room.price_per_night_usd, 'USD')}/night`;
+    option.textContent = `${translateCopy(room.name)} - ${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}${state.language === 'de' ? '/Nacht' : '/night'}`;
     dom.roomSelect.appendChild(option);
   });
 
   dom.roomsGrid.querySelectorAll('[data-book-room]').forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
       dom.roomSelect.value = button.dataset.bookRoom;
       document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
       requestQuote();
@@ -642,9 +1397,110 @@ function renderAmenities() {
   [...seenAmenities.values()].forEach((amenity) => {
     const iconName = amenityIconMap[amenity.icon] || 'sparkles';
     const item = document.createElement('article');
-    item.innerHTML = `<i data-lucide="${iconName}"></i><span>${amenity.label}</span>`;
+    item.innerHTML = `<i data-lucide="${iconName}"></i><span>${translateCopy(amenity.label)}</span>`;
     dom.amenityWall.appendChild(item);
   });
+}
+
+function pageBySlug(slug) {
+  return state.contentPages.find((page) => page.slug === slug) || null;
+}
+
+function setText(element, value) {
+  if (element) {
+    element.textContent = value || '';
+  }
+}
+
+function updateMenuLabel(anchor, label) {
+  const link = anchor.startsWith('[')
+    ? document.querySelector(`.main-menu ${anchor}`)
+    : document.querySelector(`.main-menu a[href="${anchor}"]`);
+  if (link && label) {
+    link.textContent = label;
+  }
+}
+
+function updateMenuVisibility(selector, visible) {
+  const link = selector.startsWith('[')
+    ? document.querySelector(`.main-menu ${selector}`)
+    : document.querySelector(`.main-menu a[href="${selector}"]`);
+  if (link) {
+    link.hidden = !visible;
+  }
+}
+
+function renderSimpleHighlights(container, highlights = []) {
+  container.innerHTML = '';
+  highlights.forEach((highlight) => {
+    const item = document.createElement('span');
+    item.textContent = highlight;
+    container.appendChild(item);
+  });
+}
+
+function renderIconHighlights(container, highlights = [], icon = 'sparkles') {
+  container.innerHTML = '';
+  highlights.forEach((highlight) => {
+    const item = document.createElement('article');
+    item.innerHTML = `<i data-lucide="${amenityIconMap[icon] || icon || 'sparkles'}"></i><span></span>`;
+    item.querySelector('span').textContent = highlight;
+    container.appendChild(item);
+  });
+}
+
+function renderPageContent() {
+  const eatSip = pageBySlug('eat-sip');
+  const property = pageBySlug('property');
+  const about = pageBySlug('about');
+
+  [eatSip, property, about].forEach((page) => {
+    const route = contentPageToRoute[page?.slug];
+    if (!route) return;
+    const active = page.active !== 0 && page.active !== false;
+    route.section().dataset.page = active ? route.pageId : 'inactive';
+    updateMenuVisibility(route.menuSelector, active);
+  });
+
+  if (eatSip) {
+    setText(dom.eatSipNav, translateCopy(eatSip.nav_label));
+    setText(dom.eatSipTitle, translateCopy(eatSip.title));
+    setText(dom.eatSipSubtitle, translateCopy(eatSip.subtitle));
+    setText(dom.eatSipBody, translateCopy(eatSip.body));
+    renderSimpleHighlights(dom.eatSipHighlights, translateList(eatSip.highlights || []));
+    const eatSipImage = eatSip.imageUrl || eatSip.image_url;
+    if (eatSipImage) {
+      dom.eatSipImage.src = eatSipImage;
+      dom.eatSipGalleryMain.src = eatSipImage;
+    }
+    updateMenuLabel('[data-page-link="eat-sip"]', translateCopy(eatSip.nav_label));
+  }
+
+  if (property) {
+    setText(dom.propertyNav, translateCopy(property.nav_label));
+    setText(dom.propertyTitle, translateCopy(property.title));
+    setText(dom.propertySubtitle, translateCopy(property.subtitle));
+    setText(dom.propertyBody, translateCopy(property.body));
+    renderIconHighlights(dom.propertyHighlights, translateList(property.highlights || []), property.icon);
+    const propertyImage = property.imageUrl || property.image_url;
+    if (propertyImage) {
+      dom.propertyImage.src = propertyImage;
+    }
+    const priceHighlight = (property.highlights || []).find((item) => /price|usd|tzs|\$|sale/i.test(item));
+    if (priceHighlight) {
+      dom.propertySalePrice.textContent = translateCopy(priceHighlight);
+    }
+    updateMenuLabel('[data-page-link="bomagawani"]', translateCopy(property.nav_label));
+  }
+
+  if (about) {
+    setText(dom.aboutNav, t('nav.contact'));
+    setText(dom.aboutTitle, translateCopy(about.title || 'Contact Bomagawani'));
+    setText(dom.aboutSubtitle, translateCopy(about.subtitle || 'Reach us for room bookings, food requests, directions, and guest support.'));
+    setText(dom.aboutBody, translateCopy(about.body || 'Send us a message before you arrive, ask about room availability, or request food and drinks for your stay.'));
+    renderSimpleHighlights(dom.aboutHighlights, translateList(about.highlights || []));
+    updateMenuLabel('[data-page-link="contact"]', t('nav.contact'));
+  }
 }
 
 function buildWhatsAppLink(number, message) {
@@ -667,8 +1523,8 @@ function renderChatbot() {
   }
 
   dom.chatbotWidget.hidden = false;
-  dom.chatbotTitle.textContent = chatbot.title || 'Quick Help';
-  dom.chatbotGreeting.textContent = chatbot.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.';
+  dom.chatbotTitle.textContent = translateCopy(chatbot.title || 'Quick Help');
+  dom.chatbotGreeting.textContent = translateCopy(chatbot.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.');
   dom.chatbotWhatsapp.textContent = t('chatbot.whatsapp');
   dom.chatbotWhatsapp.href = buildWhatsAppLink(chatbot.whatsapp_number, chatbot.whatsapp_message);
 
@@ -678,8 +1534,8 @@ function renderChatbot() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'chatbot-faq-btn';
-    button.textContent = faq.question;
-    button.addEventListener('click', () => renderChatbotAnswer(faq.answer));
+    button.textContent = translateCopy(faq.question);
+    button.addEventListener('click', () => renderChatbotAnswer(translateCopy(faq.answer)));
     dom.chatbotFaqList.appendChild(button);
   });
 
@@ -688,30 +1544,44 @@ function renderChatbot() {
 
 function renderCurrencies() {
   dom.currencySelect.innerHTML = '';
-  state.currencies.forEach((currency) => {
+  const requiredCurrencies = [...new Set([...state.currencies, 'USD', 'EUR'])];
+  requiredCurrencies.forEach((currency) => {
     const option = document.createElement('option');
     option.value = currency;
     option.textContent = currency;
     dom.currencySelect.appendChild(option);
   });
 
-  dom.currencySelect.value = 'USD';
+  dom.currencySelect.value = currentCurrency();
 }
 
 function applySettings() {
-  dom.headline.textContent = state.settings.headline;
-  dom.subheadline.textContent = state.settings.subheadline;
-  dom.aboutText.textContent = state.settings.about_text;
+  dom.headline.textContent = translateCopy(state.settings.headline);
+  dom.subheadline.textContent = translateCopy(state.settings.subheadline);
+  dom.aboutText.textContent = translateCopy(state.settings.about_text);
   setFooterYear();
   dom.locationLine.textContent = state.settings.address;
   dom.mapLink.href = state.settings.map_link;
+  dom.contactPhoneLink.href = `tel:${String(state.settings.contact_phone || '').replace(/[^\d+]/g, '')}`;
+  dom.contactEmailLink.href = `mailto:${state.settings.contact_email || ''}`;
+  dom.contactMapLink.href = state.settings.map_link;
+  dom.eatSipRequestLink.href = '/contact';
+  dom.footerPhoneLink.href = dom.contactPhoneLink.href;
+  dom.footerPhoneLink.textContent = state.settings.contact_phone || 'Call';
+  dom.footerEmailLink.href = dom.contactEmailLink.href;
+  dom.footerEmailLink.textContent = state.settings.contact_email || 'Email';
+  dom.footerMapLink.href = state.settings.map_link;
 
   const mapQuery = encodeURIComponent(state.settings.address || 'Kigombe, Tanga, Tanzania');
   dom.mapEmbed.src = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
 
-  dom.statRooms.textContent = `${state.rooms.length} Rooms`;
-  dom.statLocation.textContent = state.settings.address.split(',')[0] || state.settings.address;
-  document.title = `${state.settings.domain} | Coastal Room Booking`;
+  if (dom.statRooms) {
+    dom.statRooms.textContent = `${state.rooms.length} ${t('nav.rooms')}`;
+  }
+  if (dom.statLocation) {
+    dom.statLocation.textContent = state.settings.address.split(',')[0] || state.settings.address;
+  }
+  document.title = `${state.settings.domain} | ${pageTitleForCurrentPage()}`;
 
   const heroImages = [
     ...(state.heroSlides || []).map((slide) => slide.image_url),
@@ -809,6 +1679,34 @@ function renderQuote(quote) {
   `;
 }
 
+function applyBookingQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const checkIn = params.get('checkIn') || '';
+  const checkOut = params.get('checkOut') || '';
+  const guests = Number(params.get('guests') || params.get('adults') || 0);
+
+  if (checkIn) {
+    dom.checkIn.value = checkIn;
+    dom.checkOut.min = checkIn;
+  }
+
+  if (checkOut) {
+    dom.checkOut.value = checkOut;
+  }
+
+  if (checkIn || checkOut) {
+    updateBookingDateRangeText();
+  }
+
+  if (guests > 0) {
+    dom.guestsCount.value = String(guests);
+  }
+
+  if (checkIn && checkOut) {
+    requestQuote();
+  }
+}
+
 async function requestQuote() {
   const roomId = dom.roomSelect.value;
   const checkIn = dom.checkIn.value;
@@ -894,6 +1792,7 @@ async function submitBooking(event) {
 
     dom.bookingStatus.innerHTML = `${t('status.bookingSuccessPrefix')} <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>.`;
     dom.bookingForm.reset();
+    setBookingDateRange('', '');
     dom.paymentOption.value = 'pay_on_arrival';
     updatePhoneInputRules();
     state.currentQuote = null;
@@ -938,21 +1837,122 @@ function configureDateInputs() {
   const today = new Date().toISOString().slice(0, 10);
   dom.checkIn.min = today;
   dom.checkOut.min = today;
+  dom.heroCheckIn.min = today;
+  dom.heroCheckOut.min = today;
 
-  dom.checkIn.addEventListener('change', () => {
-    if (dom.checkOut.value && dom.checkOut.value <= dom.checkIn.value) {
-      const nextDay = normalizeDate(dom.checkIn.value);
-      nextDay.setDate(nextDay.getDate() + 1);
-      dom.checkOut.value = nextDay.toISOString().slice(0, 10);
+  updateBookingDateRangeText();
+
+  dom.bookingDateRangeTrigger.addEventListener('click', () => {
+    if (dom.bookingDateRangePicker.hidden) {
+      showBookingDateRangePicker();
+    } else {
+      hideBookingDateRangePicker();
     }
+  });
 
-    dom.checkOut.min = dom.checkIn.value || today;
+  dom.bookingDateRangePrev.addEventListener('click', () => {
+    state.bookingRangePickerMonth = addMonths(state.bookingRangePickerMonth || new Date(), -1);
+    renderBookingDateRangePicker();
+  });
+
+  dom.bookingDateRangeNext.addEventListener('click', () => {
+    state.bookingRangePickerMonth = addMonths(state.bookingRangePickerMonth || new Date(), 1);
+    renderBookingDateRangePicker();
+  });
+
+  dom.bookingDateRangeClear.addEventListener('click', () => {
+    setBookingDateRange('', '');
+    dom.bookingDateRangeStatus.textContent = t('date.selectArrival');
     requestQuote();
   });
 
-  dom.checkOut.addEventListener('change', requestQuote);
+  document.addEventListener('click', (event) => {
+    const clickedInsidePicker = dom.bookingDateRangePicker.contains(event.target);
+    const clickedTrigger = dom.bookingDateRangeTrigger.contains(event.target);
+    if (!clickedInsidePicker && !clickedTrigger) hideBookingDateRangePicker();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') hideBookingDateRangePicker();
+  });
+
   dom.roomSelect.addEventListener('change', requestQuote);
-  dom.currencySelect.addEventListener('change', requestQuote);
+  dom.currencySelect.addEventListener('change', async () => {
+    await loadExchangeRate(dom.currencySelect.value);
+    renderRooms();
+    refreshIcons();
+    requestQuote();
+  });
+}
+
+function configureHeroBookingShortcut() {
+  let bookingType = 'rooms';
+
+  dom.heroBookingForm.querySelectorAll('[data-booking-type]').forEach((button) => {
+    button.addEventListener('click', () => {
+      bookingType = button.dataset.bookingType;
+      dom.heroBookingForm.querySelectorAll('[data-booking-type]').forEach((item) => {
+        item.classList.toggle('is-selected', item === button);
+      });
+    });
+  });
+
+  updateHeroDateRangeText();
+
+  dom.heroDateRangeTrigger.addEventListener('click', () => {
+    if (dom.heroDateRangePicker.hidden) {
+      showHeroDateRangePicker();
+    } else {
+      hideHeroDateRangePicker();
+    }
+  });
+
+  dom.dateRangePrev.addEventListener('click', () => {
+    state.heroRangePickerMonth = addMonths(state.heroRangePickerMonth || new Date(), -1);
+    renderHeroDateRangePicker();
+  });
+
+  dom.dateRangeNext.addEventListener('click', () => {
+    state.heroRangePickerMonth = addMonths(state.heroRangePickerMonth || new Date(), 1);
+    renderHeroDateRangePicker();
+  });
+
+  dom.dateRangeClear.addEventListener('click', () => {
+    setHeroDateRange('', '');
+    dom.dateRangeStatus.textContent = t('date.selectArrival');
+  });
+
+  document.addEventListener('click', (event) => {
+    const clickedInsidePicker = dom.heroDateRangePicker.contains(event.target);
+    const clickedTrigger = dom.heroDateRangeTrigger.contains(event.target);
+    if (!clickedInsidePicker && !clickedTrigger) hideHeroDateRangePicker();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') hideHeroDateRangePicker();
+  });
+
+  dom.heroBookingForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    if (bookingType === 'food') {
+      window.location.href = '/eat-sip';
+      return;
+    }
+
+    const adults = Math.max(1, Number(dom.heroAdults.value || 1));
+    const children = Math.max(0, Number(dom.heroChildren.value || 0));
+    const params = new URLSearchParams();
+
+    if (dom.heroCheckIn.value) params.set('checkIn', dom.heroCheckIn.value);
+    if (dom.heroCheckOut.value) params.set('checkOut', dom.heroCheckOut.value);
+    params.set('adults', String(adults));
+    params.set('children', String(children));
+    params.set('rooms', String(Math.max(1, Number(dom.heroRoomCount.value || 1))));
+    params.set('guests', String(adults + children));
+
+    window.location.href = `/rooms?${params.toString()}#booking`;
+  });
 }
 
 function configurePhoneInput() {
@@ -1012,18 +2012,20 @@ function getSuggestedLanguage() {
   }
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-  if (timezone.includes('Dar_es_Salaam') && state.language !== 'sw') {
-    return 'sw';
+  if ((timezone.includes('Berlin') || timezone.includes('Vienna') || timezone.includes('Zurich')) && state.language !== 'de') {
+    return 'de';
   }
 
   return null;
 }
 
 function configureLanguagePreference() {
-  dom.languageSelect.value = state.language;
-  dom.languageSelect.addEventListener('change', (event) => {
-    setLanguage(event.target.value);
+  dom.languageButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      setLanguage(button.dataset.languageOption);
+    });
   });
+  applyTranslations();
 
   const promptAlreadyShown = localStorage.getItem('language_prompt_seen') === '1';
   const suggestedLanguage = getSuggestedLanguage();
@@ -1112,17 +2114,22 @@ async function boot() {
     state.settings = data.settings;
     state.rooms = data.rooms;
     state.links = data.links;
+    state.contentPages = data.contentPages || [];
     state.heroSlides = data.heroSlides || [];
     state.chatbot = data.chatbot || null;
     state.chatbotFaqs = data.chatbotFaqs || [];
     state.currencies = data.currencies?.length ? data.currencies : state.currencies;
 
+    await loadExchangeRate(currentCurrency());
     applySettings();
     renderLinks();
+    renderCurrencies();
     renderRooms();
     renderAmenities();
+    renderPageContent();
+    applyPageVisibility();
     renderChatbot();
-    renderCurrencies();
+    applyBookingQueryParams();
     updateStructuredData();
     applyTranslations();
     refreshIcons();
@@ -1136,6 +2143,7 @@ setFooterYear();
 configureHeroControls();
 configureLanguagePreference();
 configureDateInputs();
+configureHeroBookingShortcut();
 configurePhoneInput();
 configureLocationRoute();
 configureInstallPrompt();

@@ -21,62 +21,184 @@
   </head>
   <body>
     <header class="topbar">
-      <a href="#" class="brand">
+      <a href="/" class="brand">
         <img src="/logo.svg" alt="Bomagawani logo" class="brand-logo" />
         <span class="brand-text">Bomagawani.com</span>
       </a>
 
-      <nav class="top-links" id="platform-links"></nav>
+      <nav class="top-links main-menu" aria-label="Primary navigation">
+        <a href="/" data-page-link="home" data-i18n="nav.home">Home</a>
+        <a href="/rooms" data-page-link="rooms" data-i18n="nav.rooms">Rooms</a>
+        <a href="/eat-sip" data-page-link="eat-sip">Eat & Sip</a>
+        <a href="/bomagawani" data-page-link="bomagawani">Bomagawani</a>
+        <a href="/contact" data-page-link="contact">Contact</a>
+      </nav>
 
       <div class="top-actions">
-        <select id="language-select" class="lang-select" aria-label="Language selector">
-          <option value="en">English</option>
-          <option value="sw">Kiswahili</option>
-        </select>
+        <div class="language-switch" id="language-switch" aria-label="Language selector">
+          <button type="button" class="language-option" data-language-option="en" aria-label="Use English and US dollars">
+            <span>🇺🇸</span>
+            <strong>US</strong>
+          </button>
+          <button type="button" class="language-option" data-language-option="de" aria-label="Deutsch und Euro verwenden">
+            <span>🇩🇪</span>
+            <strong>DE</strong>
+          </button>
+        </div>
         <a class="ghost-btn" href="/admin" data-i18n="nav.admin">Admin</a>
-        <a class="primary-btn" href="#booking" data-i18n="nav.bookNow">Book Now</a>
+        <a class="primary-btn" href="/rooms#booking" data-i18n="nav.bookNow">Book Now</a>
       </div>
     </header>
 
-    <main>
-      <section class="hero" id="hero">
+    <main id="home">
+      <section class="hero" id="hero" data-page="home">
         <div class="hero-slider" id="hero-slider"></div>
         <div class="hero-overlay"></div>
         <button class="hero-control prev" id="hero-prev" type="button" aria-label="Previous hero image">‹</button>
         <button class="hero-control next" id="hero-next" type="button" aria-label="Next hero image">›</button>
-        <div class="hero-content">
-          <p class="hero-kicker">Kigombe, Tanzania</p>
-          <h1 id="headline">Beautiful Coastal Stays</h1>
-          <p id="subheadline">Direct booking, instant availability, and a warm welcome.</p>
+        <div class="hero-content hero-home-layout">
+          <div class="hero-copy">
+            <p class="hero-kicker" data-i18n="home.heroKicker">Private Coastal Stay • Swahili Coast</p>
+            <h1 id="headline">Bomagawani House Rent</h1>
+            <p id="subheadline">A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.</p>
 
-          <div class="hero-stats">
-            <article>
-              <strong id="stat-rooms">2 Rooms</strong>
-              <span data-i18n="hero.roomsLabel">Ready to book</span>
-            </article>
-            <article>
-              <strong>24/7</strong>
-              <span data-i18n="hero.supportLabel">Guest support</span>
-            </article>
-            <article>
-              <strong id="stat-location">Kigombe</strong>
-              <span data-i18n="hero.locationLabel">Prime location</span>
-            </article>
+            <div class="hero-cta-row">
+              <a class="primary-btn" href="/rooms" data-i18n="home.viewRooms">View Rooms</a>
+              <a class="hero-text-link" href="/bomagawani" data-i18n="home.exploreHouse">Explore the house</a>
+            </div>
           </div>
         </div>
         <div class="hero-dots" id="hero-dots" aria-label="Hero image navigation"></div>
       </section>
 
-      <section class="section section-intro">
-        <article>
-          <h2 data-i18n="intro.title">Stay in style with easy booking</h2>
-          <p id="about-text">
-            Bomagawani House Rent blends comfort and convenience for guests, families, and business travelers.
-          </p>
+      <section class="section home-booking-section" data-page="home" aria-label="Quick availability search">
+        <form class="home-booking-panel" id="hero-booking-form">
+          <div class="booking-panel-intro">
+            <span data-i18n="booking.planStay">Plan your stay</span>
+            <strong data-i18n="booking.checkAvailability">Check availability</strong>
+          </div>
+          <label class="date-range-field">
+            <span data-i18n="form.stayDates">Stay dates</span>
+            <button type="button" class="date-range-trigger" id="hero-date-range-trigger" aria-expanded="false" aria-controls="hero-date-range-picker">
+              <span id="hero-date-range-text" data-i18n="date.selectRange">Select check-in and check-out</span>
+              <i data-lucide="calendar-days"></i>
+            </button>
+            <input type="hidden" id="hero-check-in" />
+            <input type="hidden" id="hero-check-out" />
+          </label>
+          <label>
+            <span data-i18n="form.adults">Adults</span>
+            <input type="number" id="hero-adults" min="1" value="2" />
+          </label>
+          <label>
+            <span data-i18n="form.children">Children</span>
+            <input type="number" id="hero-children" min="0" value="0" />
+          </label>
+          <label>
+            <span data-i18n="nav.rooms">Rooms</span>
+            <input type="number" id="hero-room-count" min="1" value="1" />
+          </label>
+          <div class="home-booking-type" aria-label="Booking type">
+            <button type="button" class="is-selected" data-booking-type="rooms" data-i18n="nav.rooms">Rooms</button>
+            <button type="button" data-booking-type="food" data-i18n="nav.eatSip">Eat & Sip</button>
+          </div>
+          <button type="submit" class="home-search-btn" data-i18n="booking.search">Search</button>
+        </form>
+        <div class="date-range-popover" id="hero-date-range-picker" hidden>
+          <div class="date-range-head">
+            <button type="button" id="date-range-prev" aria-label="Previous month">‹</button>
+            <strong id="date-range-month">Month Year</strong>
+            <button type="button" id="date-range-next" aria-label="Next month">›</button>
+          </div>
+          <div class="date-range-weekdays" aria-hidden="true">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
+          </div>
+          <div class="date-range-grid" id="date-range-grid"></div>
+          <div class="date-range-foot">
+            <span id="date-range-status" data-i18n="date.selectArrival">Select your arrival date.</span>
+            <button type="button" id="date-range-clear">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section home-welcome" data-page="home">
+        <article class="home-story-card">
+          <div>
+            <p class="section-kicker" data-i18n="home.welcome">Welcome</p>
+            <h2 data-i18n="home.welcomeTitle">Stay close to the coast with comfort, calm, and local care.</h2>
+          </div>
+          <div class="home-welcome-copy">
+            <p id="about-text">
+              Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.
+            </p>
+            <p>
+              <span data-i18n="home.welcomeBody">Enjoy quiet mornings, fresh ocean air, shaded veranda space, simple meals on request, and friendly help with arrival, directions, and booking details.</span>
+            </p>
+          </div>
         </article>
       </section>
 
-      <section class="section" id="rooms-section">
+      <section class="section experience-section" aria-label="Bomagawani experience highlights" data-page="home">
+        <a class="home-shortcut" href="/rooms">
+          <span class="shortcut-icon"><i data-lucide="bed-double"></i></span>
+          <small data-i18n="shortcut.stay">Stay</small>
+          <strong data-i18n="nav.rooms">Rooms</strong>
+          <span data-i18n="shortcut.roomsText">Private rooms with photos, prices, amenities, and direct booking.</span>
+          <em data-i18n="shortcut.roomsAction">Explore rooms</em>
+        </a>
+        <a class="home-shortcut" href="/eat-sip">
+          <span class="shortcut-icon"><i data-lucide="utensils-crossed"></i></span>
+          <small data-i18n="shortcut.taste">Taste</small>
+          <strong data-i18n="nav.eatSip">Eat & Sip</strong>
+          <span data-i18n="shortcut.eatText">Fresh coastal foods, drinks, and meal preparation for your stay.</span>
+          <em data-i18n="shortcut.eatAction">View menu story</em>
+        </a>
+        <a class="home-shortcut" href="/bomagawani">
+          <span class="shortcut-icon"><i data-lucide="map-pin"></i></span>
+          <small data-i18n="shortcut.discover">Discover</small>
+          <strong data-i18n="nav.bomagawani">Bomagawani</strong>
+          <span data-i18n="shortcut.houseText">See the house details, location, and guest support.</span>
+          <em data-i18n="shortcut.houseAction">See details</em>
+        </a>
+      </section>
+
+      <section class="section home-details-section" data-page="home" aria-label="Bomagawani coastal property details">
+        <div class="section-head refined-head">
+          <p class="section-kicker">Property Notes</p>
+          <h2>A coastal home shaped by nature, shade, and slow living.</h2>
+          <p>Bomagawani sits in a peaceful coastal environment near Tanga, with house details suited to warm weather and relaxed stays.</p>
+        </div>
+        <div class="home-details-grid">
+          <article>
+            <span class="detail-number">01</span>
+            <h3>Marine coast setting</h3>
+            <p>Located along Tanzania’s northern Swahili Coast near the protected Coelacanth marine park, with mangroves, clear water, and quiet natural surroundings.</p>
+          </article>
+          <article>
+            <span class="detail-number">02</span>
+            <h3>Afro-Arabian character</h3>
+            <p>The house style highlights shaded veranda living, high ceilings, and natural airflow for warm coastal weather.</p>
+          </article>
+          <article>
+            <span class="detail-number">03</span>
+            <h3>Easy Tanga access</h3>
+            <p>Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access for guests and supplies.</p>
+          </article>
+          <article>
+            <span class="detail-number">04</span>
+            <h3>Practical essentials</h3>
+            <p>Guest essentials include power support, cooking water, bottled drinking water, simple waste handling, and mobile phone connectivity.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="rooms-section" data-page="rooms">
         <div class="section-head">
           <h2 data-i18n="rooms.title">Our Rooms</h2>
           <p data-i18n="rooms.subtitle">Choose your room and book in minutes.</p>
@@ -84,7 +206,7 @@
         <div class="rooms-grid" id="rooms-grid"></div>
       </section>
 
-      <section class="section amenities-area">
+      <section class="section amenities-area" data-page="rooms">
         <div class="section-head">
           <h2 data-i18n="amenities.title">Amenities At A Glance</h2>
           <p data-i18n="amenities.subtitle">Everything you need for a comfortable stay.</p>
@@ -92,7 +214,221 @@
         <div class="amenity-wall" id="amenity-wall"></div>
       </section>
 
-      <section class="section booking-layout" id="booking">
+      <section class="section eat-sip-page" id="eat-sip-section" data-page="eat-sip">
+        <div class="eat-hero">
+          <div class="eat-hero-copy">
+            <p class="section-kicker" id="eat-sip-nav">Eat & Sip</p>
+            <h2 id="eat-sip-title">Eat & Sip by the Coast</h2>
+            <p class="story-subtitle" id="eat-sip-subtitle">Fresh coastal foods, cool drinks, and flavors prepared with local care.</p>
+            <p id="eat-sip-body"></p>
+            <div class="eat-actions">
+              <a class="primary-btn" id="eat-sip-request-link" href="/contact">Request Food Booking</a>
+              <a class="hero-text-link" href="/contact">Ask what is available today</a>
+            </div>
+          </div>
+          <aside class="eat-feature-image">
+            <img id="eat-sip-image" src="https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80" alt="Coastal food and drinks" loading="lazy" decoding="async" />
+            <div>
+              <span>Coastal Kitchen</span>
+              <strong>Come for food, drinks, or both.</strong>
+            </div>
+          </aside>
+        </div>
+
+        <div class="eat-service-grid" aria-label="Eat and Sip options">
+          <article>
+            <i data-lucide="utensils-crossed"></i>
+            <span>Dine In</span>
+            <h3>Come just to eat</h3>
+            <p>Guests can visit for a prepared meal without booking a room, depending on kitchen availability.</p>
+          </article>
+          <article>
+            <i data-lucide="glass-water"></i>
+            <span>Refreshments</span>
+            <h3>Drinks & easy bites</h3>
+            <p>Fresh juice, tea, coffee, water, soft drinks, and simple snacks can be arranged for relaxed visits.</p>
+          </article>
+          <article>
+            <i data-lucide="chef-hat"></i>
+            <span>On Request</span>
+            <h3>Meal booking</h3>
+            <p>Request breakfast, lunch, dinner, or a small group meal in advance so ingredients are prepared well.</p>
+          </article>
+        </div>
+
+        <div class="eat-menu-section">
+          <div class="section-head split-head">
+            <div>
+              <p class="section-kicker">Tanzania Coastal Taste</p>
+              <h2>Simple food with Swahili Coast flavor.</h2>
+            </div>
+            <p>Food is prepared around local ingredients, clean kitchen care, and what guests want to enjoy that day.</p>
+          </div>
+          <div class="eat-menu-grid">
+            <article>
+              <span>01</span>
+              <h3>Seafood & grilled plates</h3>
+              <p>Fish, prawns when available, grilled bites, sauces, lemon, coconut notes, and coastal-style sides.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>Rice, pilau & home meals</h3>
+              <p>Comforting rice dishes, pilau-style flavors, vegetables, beans, soups, and homestyle plates.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>Breakfast & tea time</h3>
+              <p>Tea, coffee, fruit, bread, eggs on request, fresh juice, and light morning options.</p>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>Fresh drinks</h3>
+              <p>Tropical juices, water, soft drinks, evening refreshments, and simple drinks for guests visiting.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="eat-gallery-wall" aria-label="Food and drink gallery">
+          <figure class="eat-gallery-main">
+            <img id="eat-sip-gallery-main" src="https://images.unsplash.com/photo-1543352634-a1c51d9f1fa7?auto=format&fit=crop&w=1000&q=80" alt="Prepared coastal meal" loading="lazy" decoding="async" />
+            <figcaption>Pictures can be updated from Admin as your food photos grow.</figcaption>
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?auto=format&fit=crop&w=800&q=80" alt="Fresh tropical drink" loading="lazy" decoding="async" />
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" alt="Grilled food platter" loading="lazy" decoding="async" />
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80" alt="Rice and coastal meal" loading="lazy" decoding="async" />
+          </figure>
+        </div>
+
+        <div class="eat-request-card">
+          <div>
+            <p class="section-kicker">Food Booking</p>
+            <h2>Tell us what you want to eat or drink.</h2>
+            <p>Send a request for dine-in food, guest meals, drinks, or a small group plan. We will confirm what is available and the best preparation time.</p>
+          </div>
+          <div class="highlight-list" id="eat-sip-highlights"></div>
+        </div>
+      </section>
+
+      <section class="section property-sale-page" id="property-section" data-page="bomagawani">
+        <div class="property-sale-hero">
+          <div class="property-sale-copy">
+            <p class="section-kicker" id="property-nav">Bomagawani</p>
+            <h2 id="property-title">Bomagawani House Details</h2>
+            <p class="story-subtitle" id="property-subtitle">A coastal house-rent stay designed for comfort, privacy, and easy hosting.</p>
+            <p id="property-body"></p>
+            <div class="property-sale-actions">
+              <a class="primary-btn" href="/contact">Book a Viewing</a>
+              <a class="hero-text-link" href="/contact">Ask for sale details</a>
+            </div>
+          </div>
+          <aside class="property-sale-card">
+            <span>House For Sale</span>
+            <strong id="property-sale-price">Price on request</strong>
+            <p>Request the full house details, viewing time, photos, and video tour before visiting.</p>
+          </aside>
+        </div>
+
+        <div class="property-media-grid" aria-label="House photos and video">
+          <figure class="property-media-main">
+            <img id="property-image" src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80" alt="Bomagawani house view" loading="lazy" decoding="async" />
+            <figcaption>Upload the house feature photo from Admin Page Content.</figcaption>
+          </figure>
+          <article class="property-video-card">
+            <i data-lucide="play-circle"></i>
+            <span>Video Tour</span>
+            <h3>Request or add a walk-through video</h3>
+            <p>Use this space to guide buyers to house videos, room walk-throughs, and viewing appointments.</p>
+          </article>
+          <article class="property-media-note">
+            <i data-lucide="images"></i>
+            <span>Gallery Ready</span>
+            <h3>Photos & viewing support</h3>
+            <p>Show bedrooms, veranda areas, access roads, services, and surrounding coastal environment.</p>
+          </article>
+        </div>
+
+        <div class="property-sale-facts">
+          <div class="section-head split-head">
+            <div>
+              <p class="section-kicker">Property Notes</p>
+              <h2>A coastal home shaped for shade, airflow, and practical living.</h2>
+            </div>
+            <p>Key details from the property notes are kept simple here so buyers can understand the house quickly.</p>
+          </div>
+          <div class="property-fact-grid">
+            <article>
+              <span>01</span>
+              <h3>Marine coast setting</h3>
+              <p>Located around Tanzania’s northern Swahili Coast near the protected Coelacanth marine park, with a calm natural setting.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>Afro-Arabian character</h3>
+              <p>Shaded veranda living, high ceilings, and natural airflow support comfortable coastal living.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>Easy Tanga access</h3>
+              <p>Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access.</p>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>Practical essentials</h3>
+              <p>Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="property-feature-strip" id="property-highlights"></div>
+      </section>
+
+      <section class="section contact-page" id="about-section" data-page="contact">
+        <article class="contact-hero-card">
+          <div class="contact-copy">
+            <p class="section-kicker" id="about-nav">Contact</p>
+            <h2 id="about-title">Contact Bomagawani</h2>
+            <p class="story-subtitle" id="about-subtitle">Reach us for room bookings, food requests, directions, and guest support.</p>
+            <p id="about-body"></p>
+            <div class="contact-actions">
+              <a class="primary-btn" id="contact-phone-link" href="#">Call Us</a>
+              <a class="ghost-btn" id="contact-email-link" href="#">Email</a>
+              <a class="ghost-btn" id="contact-map-link" href="#" target="_blank" rel="noreferrer">Open Map</a>
+            </div>
+          </div>
+          <div class="contact-inquiry-box">
+            <span>Best for quick inquiry</span>
+            <strong>Rooms, food, directions, or house viewing.</strong>
+            <p>Tell us what you need and when you plan to visit.</p>
+          </div>
+        </article>
+
+        <div class="contact-intent-grid">
+          <article>
+            <i data-lucide="bed"></i>
+            <h3>Stay inquiry</h3>
+            <p>Ask about rooms, available dates, prices, and arrival time.</p>
+          </article>
+          <article>
+            <i data-lucide="utensils-crossed"></i>
+            <h3>Food inquiry</h3>
+            <p>Request food, drinks, breakfast, dinner, or a small meal plan.</p>
+          </article>
+          <article>
+            <i data-lucide="home"></i>
+            <h3>House sale viewing</h3>
+            <p>Ask for sale details, viewing time, photos, video, and buyer information.</p>
+          </article>
+        </div>
+
+        <div class="about-highlights contact-note-list" id="about-highlights"></div>
+      </section>
+
+      <section class="section booking-layout" id="booking" data-page="rooms">
         <div class="booking-card">
           <h2 data-i18n="booking.title">Book Direct on Bomagawani.com</h2>
           <p data-i18n="booking.subtitle">Select room, date, and currency. Your booking code is created instantly.</p>
@@ -103,15 +439,37 @@
               <select id="room-select" required></select>
             </label>
 
-            <div class="date-grid">
-              <label>
-                <span data-i18n="form.checkIn">Check-in</span>
-                <input type="date" id="check-in" required />
+            <div class="booking-date-range-wrap">
+              <label class="booking-range-field">
+                <span data-i18n="form.stayDates">Stay dates</span>
+                <button type="button" class="date-range-trigger booking-date-trigger" id="booking-date-range-trigger" aria-expanded="false" aria-controls="booking-date-range-picker">
+                  <span id="booking-date-range-text" data-i18n="date.selectRange">Select check-in and check-out</span>
+                  <i data-lucide="calendar-days"></i>
+                </button>
+                <input type="hidden" id="check-in" />
+                <input type="hidden" id="check-out" />
               </label>
-              <label>
-                <span data-i18n="form.checkOut">Check-out</span>
-                <input type="date" id="check-out" required />
-              </label>
+              <div class="date-range-popover booking-date-popover" id="booking-date-range-picker" hidden>
+                <div class="date-range-head">
+                  <button type="button" id="booking-date-range-prev" aria-label="Previous month">‹</button>
+                  <strong id="booking-date-range-month">Month Year</strong>
+                  <button type="button" id="booking-date-range-next" aria-label="Next month">›</button>
+                </div>
+                <div class="date-range-weekdays" aria-hidden="true">
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
+                  <span>Fri</span>
+                  <span>Sat</span>
+                  <span>Sun</span>
+                </div>
+                <div class="date-range-grid" id="booking-date-range-grid"></div>
+                <div class="date-range-foot">
+                  <span id="booking-date-range-status" data-i18n="date.selectArrival">Select your arrival date.</span>
+                  <button type="button" id="booking-date-range-clear">Clear</button>
+                </div>
+              </div>
             </div>
 
             <div class="date-grid">
@@ -214,7 +572,15 @@
     </main>
 
     <footer class="footer">
-      <p id="footer-text">Bomagawani</p>
+      <div class="footer-brand">
+        <strong id="footer-text">Bomagawani</strong>
+        <span id="footer-tagline" data-i18n="footer.tagline">Coastal stays, fresh flavors, easy booking.</span>
+      </div>
+      <div class="footer-contact">
+        <a id="footer-phone-link" href="#">Call</a>
+        <a id="footer-email-link" href="#">Email</a>
+        <a id="footer-map-link" href="#" target="_blank" rel="noreferrer">Map</a>
+      </div>
     </footer>
 
     <section class="floating-prompt" id="language-prompt" hidden>

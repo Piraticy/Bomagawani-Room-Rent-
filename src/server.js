@@ -136,6 +136,14 @@ function normalizeRoom(room) {
   };
 }
 
+function normalizeContentPage(page) {
+  return {
+    ...page,
+    imageUrl: page.image_url || '',
+    highlights: JSON.parse(page.highlights_json || '[]')
+  };
+}
+
 function normalizeCurrency(code) {
   return String(code || 'USD')
     .trim()
@@ -267,6 +275,14 @@ function getPlatformLinks() {
   return db.prepare('SELECT * FROM platform_links ORDER BY sort_order ASC, id ASC').all();
 }
 
+function getContentPages({ activeOnly = false } = {}) {
+  const where = activeOnly ? 'WHERE active = 1' : '';
+  return db
+    .prepare(`SELECT * FROM content_pages ${where} ORDER BY sort_order ASC, id ASC`)
+    .all()
+    .map(normalizeContentPage);
+}
+
 function getHeroSlides() {
   return db.prepare('SELECT id, image_url, caption, sort_order FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
 }
@@ -321,6 +337,10 @@ function adminSummary() {
 function buildSitemapXml(baseUrl, rooms) {
   const urls = [
     `${baseUrl}/`,
+    `${baseUrl}/rooms`,
+    `${baseUrl}/eat-sip`,
+    `${baseUrl}/bomagawani`,
+    `${baseUrl}/contact`,
     `${baseUrl}/admin`
   ];
 
@@ -370,6 +390,7 @@ app.get('/api/public/bootstrap', async (req, res) => {
       settings,
       rooms,
       links: getPlatformLinks(),
+      contentPages: getContentPages(),
       heroSlides: getHeroSlides(),
       chatbot: getChatbotSettings(),
       chatbotFaqs: getChatbotFaqs(),
@@ -651,6 +672,7 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     settings: getSettings(),
     rooms: getAllRooms(),
     links: getPlatformLinks(),
+    contentPages: getContentPages(),
     heroSlides: getHeroSlides(),
     chatbot: getChatbotSettings(),
     chatbotFaqs: getChatbotFaqs()
@@ -1017,9 +1039,10 @@ app.delete('/api/admin/hero-slides/:id', requireAdmin, (req, res) => {
   const usedByRoom = db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(slide.image_url).count > 0;
   const usedByCover = db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(slide.image_url).count > 0;
   const usedBySettings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get().hero_image === slide.image_url;
+  const usedByContentPage = db.prepare('SELECT COUNT(*) AS count FROM content_pages WHERE image_url = ?').get(slide.image_url).count > 0;
   const usedByOtherSlides = db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(slide.image_url).count > 0;
 
-  if (!usedByRoom && !usedByCover && !usedBySettings && !usedByOtherSlides) {
+  if (!usedByRoom && !usedByCover && !usedBySettings && !usedByContentPage && !usedByOtherSlides) {
     removeUploadByUrl(slide.image_url);
     removeRelatedOriginalByProcessedUrl(slide.image_url);
   }
@@ -1107,6 +1130,122 @@ app.put('/api/admin/platform-links', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
+app.put('/api/admin/page-content', requireAdmin, (req, res) => {
+  const pages = Array.isArray(req.body.pages) ? req.body.pages : [];
+  const allowedSlugs = new Set(['eat-sip', 'property', 'about']);
+
+  const trx = db.transaction(() => {
+    const upsert = db.prepare(
+      `INSERT INTO content_pages (
+        slug, nav_label, title, subtitle, body, highlights_json, image_url, icon, sort_order, active, updated_at
+      ) VALUES (
+        @slug, @nav_label, @title, @subtitle, @body, @highlights_json, @image_url, @icon, @sort_order, @active, CURRENT_TIMESTAMP
+      )
+      ON CONFLICT(slug) DO UPDATE SET
+        nav_label = excluded.nav_label,
+        title = excluded.title,
+        subtitle = excluded.subtitle,
+        body = excluded.body,
+        highlights_json = excluded.highlights_json,
+        image_url = excluded.image_url,
+        icon = excluded.icon,
+        sort_order = excluded.sort_order,
+        active = excluded.active,
+        updated_at = CURRENT_TIMESTAMP`
+    );
+
+    pages.forEach((page, index) => {
+      const slug = slugify(page.slug || '');
+      if (!allowedSlugs.has(slug)) return;
+
+      const navLabel = String(page.navLabel || '').trim();
+      const title = String(page.title || '').trim();
+      const subtitle = String(page.subtitle || '').trim();
+      const body = String(page.body || '').trim();
+      const icon = String(page.icon || 'sparkles').trim();
+      const highlights = Array.isArray(page.highlights)
+        ? page.highlights.map((item) => String(item || '').trim()).filter(Boolean)
+        : [];
+
+      if (!navLabel || !title || !body) {
+        throw new Error('Each page needs a nav label, title, and body.');
+      }
+
+      upsert.run({
+        slug,
+        nav_label: navLabel,
+        title,
+        subtitle,
+        body,
+        highlights_json: JSON.stringify(highlights),
+        image_url: String(page.imageUrl || page.image_url || '').trim(),
+        icon,
+        sort_order: Number(page.sortOrder || index + 1),
+        active: page.active === false ? 0 : 1
+      });
+    });
+  });
+
+  try {
+    trx();
+    return res.json({ ok: true });
+  } catch (error) {
+    return res.status(400).json({ error: error.message || 'Failed to save page content.' });
+  }
+});
+
+app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('image'), async (req, res) => {
+  const slug = slugify(req.params.slug || '');
+  const allowedSlugs = new Set(['eat-sip', 'property', 'about']);
+  if (!allowedSlugs.has(slug)) {
+    removeFileIfExists(req.file?.path);
+    return res.status(400).json({ error: 'Unsupported page.' });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: 'Image file is required.' });
+  }
+
+  try {
+    const settings = getSettings();
+    const page = db.prepare('SELECT * FROM content_pages WHERE slug = ?').get(slug);
+    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const outputFilename = `${baseName}.jpg`;
+    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
+    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
+    const outputPath = path.join(siteUploadDir, outputFilename);
+    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+
+    await saveOriginalCopy(req.file.path, originalCopyPath);
+    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
+
+    const imageUrl = `/uploads/site/${outputFilename}`;
+    db.prepare('UPDATE content_pages SET image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?').run(imageUrl, slug);
+
+    removeFileIfExists(req.file.path);
+
+    if (page?.image_url && page.image_url !== imageUrl) {
+      const usedByRoom = db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(page.image_url).count > 0;
+      const usedByCover = db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(page.image_url).count > 0;
+      const usedBySettings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get().hero_image === page.image_url;
+      const usedBySlides = db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(page.image_url).count > 0;
+      const usedByOtherPages = db
+        .prepare('SELECT COUNT(*) AS count FROM content_pages WHERE image_url = ? AND slug != ?')
+        .get(page.image_url, slug).count > 0;
+
+      if (!usedByRoom && !usedByCover && !usedBySettings && !usedBySlides && !usedByOtherPages) {
+        removeUploadByUrl(page.image_url);
+        removeRelatedOriginalByProcessedUrl(page.image_url);
+      }
+    }
+
+    return res.status(201).json({ imageUrl });
+  } catch (error) {
+    removeFileIfExists(req.file?.path);
+    return res.status(500).json({ error: 'Page image upload failed.' });
+  }
+});
+
 app.put('/api/admin/chatbot-settings', requireAdmin, (req, res) => {
   const title = String(req.body.title || '').trim();
   const greeting = String(req.body.greeting || '').trim();
@@ -1164,6 +1303,14 @@ app.put('/api/admin/chatbot-faqs', requireAdmin, (req, res) => {
 
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicDir, 'admin.html'));
+});
+
+app.get(['/rooms', '/eat-sip', '/bomagawani', '/contact'], (req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+app.get('/about-us', (req, res) => {
+  res.redirect(301, '/contact');
 });
 
 app.get('/', (req, res) => {

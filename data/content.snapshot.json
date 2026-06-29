@@ -3,12 +3,12 @@
   "siteSettings": {
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
-    "headline": "Beautiful Coastal Stays in Kigombe",
-    "subheadline": "Book the Master Bedroom or Guest Room in minutes with instant availability.",
-    "aboutText": "Bomagawani House Rent combines warm hospitality, modern comfort, and simple digital booking for travelers and families.",
+    "headline": "Bomagawani House Rent",
+    "subheadline": "A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.",
+    "aboutText": "Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania\u2019s northern Swahili Coast.",
     "address": "Kigombe, Tanga, Tanzania",
     "mapLink": "https://maps.google.com/?q=Kigombe%20Tanga%20Tanzania",
-    "contactPhone": "+255 700 000 000",
+    "contactPhone": "+255 756 906 006",
     "contactEmail": "stay@bomagawani.com",
     "checkInTime": "14:00",
     "checkOutTime": "11:00",
@@ -24,7 +24,7 @@
       "longDescription": "The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.",
       "pricePerNightUsd": 120,
       "maxGuests": 2,
-      "sizeLabel": "38 m²",
+      "sizeLabel": "38 m\u00b2",
       "featured": true,
       "active": true,
       "coverImage": "",
@@ -71,10 +71,10 @@
       "longDescription": "The Guest Room offers a calm, clean, and budget-friendly option while still giving access to the full property experience.",
       "pricePerNightUsd": 75,
       "maxGuests": 2,
-      "sizeLabel": "24 m²",
+      "sizeLabel": "24 m\u00b2",
       "featured": false,
       "active": true,
-      "coverImage": "",
+      "coverImage": "/uploads/rooms/guest-room-main.jpg",
       "amenities": [
         {
           "icon": "wifi",
@@ -113,7 +113,18 @@
           "label": "Drinks"
         }
       ],
-      "images": []
+      "images": [
+        {
+          "imageUrl": "/uploads/rooms/guest-room-main.jpg",
+          "caption": "Guest Room main view",
+          "sortOrder": 1
+        },
+        {
+          "imageUrl": "/uploads/rooms/guest-room-alt.jpg",
+          "caption": "Guest Room bed view",
+          "sortOrder": 2
+        }
+      ]
     }
   ],
   "platformLinks": [
@@ -146,7 +157,7 @@
   "chatbot": {
     "title": "Quick Help",
     "greeting": "Hi. Ask me anything about rooms, prices, check-in, or booking.",
-    "whatsappNumber": "255700000000",
+    "whatsappNumber": "255756906006",
     "whatsappMessage": "Hello Bomagawani, I need help with booking.",
     "enabled": true
   },
@@ -165,6 +176,59 @@
       "question": "How can I confirm my booking?",
       "answer": "Submit your booking request and our team will confirm quickly. You get a booking code instantly.",
       "sortOrder": 3
+    }
+  ],
+  "contentPages": [
+    {
+      "slug": "eat-sip",
+      "navLabel": "Eat & Sip",
+      "title": "Eat & Sip by the Coast",
+      "subtitle": "Coastal meals, fresh drinks, and on-request food booking for guests and visitors.",
+      "body": "Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.",
+      "highlights": [
+        "Visitors can come just to eat, drink, or enjoy both together",
+        "On-request breakfast, lunch, dinner, and small group meals",
+        "Tanzania coastal-style seafood, rice dishes, tea, coffee, and fresh juices",
+        "Food preparation is confirmed based on availability and guest plans"
+      ],
+      "imageUrl": "",
+      "icon": "utensils-crossed",
+      "sortOrder": 1,
+      "active": true
+    },
+    {
+      "slug": "property",
+      "navLabel": "Bomagawani",
+      "title": "Bomagawani House For Sale",
+      "subtitle": "A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.",
+      "body": "Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.",
+      "highlights": [
+        "House for sale - price on request",
+        "Private rooms and guest-ready layout",
+        "Near Tanzania's northern Swahili Coast",
+        "Viewing, photos, and video tour available on request"
+      ],
+      "imageUrl": "",
+      "icon": "home",
+      "sortOrder": 2,
+      "active": true
+    },
+    {
+      "slug": "about",
+      "navLabel": "Contact",
+      "title": "Contact Bomagawani",
+      "subtitle": "Ask about rooms, food, directions, or arrange a house-sale viewing.",
+      "body": "Send a quick inquiry and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.",
+      "highlights": [
+        "Room booking and arrival questions",
+        "Food and drink requests",
+        "House sale viewing appointments",
+        "Photos, video, map, and buyer details"
+      ],
+      "imageUrl": "",
+      "icon": "phone-call",
+      "sortOrder": 3,
+      "active": true
     }
   ]
 }

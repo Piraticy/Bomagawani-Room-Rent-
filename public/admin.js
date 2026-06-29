@@ -29,6 +29,10 @@ const dom = {
   setLogoText: document.getElementById('set-logo-text'),
   setAbout: document.getElementById('set-about'),
 
+  pageContentWrap: document.getElementById('page-content-wrap'),
+  savePageContent: document.getElementById('save-page-content'),
+  pageContentStatus: document.getElementById('page-content-status'),
+
   heroUploadForm: document.getElementById('hero-upload-form'),
   heroImage: document.getElementById('hero-image'),
   heroStatus: document.getElementById('hero-status'),
@@ -85,6 +89,7 @@ const dom = {
 const state = {
   rooms: [],
   links: [],
+  contentPages: [],
   bookings: [],
   heroSlides: [],
   chatbot: null,
@@ -335,6 +340,99 @@ function renderLinks() {
   state.links.forEach((link) => addLinkRow(link));
 }
 
+function pageLabel(slug) {
+  if (slug === 'eat-sip') return 'Eat & Sip';
+  if (slug === 'property') return 'Bomagawani';
+  if (slug === 'about') return 'Contact';
+  return slug;
+}
+
+function addLabeledField(card, labelText, inputElement, full = false) {
+  const label = document.createElement('label');
+  label.textContent = labelText;
+  if (full) label.className = 'full';
+  label.appendChild(inputElement);
+  card.appendChild(label);
+}
+
+function createPageInput(type, value, rows = 3) {
+  const element = type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+  if (type === 'textarea') {
+    element.rows = rows;
+  }
+  element.value = value || '';
+  return element;
+}
+
+function addPageContentCard(page) {
+  const card = document.createElement('article');
+  card.className = 'page-content-card';
+  card.dataset.pageSlug = page.slug;
+
+  const title = document.createElement('h3');
+  title.textContent = pageLabel(page.slug);
+  card.appendChild(title);
+
+  const navInput = createPageInput('input', page.nav_label);
+  navInput.dataset.pageField = 'navLabel';
+  addLabeledField(card, 'Menu label', navInput);
+
+  const iconInput = createPageInput('input', page.icon || 'sparkles');
+  iconInput.dataset.pageField = 'icon';
+  addLabeledField(card, 'Lucide icon name', iconInput);
+
+  const titleInput = createPageInput('input', page.title);
+  titleInput.dataset.pageField = 'title';
+  addLabeledField(card, 'Title', titleInput, true);
+
+  const subtitleInput = createPageInput('input', page.subtitle);
+  subtitleInput.dataset.pageField = 'subtitle';
+  addLabeledField(card, 'Subtitle', subtitleInput, true);
+
+  const bodyInput = createPageInput('textarea', page.body, 4);
+  bodyInput.dataset.pageField = 'body';
+  addLabeledField(card, 'Body', bodyInput, true);
+
+  const highlightsInput = createPageInput('textarea', (page.highlights || []).join('\n'), 5);
+  highlightsInput.dataset.pageField = 'highlights';
+  addLabeledField(card, 'Highlights (one per line)', highlightsInput, true);
+
+  const imageWrap = document.createElement('div');
+  imageWrap.className = 'page-image-tools full';
+  imageWrap.innerHTML = `
+    <label>Feature image URL
+      <input data-page-field="imageUrl" value="${page.imageUrl || page.image_url || ''}" placeholder="/uploads/site/example.jpg" />
+    </label>
+    <div class="page-image-preview ${page.imageUrl || page.image_url ? 'has-image' : ''}">
+      ${(page.imageUrl || page.image_url) ? `<img src="${page.imageUrl || page.image_url}" alt="${pageLabel(page.slug)} feature preview" />` : '<span>No feature image yet</span>'}
+    </div>
+    <div class="action-row">
+      <input type="file" accept="image/*" data-page-field="imageFile" />
+      <button class="ghost-btn" type="button" data-upload-page-image="${page.slug}">Upload Page Image</button>
+    </div>
+  `;
+  card.appendChild(imageWrap);
+
+  const activeLabel = document.createElement('label');
+  activeLabel.className = 'inline';
+  const activeInput = document.createElement('input');
+  activeInput.type = 'checkbox';
+  activeInput.dataset.pageField = 'active';
+  activeInput.checked = page.active !== 0 && page.active !== false;
+  activeLabel.appendChild(activeInput);
+  activeLabel.append(' Show this section on website');
+  card.appendChild(activeLabel);
+
+  dom.pageContentWrap.appendChild(card);
+}
+
+function renderPageContentEditor() {
+  dom.pageContentWrap.innerHTML = '';
+
+  const sortedPages = [...state.contentPages].sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+  sortedPages.forEach(addPageContentCard);
+}
+
 function populateChatbotSettings(chatbot) {
   dom.chatbotTitle.value = chatbot?.title || 'Quick Help';
   dom.chatbotGreeting.value = chatbot?.greeting || '';
@@ -542,6 +640,7 @@ async function loadDashboard() {
 
   state.rooms = data.rooms;
   state.links = data.links;
+  state.contentPages = data.contentPages || [];
   state.heroSlides = data.heroSlides || [];
   state.chatbot = data.chatbot || null;
   state.chatbotFaqs = data.chatbotFaqs || [];
@@ -553,6 +652,7 @@ async function loadDashboard() {
   renderRoomGallery();
   renderHeroSlides();
   renderLinks();
+  renderPageContentEditor();
   populateChatbotSettings(state.chatbot);
   renderChatbotFaqs();
   renderBookings();
@@ -802,6 +902,77 @@ dom.saveLinks.addEventListener('click', async () => {
     await loadDashboard();
   } catch (error) {
     setStatus(dom.linksStatus, error.message, false);
+  }
+});
+
+dom.savePageContent.addEventListener('click', async () => {
+  const pages = [...dom.pageContentWrap.querySelectorAll('.page-content-card')]
+    .map((card, index) => ({
+      slug: card.dataset.pageSlug,
+      navLabel: card.querySelector('[data-page-field="navLabel"]')?.value.trim() || '',
+      title: card.querySelector('[data-page-field="title"]')?.value.trim() || '',
+      subtitle: card.querySelector('[data-page-field="subtitle"]')?.value.trim() || '',
+      body: card.querySelector('[data-page-field="body"]')?.value.trim() || '',
+      icon: card.querySelector('[data-page-field="icon"]')?.value.trim() || 'sparkles',
+      imageUrl: card.querySelector('[data-page-field="imageUrl"]')?.value.trim() || '',
+      highlights: (card.querySelector('[data-page-field="highlights"]')?.value || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean),
+      active: card.querySelector('[data-page-field="active"]')?.checked !== false,
+      sortOrder: index + 1
+    }));
+
+  try {
+    await api('/api/admin/page-content', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pages })
+    });
+
+    setStatus(dom.pageContentStatus, 'Page content saved.');
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.pageContentStatus, error.message, false);
+  }
+});
+
+dom.pageContentWrap.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-upload-page-image]');
+  if (!button) return;
+
+  const card = button.closest('.page-content-card');
+  const fileInput = card.querySelector('[data-page-field="imageFile"]');
+  const imageUrlInput = card.querySelector('[data-page-field="imageUrl"]');
+  const preview = card.querySelector('.page-image-preview');
+  const file = fileInput?.files?.[0];
+
+  if (!file) {
+    setStatus(dom.pageContentStatus, 'Choose an image first.', false);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    button.disabled = true;
+    setStatus(dom.pageContentStatus, 'Uploading page image...');
+    const result = await api(`/api/admin/page-content/${encodeURIComponent(button.dataset.uploadPageImage)}/image`, {
+      method: 'POST',
+      body: formData
+    });
+
+    imageUrlInput.value = result.imageUrl || '';
+    preview.classList.add('has-image');
+    preview.innerHTML = `<img src="${result.imageUrl}" alt="${pageLabel(card.dataset.pageSlug)} feature preview" />`;
+    fileInput.value = '';
+    setStatus(dom.pageContentStatus, 'Page image uploaded.');
+    await loadDashboard();
+  } catch (error) {
+    setStatus(dom.pageContentStatus, error.message, false);
+  } finally {
+    button.disabled = false;
   }
 });
 

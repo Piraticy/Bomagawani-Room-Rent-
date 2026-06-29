@@ -62,6 +62,7 @@
         <div class="admin-layout">
           <aside class="admin-tabs" id="admin-tabs">
             <button type="button" class="tab-btn is-active" data-tab="site">Site Settings</button>
+            <button type="button" class="tab-btn" data-tab="pages">Page Content</button>
             <button type="button" class="tab-btn" data-tab="rooms">Room Manager</button>
             <button type="button" class="tab-btn" data-tab="media">Room Media Manager</button>
             <button type="button" class="tab-btn" data-tab="channels">Platform Links</button>
@@ -97,6 +98,16 @@
               <button type="submit" class="ghost-btn">Upload Hero Image</button>
               <p class="status" id="hero-status"></p>
             </form>
+            </section>
+
+            <section class="panel tab-panel" data-tab-panel="pages" hidden>
+              <h2>Page Content</h2>
+              <p>Update the public details for Eat & Sip, Bomagawani house details, and About Us. Put one highlight per line.</p>
+              <div id="page-content-wrap" class="page-content-wrap"></div>
+              <div class="action-row">
+                <button id="save-page-content" class="primary-btn" type="button">Save Page Content</button>
+              </div>
+              <p class="status" id="page-content-status"></p>
             </section>
 
             <section class="panel tab-panel" data-tab-panel="rooms" hidden>

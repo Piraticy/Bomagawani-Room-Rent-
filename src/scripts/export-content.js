@@ -19,6 +19,7 @@ function getRoomImages(roomId) {
 const settings = db.prepare('SELECT * FROM site_settings WHERE id = 1').get();
 const rooms = db.prepare('SELECT * FROM rooms ORDER BY featured DESC, id ASC').all();
 const platformLinks = db.prepare('SELECT * FROM platform_links ORDER BY sort_order ASC, id ASC').all();
+const contentPages = db.prepare('SELECT * FROM content_pages ORDER BY sort_order ASC, id ASC').all();
 const heroSlides = db.prepare('SELECT * FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
 const chatbot = db.prepare('SELECT * FROM chatbot_settings WHERE id = 1').get();
 const chatbotFaqs = db.prepare('SELECT * FROM chatbot_faqs ORDER BY sort_order ASC, id ASC').all();
@@ -60,6 +61,18 @@ const snapshot = {
     url: link.url,
     icon: link.icon,
     sortOrder: Number(link.sort_order || 0)
+  })),
+  contentPages: contentPages.map((page) => ({
+    slug: page.slug,
+    navLabel: page.nav_label,
+    title: page.title,
+    subtitle: page.subtitle,
+    body: page.body,
+    highlights: JSON.parse(page.highlights_json || '[]'),
+    imageUrl: page.image_url || '',
+    icon: page.icon,
+    sortOrder: Number(page.sort_order || 0),
+    active: Boolean(page.active)
   })),
   heroSlides: heroSlides.map((slide) => ({
     imageUrl: slide.image_url,

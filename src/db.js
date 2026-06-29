@@ -42,6 +42,21 @@ CREATE TABLE IF NOT EXISTS platform_links (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS content_pages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug TEXT NOT NULL UNIQUE,
+  nav_label TEXT NOT NULL,
+  title TEXT NOT NULL,
+  subtitle TEXT NOT NULL,
+  body TEXT NOT NULL,
+  highlights_json TEXT NOT NULL DEFAULT '[]',
+  image_url TEXT,
+  icon TEXT NOT NULL DEFAULT 'sparkles',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  active INTEGER NOT NULL DEFAULT 1,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS rooms (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -237,6 +252,49 @@ function applyContentSnapshot(snapshot) {
       });
     }
 
+    if (Array.isArray(payload.contentPages)) {
+      const upsertPage = db.prepare(
+        `INSERT INTO content_pages (
+          slug, nav_label, title, subtitle, body, highlights_json, image_url, icon, sort_order, active, updated_at
+        ) VALUES (
+          @slug, @nav_label, @title, @subtitle, @body, @highlights_json, @image_url, @icon, @sort_order, @active, CURRENT_TIMESTAMP
+        )
+        ON CONFLICT(slug) DO UPDATE SET
+          nav_label = excluded.nav_label,
+          title = excluded.title,
+          subtitle = excluded.subtitle,
+          body = excluded.body,
+          highlights_json = excluded.highlights_json,
+          image_url = excluded.image_url,
+          icon = excluded.icon,
+          sort_order = excluded.sort_order,
+          active = excluded.active,
+          updated_at = CURRENT_TIMESTAMP`
+      );
+
+      payload.contentPages.forEach((page, index) => {
+        const slug = slugify(page.slug);
+        if (!slug) return;
+
+        const highlights = Array.isArray(page.highlights)
+          ? page.highlights.map((item) => asString(item)).filter(Boolean)
+          : [];
+
+        upsertPage.run({
+          slug,
+          nav_label: asString(page.nav_label ?? page.navLabel, slug),
+          title: asString(page.title, slug),
+          subtitle: asString(page.subtitle),
+          body: asString(page.body),
+          highlights_json: JSON.stringify(highlights),
+          image_url: asString(page.image_url ?? page.imageUrl),
+          icon: asString(page.icon, 'sparkles'),
+          sort_order: asInt(page.sort_order ?? page.sortOrder, index + 1),
+          active: asBoolInt(page.active, 1)
+        });
+      });
+    }
+
     if (Array.isArray(payload.heroSlides)) {
       db.prepare('DELETE FROM hero_slides').run();
       const insertSlide = db.prepare(
@@ -269,7 +327,7 @@ function applyContentSnapshot(snapshot) {
       ).run({
         title: asString(payload.chatbot.title, current?.title || 'Quick Help'),
         greeting: asString(payload.chatbot.greeting, current?.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.'),
-        whatsapp_number: asString(payload.chatbot.whatsapp_number ?? payload.chatbot.whatsappNumber, current?.whatsapp_number || '255700000000'),
+        whatsapp_number: asString(payload.chatbot.whatsapp_number ?? payload.chatbot.whatsappNumber, current?.whatsapp_number || '255756906006'),
         whatsapp_message: asString(payload.chatbot.whatsapp_message ?? payload.chatbot.whatsappMessage, current?.whatsapp_message || 'Hello Bomagawani, I need help with booking.'),
         enabled: asBoolInt(payload.chatbot.enabled, current ? current.enabled : 1)
       });
@@ -396,6 +454,74 @@ if (!hasColumn('bookings', 'payment_option')) {
   db.exec("ALTER TABLE bookings ADD COLUMN payment_option TEXT NOT NULL DEFAULT 'pay_on_arrival'");
 }
 
+if (!hasColumn('content_pages', 'image_url')) {
+  db.exec('ALTER TABLE content_pages ADD COLUMN image_url TEXT');
+}
+
+function seedContentPages() {
+  const insertPage = db.prepare(
+    `INSERT OR IGNORE INTO content_pages (
+      slug, nav_label, title, subtitle, body, highlights_json, icon, sort_order, active
+    ) VALUES (
+      @slug, @nav_label, @title, @subtitle, @body, @highlights_json, @icon, @sort_order, @active
+    )`
+  );
+
+  [
+    {
+      slug: 'eat-sip',
+      nav_label: 'Eat & Sip',
+      title: 'Eat & Sip by the Coast',
+      subtitle: 'Fresh coastal foods, cool drinks, and flavors prepared with local care.',
+      body: 'Enjoy delicious coastal meals inspired by Tanga flavors: seafood, rice dishes, grilled bites, fresh fruit, tropical juices, tea, coffee, and relaxed evening drinks. The experience is warm, simple, and made for guests who want to taste the place they are staying in.',
+      highlights: [
+        'Fresh seafood and coastal home-style cooking',
+        'Local ingredients prepared with clean kitchen standards',
+        'Breakfast, tea, coffee, fresh juice, and soft drinks',
+        'Meal preparation can be arranged around guest plans'
+      ],
+      icon: 'utensils-crossed',
+      sort_order: 1
+    },
+    {
+      slug: 'property',
+      nav_label: 'Bomagawani',
+      title: 'Bomagawani House Details',
+      subtitle: 'A coastal house-rent stay designed for comfort, privacy, and easy hosting.',
+      body: 'Bomagawani brings together room rental, hospitality, food, drinks, and guest support in one calm property experience. It is ideal for travelers, families, couples, and business guests who want direct booking and clear communication.',
+      highlights: [
+        'Private rooms with practical amenities',
+        'Guest support, booking receipts, and status tracking',
+        'Coastal location with map directions',
+        'Admin-managed rooms, photos, prices, and content'
+      ],
+      icon: 'home',
+      sort_order: 2
+    },
+    {
+      slug: 'about',
+      nav_label: 'Contact',
+      title: 'Contact Bomagawani',
+      subtitle: 'Reach us for room bookings, food requests, directions, and guest support.',
+      body: 'Contact Bomagawani before you arrive, ask about room availability, request meals and drinks, or get directions to the house in Kigombe.',
+      highlights: [
+        'Call or WhatsApp for quick guest support',
+        'Ask about rooms, food, drinks, and arrival time',
+        'Use map directions to reach Kigombe easily',
+        'Track your booking with your booking code'
+      ],
+      icon: 'phone-call',
+      sort_order: 3
+    }
+  ].forEach((page) => {
+    insertPage.run({
+      ...page,
+      highlights_json: JSON.stringify(page.highlights),
+      active: 1
+    });
+  });
+}
+
 const settingsCount = db.prepare('SELECT COUNT(*) AS count FROM site_settings').get().count;
 if (!settingsCount) {
   db.prepare(`
@@ -422,12 +548,12 @@ if (!settingsCount) {
   `).run({
     site_name: 'Bomagawani House Rent',
     domain: 'Bomagawani.com',
-    headline: 'Beautiful Coastal Stays in Kigombe',
-    subheadline: 'Book your room in minutes with instant availability.',
-    about_text: 'Bomagawani House Rent combines warm hospitality, modern comfort, and simple digital booking for travelers and families.',
+    headline: 'Bomagawani House Rent',
+    subheadline: 'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.',
+    about_text: 'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.',
     address: 'Kigombe, Tanga, Tanzania',
     map_link: 'https://www.google.com/maps?q=Kigombe,+Tanga,+Tanzania',
-    contact_phone: '+255 700 000 000',
+    contact_phone: '+255 756 906 006',
     contact_email: 'stay@bomagawani.com',
     check_in_time: '14:00',
     check_out_time: '11:00',
@@ -436,12 +562,142 @@ if (!settingsCount) {
   });
 }
 
+db.prepare(`
+  UPDATE site_settings
+  SET contact_phone = '+255 756 906 006'
+  WHERE contact_phone = '+255 700 000 000'
+`).run();
+
+seedContentPages();
+
+const eatSipPage = db.prepare("SELECT title, body FROM content_pages WHERE slug = 'eat-sip'").get();
+if (
+  eatSipPage?.title === 'Eat & Sip by the Coast' &&
+  eatSipPage?.body?.startsWith('Enjoy delicious coastal meals inspired by Tanga flavors')
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'eat-sip'`
+  ).run({
+    subtitle: 'Coastal meals, fresh drinks, and on-request food booking for guests and visitors.',
+    body: 'Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.',
+    highlights_json: JSON.stringify([
+      'Visitors can come just to eat, drink, or enjoy both together',
+      'On-request breakfast, lunch, dinner, and small group meals',
+      'Tanzania coastal-style seafood, rice dishes, tea, coffee, and fresh juices',
+      'Food preparation is confirmed based on availability and guest plans'
+    ])
+  });
+}
+
+const propertyPage = db.prepare("SELECT title, body FROM content_pages WHERE slug = 'property'").get();
+if (
+  propertyPage?.title === 'Bomagawani House Details' &&
+  propertyPage?.body?.startsWith('Bomagawani brings together room rental')
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET title = @title,
+         subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         icon = @icon,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'property'`
+  ).run({
+    title: 'Bomagawani House For Sale',
+    subtitle: 'A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.',
+    body: 'Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.',
+    highlights_json: JSON.stringify([
+      'House for sale - price on request',
+      'Private rooms and guest-ready layout',
+      'Near Tanzania’s northern Swahili Coast',
+      'Viewing, photos, and video tour available on request'
+    ]),
+    icon: 'home'
+  });
+}
+
+const buyerContactPage = db.prepare("SELECT title, body FROM content_pages WHERE slug = 'about'").get();
+if (
+  buyerContactPage?.title === 'Contact Bomagawani' &&
+  buyerContactPage?.body?.startsWith('Contact Bomagawani before you arrive')
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         icon = @icon,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'about'`
+  ).run({
+    subtitle: 'Ask about rooms, food, directions, or arrange a house-sale viewing.',
+    body: 'Send a quick inquiry and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.',
+    highlights_json: JSON.stringify([
+      'Room booking and arrival questions',
+      'Food and drink requests',
+      'House sale viewing appointments',
+      'Photos, video, map, and buyer details'
+    ]),
+    icon: 'phone-call'
+  });
+}
+
+const currentSettings = db.prepare('SELECT headline, subheadline FROM site_settings WHERE id = 1').get();
+if (
+  currentSettings?.headline === 'Beautiful Coastal Stays in Kigombe' ||
+  currentSettings?.headline === 'Coastal rooms, food, and easy booking in Kigombe'
+) {
+  db.prepare(
+    `UPDATE site_settings
+     SET headline = ?,
+         subheadline = ?,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = 1`
+  ).run(
+    'Bomagawani House Rent',
+    'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.'
+  );
+}
+
+const contactPage = db.prepare("SELECT nav_label, title FROM content_pages WHERE slug = 'about'").get();
+if (contactPage?.nav_label === 'About Us' && contactPage?.title === 'About Bomagawani') {
+  db.prepare(
+    `UPDATE content_pages
+     SET nav_label = @nav_label,
+         title = @title,
+         subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         icon = @icon,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'about'`
+  ).run({
+    nav_label: 'Contact',
+    title: 'Contact Bomagawani',
+    subtitle: 'Reach us for room bookings, food requests, directions, and guest support.',
+    body: 'Contact Bomagawani before you arrive, ask about room availability, request meals and drinks, or get directions to the house in Kigombe.',
+    highlights_json: JSON.stringify([
+      'Call or WhatsApp for quick guest support',
+      'Ask about rooms, food, drinks, and arrival time',
+      'Use map directions to reach Kigombe easily',
+      'Track your booking with your booking code'
+    ]),
+    icon: 'phone-call'
+  });
+}
+
 const roomsCount = db.prepare('SELECT COUNT(*) AS count FROM rooms').get().count;
 if (!roomsCount) {
   const insertRoom = db.prepare(`
     INSERT INTO rooms (
-      name, slug, short_description, long_description, price_per_night_usd, max_guests, size_label, featured, amenities_json
-    ) VALUES (@name, @slug, @short_description, @long_description, @price_per_night_usd, @max_guests, @size_label, @featured, @amenities_json)
+      name, slug, short_description, long_description, price_per_night_usd, max_guests, size_label, featured, amenities_json, cover_image
+    ) VALUES (@name, @slug, @short_description, @long_description, @price_per_night_usd, @max_guests, @size_label, @featured, @amenities_json, @cover_image)
   `);
 
   insertRoom.run({
@@ -453,6 +709,7 @@ if (!roomsCount) {
     max_guests: 2,
     size_label: '38 m2',
     featured: 1,
+    cover_image: '',
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
       { icon: 'waves', label: 'Beach View' },
@@ -473,6 +730,7 @@ if (!roomsCount) {
     max_guests: 2,
     size_label: '24 m2',
     featured: 0,
+    cover_image: '/uploads/rooms/guest-room-main.jpg',
     amenities_json: JSON.stringify([
       { icon: 'wifi', label: 'Fast Wi-Fi' },
       { icon: 'utensils', label: 'Sea Food' },
@@ -483,6 +741,47 @@ if (!roomsCount) {
     ])
   });
 }
+
+function ensureGuestRoomDefaultImages() {
+  const guestRoom = db.prepare("SELECT id, cover_image FROM rooms WHERE slug = 'guest-room'").get();
+  if (!guestRoom) return;
+
+  const guestImages = db
+    .prepare('SELECT image_url FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id ASC')
+    .all(guestRoom.id);
+
+  const defaultImages = [
+    { image_url: '/uploads/rooms/guest-room-main.jpg', caption: 'Guest Room main view', sort_order: 1 },
+    { image_url: '/uploads/rooms/guest-room-alt.jpg', caption: 'Guest Room bed view', sort_order: 2 }
+  ];
+
+  const hasDefaultImages = defaultImages.every((image) => guestImages.some((row) => row.image_url === image.image_url));
+  const needsDefaultImages = !guestImages.length || !guestRoom.cover_image || String(guestRoom.cover_image).includes('images.unsplash.com');
+
+  if (!needsDefaultImages && hasDefaultImages) return;
+
+  const replaceImages = db.transaction(() => {
+    db.prepare('DELETE FROM room_images WHERE room_id = ?').run(guestRoom.id);
+    const insertImage = db.prepare(
+      'INSERT INTO room_images (room_id, image_url, caption, sort_order) VALUES (@room_id, @image_url, @caption, @sort_order)'
+    );
+
+    defaultImages.forEach((image) => {
+      insertImage.run({
+        room_id: guestRoom.id,
+        image_url: image.image_url,
+        caption: image.caption,
+        sort_order: image.sort_order
+      });
+    });
+
+    db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(defaultImages[0].image_url, guestRoom.id);
+  });
+
+  replaceImages();
+}
+
+ensureGuestRoomDefaultImages();
 
 const linksCount = db.prepare('SELECT COUNT(*) AS count FROM platform_links').get().count;
 if (!linksCount) {
@@ -512,11 +811,17 @@ if (!chatbotSettingsCount) {
   ).run({
     title: 'Quick Help',
     greeting: 'Hi. Ask me anything about rooms, prices, check-in, or booking.',
-    whatsapp_number: '255700000000',
+    whatsapp_number: '255756906006',
     whatsapp_message: 'Hello Bomagawani, I need help with booking.',
     enabled: 1
   });
 }
+
+db.prepare(`
+  UPDATE chatbot_settings
+  SET whatsapp_number = '255756906006'
+  WHERE whatsapp_number = '255700000000'
+`).run();
 
 const chatbotFaqCount = db.prepare('SELECT COUNT(*) AS count FROM chatbot_faqs').get().count;
 if (!chatbotFaqCount) {
@@ -594,5 +899,49 @@ if (!heroSlidesCount) {
 
 applyContentSnapshot(readContentSnapshot());
 applyAmenityUpgrade();
+
+const syncedSettings = db.prepare('SELECT headline FROM site_settings WHERE id = 1').get();
+if (
+  syncedSettings?.headline === 'Beautiful Coastal Stays in Kigombe' ||
+  syncedSettings?.headline === 'Coastal rooms, food, and easy booking in Kigombe'
+) {
+  db.prepare(
+    `UPDATE site_settings
+     SET headline = ?,
+         subheadline = ?,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = 1`
+  ).run(
+    'Bomagawani House Rent',
+    'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.'
+  );
+}
+
+const syncedContactPage = db.prepare("SELECT nav_label, title FROM content_pages WHERE slug = 'about'").get();
+if (syncedContactPage?.nav_label === 'About Us' && syncedContactPage?.title === 'About Bomagawani') {
+  db.prepare(
+    `UPDATE content_pages
+     SET nav_label = @nav_label,
+         title = @title,
+         subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         icon = @icon,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'about'`
+  ).run({
+    nav_label: 'Contact',
+    title: 'Contact Bomagawani',
+    subtitle: 'Reach us for room bookings, food requests, directions, and guest support.',
+    body: 'Contact Bomagawani before you arrive, ask about room availability, request meals and drinks, or get directions to the house in Kigombe.',
+    highlights_json: JSON.stringify([
+      'Call or WhatsApp for quick guest support',
+      'Ask about rooms, food, drinks, and arrival time',
+      'Use map directions to reach Kigombe easily',
+      'Track your booking with your booking code'
+    ]),
+    icon: 'phone-call'
+  });
+}
 
 module.exports = db;
