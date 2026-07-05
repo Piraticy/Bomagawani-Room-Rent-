@@ -322,8 +322,8 @@
             <p class="story-subtitle" id="property-subtitle">A coastal house-rent stay designed for comfort, privacy, and easy hosting.</p>
             <p id="property-body"></p>
             <div class="property-sale-actions">
-              <a class="primary-btn" href="/contact">Book a Viewing</a>
-              <a class="hero-text-link" href="/contact">Ask for sale details</a>
+              <a class="primary-btn compact-btn" href="/contact" data-i18n="property.bookViewing">Book a Viewing</a>
+              <a class="ghost-btn compact-btn" href="/contact" data-i18n="property.requestPrice">Request price</a>
             </div>
           </div>
           <aside class="property-sale-card">
@@ -335,8 +335,14 @@
 
         <div class="property-media-grid" aria-label="House photos and video">
           <figure class="property-media-main">
-            <img id="property-image" src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80" alt="Bomagawani house view" loading="lazy" decoding="async" />
-            <figcaption>Upload the house feature photo from Admin Page Content.</figcaption>
+            <div class="property-gallery-stage" id="property-gallery-stage">
+              <img id="property-image" src="/uploads/property/property-house-front.webp" alt="Full front view of Bomagawani House" loading="eager" fetchpriority="high" decoding="async" />
+              <button class="property-gallery-control prev" id="property-gallery-prev" type="button" aria-label="Previous property photo">‹</button>
+              <button class="property-gallery-control next" id="property-gallery-next" type="button" aria-label="Next property photo">›</button>
+              <div class="property-gallery-count" id="property-gallery-count">1 / 9</div>
+              <figcaption id="property-image-caption">Full front view of Bomagawani House</figcaption>
+            </div>
+            <div class="property-gallery-thumbs" id="property-gallery-thumbs" aria-label="Property photo thumbnails"></div>
           </figure>
           <article class="property-video-card">
             <i data-lucide="play-circle"></i>

@@ -34,6 +34,8 @@ const translations = {
     'shortcut.houseText': 'See the house details, location, and guest support.',
     'shortcut.houseAction': 'See details',
     'footer.tagline': 'Coastal stays, fresh flavors, easy booking.',
+    'property.bookViewing': 'Book a Viewing',
+    'property.requestPrice': 'Request price',
     'hero.roomsLabel': 'Ready to book',
     'hero.supportLabel': 'Guest support',
     'hero.locationLabel': 'Prime location',
@@ -111,91 +113,6 @@ const translations = {
     'installPrompt.yes': 'Install',
     'installPrompt.no': 'Not now'
   },
-  sw: {
-    'nav.admin': 'Admin',
-    'nav.bookNow': 'Weka Nafasi',
-    'nav.home': 'Mwanzo',
-    'nav.rooms': 'Vyumba',
-    'nav.eatSip': 'Chakula & Vinywaji',
-    'nav.bomagawani': 'Bomagawani',
-    'nav.contact': 'Mawasiliano',
-    'hero.roomsLabel': 'Tayari kupokelewa',
-    'hero.supportLabel': 'Huduma ya wageni',
-    'hero.locationLabel': 'Eneo zuri',
-    'intro.title': 'Furahia ukaaji kwa kuweka nafasi kwa urahisi',
-    'experience.rooms': 'Vyumba vya starehe',
-    'experience.roomsText': 'Bei, picha, huduma na maombi ya booking kwa urahisi.',
-    'experience.food': 'Chakula cha pwani',
-    'experience.foodText': 'Milo na vinywaji safi kulingana na mpango wa mgeni.',
-    'experience.place': 'Maelezo ya nyumba',
-    'experience.placeText': 'Eneo la ukaaji lenye ukarimu, mpangilio, na urahisi.',
-    'rooms.title': 'Vyumba Vyetu',
-    'rooms.subtitle': 'Chagua chumba na weka nafasi kwa dakika chache.',
-    'amenities.title': 'Huduma Muhimu',
-    'amenities.subtitle': 'Vitu muhimu vyote kwa ukaaji wa starehe.',
-    'booking.title': 'Weka Nafasi Moja kwa Moja Bomagawani.com',
-    'booking.subtitle': 'Chagua chumba, tarehe na sarafu. Namba ya booking hutolewa papo hapo.',
-    'form.room': 'Chumba',
-    'form.checkIn': 'Kuingia',
-    'form.checkOut': 'Kutoka',
-    'form.guests': 'Wageni',
-    'form.currency': 'Sarafu',
-    'form.paymentOption': 'Namna ya malipo',
-    'form.payOnArrival': 'Lipa unapofika',
-    'form.payOnlineLater': 'Lipa online baadaye',
-    'form.fullName': 'Jina kamili',
-    'form.email': 'Barua pepe',
-    'form.phone': 'Simu',
-    'form.note': 'Ujumbe (si lazima)',
-    'form.notePlaceholder': 'Kuchelewa kufika, ombi maalum',
-    'form.submit': 'Tuma Ombi la Booking',
-    'tracking.title': 'Angalia hali ya booking yako',
-    'tracking.code': 'Namba ya booking',
-    'tracking.button': 'Fuatilia Booking',
-    'location.title': 'Eneo na maelekezo',
-    'location.openMap': 'Fungua Ramani',
-    'location.route': 'Tumia eneo langu kwa njia',
-    'channels.title': 'Pia tupo kwenye majukwaa haya',
-    'chatbot.answerPlaceholder': 'Bonyeza swali kupata jibu la haraka.',
-    'chatbot.whatsapp': 'Ongea na mtu kupitia WhatsApp',
-    'quote.empty': 'Weka tarehe kuona bei ya moja kwa moja.',
-    'quote.loading': 'Inahesabu bei...',
-    'quote.conflict': 'Tarehe hizi tayari zimechukuliwa. Tafadhali chagua tarehe nyingine.',
-    'quote.unavailable': 'Imeshindikana kupata bei.',
-    'quote.serviceDown': 'Huduma ya bei haipatikani sasa. Jaribu tena.',
-    'quote.nights': 'Usiku {nights} x {price}',
-    'quote.total': 'Jumla: {total}',
-    'status.checkQuoteFirst': 'Tafadhali hakiki bei kwanza.',
-    'status.submittingBooking': 'Inatuma ombi la booking...',
-    'status.bookingFailed': 'Booking imekataa.',
-    'status.bookingServiceDown': 'Huduma ya booking haipatikani sasa.',
-    'status.phoneInvalid': 'Tafadhali weka namba sahihi kulingana na country code uliyochagua.',
-    'status.phoneLengthRange': 'Namba ya simu iwe kati ya tarakimu {min} na {max}.',
-    'status.bookingSuccessPrefix': 'Booking imetumwa. Namba yako ni',
-    'status.openReceipt': 'Fungua risiti',
-    'tracking.checking': 'Inaangalia hali...',
-    'tracking.notFound': 'Booking haijapatikana.',
-    'tracking.serviceDown': 'Huduma ya kufuatilia haipatikani.',
-    'tracking.status': 'Hali',
-    'tracking.room': 'Chumba',
-    'tracking.dates': 'Tarehe',
-    'tracking.payment': 'Malipo',
-    'tracking.paymentOption': 'Njia ya malipo',
-    'payment.pay_on_arrival': 'Lipa unapofika',
-    'payment.pay_online': 'Lipa online',
-    'location.noSupport': 'Kifaa hiki hakiungi mkono geolocation.',
-    'location.reading': 'Inasoma eneo lako...',
-    'location.ready': 'Njia ipo tayari. Bonyeza Fungua Ramani.',
-    'location.failed': 'Imeshindikana kusoma eneo lako. Ruhusu ruhusa na ujaribu tena.',
-    'languagePrompt.title': 'Ungependa kubadili lugha?',
-    'languagePrompt.body': 'Tumegundua lugha ya eneo lako ({language}). Unataka kubadili?',
-    'languagePrompt.yes': 'Badili',
-    'languagePrompt.no': 'Baki English',
-    'installPrompt.title': 'Sakinisha App ya Bomagawani?',
-    'installPrompt.body': 'Ongeza kwenye home screen kwa booking ya haraka.',
-    'installPrompt.yes': 'Sakinisha',
-    'installPrompt.no': 'Baadaye'
-  },
   de: {
     'nav.admin': 'Admin',
     'nav.bookNow': 'Jetzt buchen',
@@ -243,6 +160,8 @@ const translations = {
     'shortcut.houseText': 'Hausdetails, Lage und Gästeservice ansehen.',
     'shortcut.houseAction': 'Details ansehen',
     'footer.tagline': 'Küstenaufenthalt, frische Küche, einfache Buchung.',
+    'property.bookViewing': 'Besichtigung buchen',
+    'property.requestPrice': 'Preis anfragen',
     'rooms.title': 'Unsere Zimmer',
     'rooms.subtitle': 'Wählen Sie Ihr Zimmer und buchen Sie in wenigen Minuten.',
     'amenities.title': 'Ausstattung auf einen Blick',
@@ -308,6 +227,54 @@ const fallbackExchangeRates = {
   EUR: 0.92
 };
 
+const PROPERTY_GALLERY_IMAGES = [
+  {
+    src: '/uploads/property/property-house-front.webp',
+    thumb: '/uploads/property/property-house-front-thumb.webp',
+    alt: 'Full front view of Bomagawani House'
+  },
+  {
+    src: '/uploads/property/property-entrance.webp',
+    thumb: '/uploads/property/property-entrance-thumb.webp',
+    alt: 'Front entrance and garden steps'
+  },
+  {
+    src: '/uploads/property/property-veranda-exterior.webp',
+    thumb: '/uploads/property/property-veranda-exterior-thumb.webp',
+    alt: 'Side veranda and garden flowers'
+  },
+  {
+    src: '/uploads/property/property-veranda-lounge.webp',
+    thumb: '/uploads/property/property-veranda-lounge-thumb.webp',
+    alt: 'Shaded veranda lounge and dining space'
+  },
+  {
+    src: '/uploads/property/property-veranda-dining.webp',
+    thumb: '/uploads/property/property-veranda-dining-thumb.webp',
+    alt: 'Veranda dining with green garden view'
+  },
+  {
+    src: '/uploads/property/property-dining-hall.webp',
+    thumb: '/uploads/property/property-dining-hall-thumb.webp',
+    alt: 'Indoor dining hall and fridge'
+  },
+  {
+    src: '/uploads/property/property-garden-sea-view.webp',
+    thumb: '/uploads/property/property-garden-sea-view-thumb.webp',
+    alt: 'Garden with trees and coastal view'
+  },
+  {
+    src: '/uploads/property/property-garden-path.webp',
+    thumb: '/uploads/property/property-garden-path-thumb.webp',
+    alt: 'Green garden path around the property'
+  },
+  {
+    src: '/uploads/property/property-coast-sunset.webp',
+    thumb: '/uploads/property/property-coast-sunset-thumb.webp',
+    alt: 'Nearby coast sunset view'
+  }
+];
+
 const copyTranslations = {
   de: {
     'Bomagawani House Rent': 'Bomagawani Hausvermietung',
@@ -341,6 +308,21 @@ const copyTranslations = {
     'Email': 'E-Mail',
     'Map': 'Karte',
     'Open Map': 'Karte öffnen',
+    'Full front view of Bomagawani House': 'Vollständige Vorderansicht des Bomagawani-Hauses',
+    'Front entrance and garden steps': 'Vordereingang und Gartentreppe',
+    'Side veranda and garden flowers': 'Seitliche Veranda und Gartenblumen',
+    'Shaded veranda lounge and dining space': 'Schattige Veranda mit Lounge- und Essbereich',
+    'Veranda dining with green garden view': 'Essen auf der Veranda mit grünem Gartenblick',
+    'Indoor dining hall and fridge': 'Innen-Essbereich und Kühlschrank',
+    'Garden with trees and coastal view': 'Garten mit Bäumen und Küstenblick',
+    'Green garden path around the property': 'Grüner Gartenweg rund um das Grundstück',
+    'Nearby coast sunset view': 'Sonnenuntergang an der nahen Küste',
+    'Bomagawani House For Sale': 'Bomagawani-Haus zu verkaufen',
+    'A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.': 'Ein Küstenobjekt in Kigombe mit privaten Zimmern, gastfertigem Wohnen und Besichtigung für Käufer.',
+    'Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.': 'Bomagawani ist mehr als eine Zimmervermietung. Das Haus steht auch zum Verkauf und bietet Küstencharakter, praktische Versorgung, schattige Wohnbereiche und Zugang zur Region Tanga. Käufer können vor dem Besuch vollständige Details, Fotos, Videos und einen Besichtigungstermin anfordern.',
+    'House for sale - price on request': 'Haus zu verkaufen – Preis auf Anfrage',
+    'House for sale – price on request': 'Haus zu verkaufen – Preis auf Anfrage',
+    'Key details from the property notes are kept simple here so buyers can understand the house quickly.': 'Die wichtigsten Details aus den Objektnotizen sind hier einfach gehalten, damit Käufer das Haus schnell verstehen.',
     'Property Notes': 'Objektnotizen',
     'A coastal home shaped by nature, shade, and slow living.': 'Ein Küstenhaus geprägt von Natur, Schatten und ruhigem Leben.',
     'Bomagawani sits in a peaceful coastal environment near Tanga, with house details suited to warm weather and relaxed stays.': 'Bomagawani liegt in einer ruhigen Küstenumgebung nahe Tanga, mit Hausdetails für warmes Wetter und entspannte Aufenthalte.',
@@ -371,28 +353,53 @@ const copyTranslations = {
     'Simple food with Swahili Coast flavor.': 'Einfache Küche mit Geschmack der Swahili-Küste.',
     'Food is prepared around local ingredients, clean kitchen care, and what guests want to enjoy that day.': 'Das Essen richtet sich nach lokalen Zutaten, sauberer Küchenarbeit und den Wünschen der Gäste.',
     'Seafood & grilled plates': 'Meeresfrüchte & Grillgerichte',
+    'Fish, prawns when available, grilled bites, sauces, lemon, coconut notes, and coastal-style sides.': 'Fisch, Garnelen nach Verfügbarkeit, Grillgerichte, Saucen, Zitrone, Kokosnoten und Beilagen im Küstenstil.',
     'Rice, pilau & home meals': 'Reis, Pilau & Hausgerichte',
+    'Comforting rice dishes, pilau-style flavors, vegetables, beans, soups, and homestyle plates.': 'Wärmende Reisgerichte, Pilau-Aromen, Gemüse, Bohnen, Suppen und hausgemachte Tellergerichte.',
     'Breakfast & tea time': 'Frühstück & Teezeit',
+    'Tea, coffee, fruit, bread, eggs on request, fresh juice, and light morning options.': 'Tee, Kaffee, Obst, Brot, Eier auf Anfrage, frischer Saft und leichte Morgenoptionen.',
     'Fresh drinks': 'Frische Getränke',
+    'Tropical juices, water, soft drinks, evening refreshments, and simple drinks for guests visiting.': 'Tropische Säfte, Wasser, Softdrinks, Erfrischungen am Abend und einfache Getränke für Besucher.',
+    'Pictures can be updated from Admin as your food photos grow.': 'Bilder können im Adminbereich aktualisiert werden, sobald neue Food-Fotos verfügbar sind.',
     'Food Booking': 'Essen buchen',
     'Tell us what you want to eat or drink.': 'Sagen Sie uns, was Sie essen oder trinken möchten.',
     'Send a request for dine-in food, guest meals, drinks, or a small group plan. We will confirm what is available and the best preparation time.': 'Senden Sie eine Anfrage für Essen vor Ort, Gästemahlzeiten, Getränke oder eine kleine Gruppe. Wir bestätigen Verfügbarkeit und passende Vorbereitungszeit.',
     'House For Sale': 'Haus zu verkaufen',
     'Price on request': 'Preis auf Anfrage',
     'Book a Viewing': 'Besichtigung buchen',
+    'Request price': 'Preis anfragen',
     'Ask for sale details': 'Verkaufsdetails anfragen',
     'Request the full house details, viewing time, photos, and video tour before visiting.': 'Fordern Sie vor dem Besuch vollständige Hausdetails, Besichtigungstermin, Fotos und Videotour an.',
     'Video Tour': 'Videotour',
+    'Request or add a walk-through video': 'Rundgangsvideo anfragen oder hinzufügen',
+    'Use this space to guide buyers to house videos, room walk-throughs, and viewing appointments.': 'Dieser Bereich führt Käufer zu Hausvideos, Rundgängen und Besichtigungsterminen.',
     'Gallery Ready': 'Galerie bereit',
     'Photos & viewing support': 'Fotos & Besichtigungshilfe',
+    'Show bedrooms, veranda areas, access roads, services, and surrounding coastal environment.': 'Zeigen Sie Schlafzimmer, Verandabereiche, Zufahrtswege, Versorgung und die umliegende Küstenumgebung.',
+    'A coastal home shaped for shade, airflow, and practical living.': 'Ein Küstenhaus, gestaltet für Schatten, Luftzirkulation und praktisches Wohnen.',
+    'Located around Tanzania’s northern Swahili Coast near the protected Coelacanth marine park, with a calm natural setting.': 'Gelegen an Tansanias nördlicher Swahili-Küste nahe dem geschützten Coelacanth-Meerespark, in ruhiger Natur.',
+    'Shaded veranda living, high ceilings, and natural airflow support comfortable coastal living.': 'Schattige Veranda-Bereiche, hohe Decken und natürliche Luftzirkulation unterstützen komfortables Küstenwohnen.',
+    'Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access.': 'Tanga ist etwa 30 km entfernt und bietet Märkte, frische Produkte, Banken, Ärzte, Einkaufsmöglichkeiten, Flughafen und Hafen.',
+    'Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.': 'Die Objektnotizen erwähnen Stromunterstützung, Brunnenwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
     'Contact Bomagawani': 'Bomagawani kontaktieren',
     'Reach us for room bookings, food requests, directions, and guest support.': 'Kontaktieren Sie uns für Zimmerbuchungen, Essensanfragen, Wegbeschreibung und Gästeservice.',
     'Best for quick inquiry': 'Ideal für schnelle Anfragen',
     'Rooms, food, directions, or house viewing.': 'Zimmer, Essen, Wegbeschreibung oder Hausbesichtigung.',
     'Tell us what you need and when you plan to visit.': 'Sagen Sie uns, was Sie brauchen und wann Sie kommen möchten.',
     'Stay inquiry': 'Anfrage zum Aufenthalt',
+    'Ask about rooms, available dates, prices, and arrival time.': 'Fragen Sie nach Zimmern, verfügbaren Daten, Preisen und Ankunftszeit.',
     'Food inquiry': 'Essensanfrage',
-    'House sale viewing': 'Hausbesichtigung zum Kauf'
+    'Request food, drinks, breakfast, dinner, or a small meal plan.': 'Fragen Sie Essen, Getränke, Frühstück, Abendessen oder einen kleinen Essensplan an.',
+    'House sale viewing': 'Hausbesichtigung zum Kauf',
+    'Ask for sale details, viewing time, photos, video, and buyer information.': 'Fragen Sie nach Verkaufsdetails, Besichtigungszeit, Fotos, Video und Käuferinformationen.',
+    'Enter dates to see your live quote.': 'Reisedaten eingeben, um den Live-Preis zu sehen.',
+    'Loading country codes...': 'Ländervorwahlen werden geladen...',
+    'Book Direct': 'Direkt buchen',
+    'Booking.com': 'Booking.com',
+    'Tripadvisor': 'Tripadvisor',
+    'Google Travel': 'Google Travel',
+    'Call': 'Anrufen',
+    'Chat': 'Chat'
   }
 };
 
@@ -415,6 +422,7 @@ const state = {
   roomSlideIntervals: {},
   heroInterval: null,
   heroIndex: 0,
+  propertyGalleryIndex: 0,
   heroRangePickerMonth: null,
   bookingRangePickerMonth: null
 };
@@ -457,6 +465,11 @@ const dom = {
   propertyBody: document.getElementById('property-body'),
   propertyHighlights: document.getElementById('property-highlights'),
   propertyImage: document.getElementById('property-image'),
+  propertyImageCaption: document.getElementById('property-image-caption'),
+  propertyGalleryCount: document.getElementById('property-gallery-count'),
+  propertyGalleryThumbs: document.getElementById('property-gallery-thumbs'),
+  propertyGalleryPrev: document.getElementById('property-gallery-prev'),
+  propertyGalleryNext: document.getElementById('property-gallery-next'),
   propertySalePrice: document.getElementById('property-sale-price'),
   aboutSection: document.getElementById('about-section'),
   aboutNav: document.getElementById('about-nav'),
@@ -779,6 +792,7 @@ function setLanguage(languageCode) {
     renderRooms();
     renderAmenities();
     renderPageContent();
+    renderPropertyGallery();
     applySettings();
     requestQuote();
     updateStructuredData();
@@ -1253,11 +1267,11 @@ function getCurrentPage() {
 }
 
 function pageTitleForCurrentPage() {
-  if (state.currentPage === 'rooms') return 'Rooms';
-  if (state.currentPage === 'eat-sip') return pageBySlug('eat-sip')?.nav_label || 'Eat & Sip';
-  if (state.currentPage === 'bomagawani') return pageBySlug('property')?.nav_label || 'Bomagawani';
-  if (state.currentPage === 'contact') return 'Contact';
-  return 'Coastal Room Booking';
+  if (state.currentPage === 'rooms') return t('nav.rooms');
+  if (state.currentPage === 'eat-sip') return translateCopy(pageBySlug('eat-sip')?.nav_label || 'Eat & Sip');
+  if (state.currentPage === 'bomagawani') return translateCopy(pageBySlug('property')?.nav_label || 'Bomagawani');
+  if (state.currentPage === 'contact') return t('nav.contact');
+  return state.language === 'de' ? 'Küstenzimmer buchen' : 'Coastal Room Booking';
 }
 
 function applyPageVisibility() {
@@ -1449,6 +1463,45 @@ function renderIconHighlights(container, highlights = [], icon = 'sparkles') {
   });
 }
 
+function showPropertyGalleryImage(index) {
+  if (!PROPERTY_GALLERY_IMAGES.length || !dom.propertyImage) return;
+
+  state.propertyGalleryIndex = (index + PROPERTY_GALLERY_IMAGES.length) % PROPERTY_GALLERY_IMAGES.length;
+  const image = PROPERTY_GALLERY_IMAGES[state.propertyGalleryIndex];
+  dom.propertyImage.src = image.src;
+  dom.propertyImage.alt = translateCopy(image.alt);
+
+  if (dom.propertyImageCaption) {
+    dom.propertyImageCaption.textContent = translateCopy(image.alt);
+  }
+
+  if (dom.propertyGalleryCount) {
+    dom.propertyGalleryCount.textContent = `${state.propertyGalleryIndex + 1} / ${PROPERTY_GALLERY_IMAGES.length}`;
+  }
+
+  dom.propertyGalleryThumbs?.querySelectorAll('[data-property-thumb]').forEach((button) => {
+    button.classList.toggle('is-active', Number(button.dataset.propertyThumb) === state.propertyGalleryIndex);
+  });
+}
+
+function renderPropertyGallery() {
+  if (!dom.propertyGalleryThumbs) return;
+
+  dom.propertyGalleryThumbs.innerHTML = PROPERTY_GALLERY_IMAGES.map(
+    (image, index) => `
+      <button type="button" class="property-gallery-thumb ${index === state.propertyGalleryIndex ? 'is-active' : ''}" data-property-thumb="${index}" aria-label="${translateCopy(image.alt)}">
+        <img src="${image.thumb}" alt="" loading="lazy" decoding="async" />
+      </button>
+    `
+  ).join('');
+
+  dom.propertyGalleryThumbs.querySelectorAll('[data-property-thumb]').forEach((button) => {
+    button.addEventListener('click', () => showPropertyGalleryImage(Number(button.dataset.propertyThumb)));
+  });
+
+  showPropertyGalleryImage(state.propertyGalleryIndex);
+}
+
 function renderPageContent() {
   const eatSip = pageBySlug('eat-sip');
   const property = pageBySlug('property');
@@ -1482,10 +1535,6 @@ function renderPageContent() {
     setText(dom.propertySubtitle, translateCopy(property.subtitle));
     setText(dom.propertyBody, translateCopy(property.body));
     renderIconHighlights(dom.propertyHighlights, translateList(property.highlights || []), property.icon);
-    const propertyImage = property.imageUrl || property.image_url;
-    if (propertyImage) {
-      dom.propertyImage.src = propertyImage;
-    }
     const priceHighlight = (property.highlights || []).find((item) => /price|usd|tzs|\$|sale/i.test(item));
     if (priceHighlight) {
       dom.propertySalePrice.textContent = translateCopy(priceHighlight);
@@ -2098,6 +2147,16 @@ function configureChatbot() {
   });
 }
 
+function configurePropertyGallery() {
+  dom.propertyGalleryPrev?.addEventListener('click', () => {
+    showPropertyGalleryImage(state.propertyGalleryIndex - 1);
+  });
+
+  dom.propertyGalleryNext?.addEventListener('click', () => {
+    showPropertyGalleryImage(state.propertyGalleryIndex + 1);
+  });
+}
+
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -2127,6 +2186,7 @@ async function boot() {
     renderRooms();
     renderAmenities();
     renderPageContent();
+    renderPropertyGallery();
     applyPageVisibility();
     renderChatbot();
     applyBookingQueryParams();
@@ -2149,6 +2209,7 @@ configureLocationRoute();
 configureInstallPrompt();
 registerServiceWorker();
 configureChatbot();
+configurePropertyGallery();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
 dom.trackingForm.addEventListener('submit', trackBooking);

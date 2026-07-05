@@ -605,6 +605,7 @@ if (
          subtitle = @subtitle,
          body = @body,
          highlights_json = @highlights_json,
+         image_url = @image_url,
          icon = @icon,
          updated_at = CURRENT_TIMESTAMP
      WHERE slug = 'property'`
@@ -618,9 +619,18 @@ if (
       'Near Tanzania’s northern Swahili Coast',
       'Viewing, photos, and video tour available on request'
     ]),
+    image_url: '/uploads/property/property-house-front.webp',
     icon: 'home'
   });
 }
+
+db.prepare(`
+  UPDATE content_pages
+  SET image_url = '/uploads/property/property-house-front.webp',
+      updated_at = CURRENT_TIMESTAMP
+  WHERE slug = 'property'
+    AND (image_url IS NULL OR image_url = '' OR image_url LIKE 'https://images.unsplash.com/%')
+`).run();
 
 const buyerContactPage = db.prepare("SELECT title, body FROM content_pages WHERE slug = 'about'").get();
 if (

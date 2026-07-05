@@ -1,0 +1,56 @@
+[
+  {
+    "src": "/uploads/property/property-house-front.webp",
+    "alt": "Full front view of Bomagawani House",
+    "bytes": 389946,
+    "thumb": "/uploads/property/property-house-front-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-entrance.webp",
+    "alt": "Front entrance and garden steps",
+    "bytes": 604348,
+    "thumb": "/uploads/property/property-entrance-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-veranda-exterior.webp",
+    "alt": "Side veranda and garden flowers",
+    "bytes": 322118,
+    "thumb": "/uploads/property/property-veranda-exterior-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-veranda-lounge.webp",
+    "alt": "Shaded veranda lounge and dining space",
+    "bytes": 218966,
+    "thumb": "/uploads/property/property-veranda-lounge-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-veranda-dining.webp",
+    "alt": "Veranda dining with green garden view",
+    "bytes": 202536,
+    "thumb": "/uploads/property/property-veranda-dining-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-dining-hall.webp",
+    "alt": "Indoor dining hall and fridge",
+    "bytes": 63542,
+    "thumb": "/uploads/property/property-dining-hall-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-garden-sea-view.webp",
+    "alt": "Garden with trees and coastal view",
+    "bytes": 543200,
+    "thumb": "/uploads/property/property-garden-sea-view-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-garden-path.webp",
+    "alt": "Green garden path around the property",
+    "bytes": 596130,
+    "thumb": "/uploads/property/property-garden-path-thumb.webp"
+  },
+  {
+    "src": "/uploads/property/property-coast-sunset.webp",
+    "alt": "Nearby coast sunset view",
+    "bytes": 302582,
+    "thumb": "/uploads/property/property-coast-sunset-thumb.webp"
+  }
+]
