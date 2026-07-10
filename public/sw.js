@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bomagawani-v16';
+const CACHE_NAME = 'bomagawani-v17';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -29,7 +29,14 @@ self.addEventListener('activate', (event) => {
 });
 
 function isAppShellRequest(pathname) {
-  return pathname === '/' || pathname.endsWith('.html') || pathname === '/app.js' || pathname === '/styles.css';
+  return (
+    pathname === '/' ||
+    pathname.endsWith('.html') ||
+    pathname === '/app.js' ||
+    pathname === '/styles.css' ||
+    pathname === '/admin.js' ||
+    pathname === '/admin.css'
+  );
 }
 
 self.addEventListener('fetch', (event) => {
