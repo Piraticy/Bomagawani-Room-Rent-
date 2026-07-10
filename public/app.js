@@ -36,6 +36,7 @@ const translations = {
     'footer.tagline': 'Coastal stays, fresh flavors, easy booking.',
     'property.bookViewing': 'Book a Viewing',
     'property.requestPrice': 'Request price',
+    'property.zoomHint': 'Tap to enlarge',
     'hero.roomsLabel': 'Ready to book',
     'hero.supportLabel': 'Guest support',
     'hero.locationLabel': 'Prime location',
@@ -166,6 +167,7 @@ const translations = {
     'footer.tagline': 'Küstenaufenthalt, frische Küche, einfache Buchung.',
     'property.bookViewing': 'Besichtigung buchen',
     'property.requestPrice': 'Preis anfragen',
+    'property.zoomHint': 'Zum Vergrößern tippen',
     'rooms.title': 'Unsere Zimmer',
     'rooms.subtitle': 'Wählen Sie Ihr Zimmer und buchen Sie in wenigen Minuten.',
     'amenities.title': 'Ausstattung auf einen Blick',
@@ -763,7 +765,7 @@ function populatePhoneCountries(countries) {
     option.dataset.iso2 = country.iso2;
     option.dataset.dial = country.dial;
     option.title = `${country.name} (${country.dial})`;
-    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial} ${country.name}`;
+    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial} ${country.iso2}`;
     fragment.appendChild(option);
   });
 
@@ -2067,8 +2069,9 @@ function configureDateInputs() {
   });
 
   document.addEventListener('click', (event) => {
-    const clickedInsidePicker = dom.bookingDateRangePicker.contains(event.target);
-    const clickedTrigger = dom.bookingDateRangeTrigger.contains(event.target);
+    const path = event.composedPath();
+    const clickedInsidePicker = path.includes(dom.bookingDateRangePicker);
+    const clickedTrigger = path.includes(dom.bookingDateRangeTrigger);
     if (!clickedInsidePicker && !clickedTrigger) hideBookingDateRangePicker();
   });
 
@@ -2124,8 +2127,9 @@ function configureHeroBookingShortcut() {
   });
 
   document.addEventListener('click', (event) => {
-    const clickedInsidePicker = dom.heroDateRangePicker.contains(event.target);
-    const clickedTrigger = dom.heroDateRangeTrigger.contains(event.target);
+    const path = event.composedPath();
+    const clickedInsidePicker = path.includes(dom.heroDateRangePicker);
+    const clickedTrigger = path.includes(dom.heroDateRangeTrigger);
     if (!clickedInsidePicker && !clickedTrigger) hideHeroDateRangePicker();
   });
 

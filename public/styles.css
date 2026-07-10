@@ -1707,6 +1707,36 @@ h4 {
   backdrop-filter: blur(12px);
 }
 
+.property-gallery-zoom-hint {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  background: rgba(12, 27, 43, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.property-gallery-zoom-hint i {
+  width: 15px;
+  height: 15px;
+}
+
+.property-gallery-stage:hover .property-gallery-zoom-hint {
+  background: rgba(18, 91, 102, 0.85);
+  transform: translateY(-1px);
+}
+
 .property-gallery-control {
   position: absolute;
   top: 50%;
