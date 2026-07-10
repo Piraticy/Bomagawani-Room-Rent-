@@ -18,6 +18,11 @@
   display: none !important;
 }
 
+:focus-visible {
+  outline: 3px solid rgba(18, 91, 102, 0.35);
+  outline-offset: 2px;
+}
+
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -156,13 +161,18 @@ main {
 .tab-btn {
   width: 100%;
   text-align: left;
-  border: 1px solid #c8d8ec;
-  background: #f2f7ff;
-  color: #294367;
+  border: 1px solid rgba(18, 91, 102, 0.18);
+  background: rgba(18, 91, 102, 0.05);
+  color: var(--primary);
   border-radius: 12px;
   padding: 10px 14px;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(18, 91, 102, 0.1);
 }
 
 .tab-btn.is-active {
@@ -228,6 +238,7 @@ select {
   padding: 10px 14px;
   cursor: pointer;
   font-weight: 700;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .primary-btn {
@@ -236,8 +247,25 @@ select {
 }
 
 .ghost-btn {
-  background: #edf4fc;
-  color: #1d3457;
+  background: rgba(18, 91, 102, 0.08);
+  color: var(--primary);
+}
+
+.primary-btn:hover,
+.ghost-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ghost-btn:hover {
+  background: rgba(18, 91, 102, 0.14);
+}
+
+.primary-btn:disabled,
+.ghost-btn:disabled,
+.small-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .small-btn {

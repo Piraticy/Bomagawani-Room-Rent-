@@ -4,8 +4,8 @@
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
     "headline": "Bomagawani House Rent",
-    "subheadline": "A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.",
-    "aboutText": "Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.",
+    "subheadline": "A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple booking.",
+    "aboutText": "Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.",
     "address": "Kigombe, Tanga, Tanzania",
     "mapLink": "https://maps.google.com/?q=Kigombe%20Tanga%20Tanzania",
     "contactPhone": "+255 756 906 006",
@@ -156,7 +156,7 @@
   "heroSlides": [],
   "chatbot": {
     "title": "Quick Help",
-    "greeting": "Hi. Ask me anything about rooms, prices, check-in, or booking.",
+    "greeting": "Hi. Ask me anything about rooms, prices, arrival, or booking.",
     "whatsappNumber": "255756906006",
     "whatsappMessage": "Hello Bomagawani, I need help with booking.",
     "enabled": true
@@ -164,7 +164,7 @@
   "chatbotFaqs": [
     {
       "question": "Which rooms are available?",
-      "answer": "Master Bedroom and Guest Room are available. More can be added by admin.",
+      "answer": "Master Bedroom and Guest Room are currently available.",
       "sortOrder": 1
     },
     {
@@ -174,7 +174,7 @@
     },
     {
       "question": "How can I confirm my booking?",
-      "answer": "Submit your booking request and our team will confirm quickly. You get a booking code instantly.",
+      "answer": "Submit your booking request and our team will confirm quickly. You receive a booking reference right away.",
       "sortOrder": 3
     }
   ],
@@ -183,7 +183,7 @@
       "slug": "eat-sip",
       "navLabel": "Eat & Sip",
       "title": "Eat & Sip by the Coast",
-      "subtitle": "Coastal meals, fresh drinks, and on-request food booking for guests and visitors.",
+      "subtitle": "Coastal meals, fresh drinks, and food requests for guests and visitors.",
       "body": "Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.",
       "highlights": [
         "Visitors can come just to eat, drink, or enjoy both together",
@@ -201,7 +201,7 @@
       "navLabel": "Bomagawani",
       "title": "Bomagawani House For Sale",
       "subtitle": "A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.",
-      "body": "Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.",
+      "body": "Bomagawani is more than a place to stay. The house is also available for sale, with coastal character, practical services, shaded living, and easy access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.",
       "highlights": [
         "House for sale - price on request",
         "Private rooms and guest-ready layout",
@@ -217,8 +217,8 @@
       "slug": "about",
       "navLabel": "Contact",
       "title": "Contact Bomagawani",
-      "subtitle": "Ask about rooms, food, directions, or arrange a house-sale viewing.",
-      "body": "Send a quick inquiry and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.",
+      "subtitle": "Ask about rooms, food, directions, or arrange a house viewing.",
+      "body": "Send a quick message and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.",
       "highlights": [
         "Room booking and arrival questions",
         "Food and drink requests",

@@ -9,6 +9,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - TRUST_PROXY=1
+      - CONTENT_SNAPSHOT_FILE=/app/content.snapshot.json
     volumes:
       - bomagawani_data:/app/data
       - bomagawani_room_uploads:/app/public/uploads/rooms

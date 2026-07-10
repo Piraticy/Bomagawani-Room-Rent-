@@ -9,7 +9,8 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-RUN mkdir -p data public/uploads/rooms public/uploads/site tmp-uploads
+RUN cp data/content.snapshot.json /app/content.snapshot.json \
+  && mkdir -p data public/uploads/rooms public/uploads/site tmp-uploads
 
 EXPOSE 3000
 

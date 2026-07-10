@@ -102,6 +102,25 @@ function setStatus(element, message, ok = true) {
   element.style.color = ok ? '#245f45' : '#8d1f31';
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+const SESSION_EXEMPT_PATHS = new Set(['/api/admin/session', '/api/admin/login']);
+
+function handleSessionExpired() {
+  dom.dashboard.hidden = true;
+  dom.logoutBtn.hidden = true;
+  dom.loginWrap.hidden = false;
+  setStatus(dom.loginStatus, 'Your session expired. Please log in again.', false);
+}
+
 async function api(path, options = {}) {
   const response = await fetch(path, options);
   const rawBody = await response.text();
@@ -114,6 +133,10 @@ async function api(path, options = {}) {
     } catch (error) {
       payload = null;
     }
+  }
+
+  if (response.status === 401 && !SESSION_EXEMPT_PATHS.has(path)) {
+    handleSessionExpired();
   }
 
   if (!response.ok) {
@@ -199,8 +222,8 @@ function renderRooms() {
     item.className = 'room-item';
     item.innerHTML = `
       <div>
-        <p><strong>${room.name}</strong> ${room.active ? '' : '(Inactive)'}</p>
-        <p>${room.price_per_night_usd} USD/night • Max ${room.max_guests}</p>
+        <p><strong>${escapeHtml(room.name)}</strong> ${room.active ? '' : '(Inactive)'}</p>
+        <p>${escapeHtml(room.price_per_night_usd)} USD/night • Max ${escapeHtml(room.max_guests)}</p>
       </div>
       <div class="action-row">
         <button class="small-btn" data-edit-room="${room.id}">Edit</button>
@@ -237,7 +260,7 @@ function renderRoomGallery() {
     section.className = 'gallery-room';
 
     if (!room.images?.length) {
-      section.innerHTML = `<h4>${room.name}</h4><p>No photos uploaded yet.</p>`;
+      section.innerHTML = `<h4>${escapeHtml(room.name)}</h4><p>No photos uploaded yet.</p>`;
       dom.roomGallery.appendChild(section);
       return;
     }
@@ -247,9 +270,9 @@ function renderRoomGallery() {
         const isCover = room.cover_image === image.image_url;
         return `
           <article class="gallery-item">
-            <img src="${image.image_url}" alt="${room.name}" loading="lazy" />
+            <img src="${escapeHtml(image.image_url)}" alt="${escapeHtml(room.name)}" loading="lazy" />
             <div class="gallery-meta">
-              <small>${image.caption || 'No caption'}</small>
+              <small>${escapeHtml(image.caption) || 'No caption'}</small>
               <small>${isCover ? 'Cover image' : 'Gallery image'}</small>
               <div class="action-row">
                 <button class="small-btn" data-cover-room="${room.id}" data-cover-image="${image.id}">Set Cover</button>
@@ -261,7 +284,7 @@ function renderRoomGallery() {
       })
       .join('');
 
-    section.innerHTML = `<h4>${room.name}</h4><div class="gallery-grid">${cards}</div>`;
+    section.innerHTML = `<h4>${escapeHtml(room.name)}</h4><div class="gallery-grid">${cards}</div>`;
     dom.roomGallery.appendChild(section);
   });
 
@@ -290,9 +313,9 @@ function renderHeroSlides() {
     const card = document.createElement('article');
     card.className = 'hero-slide-item';
     card.innerHTML = `
-      <img src="${slide.image_url}" alt="Hero slide ${index + 1}" loading="lazy" />
+      <img src="${escapeHtml(slide.image_url)}" alt="Hero slide ${index + 1}" loading="lazy" />
       <div class="hero-slide-meta">
-        <small>${slide.caption || 'No caption'}</small>
+        <small>${escapeHtml(slide.caption) || 'No caption'}</small>
         <div class="action-row">
           <button class="small-btn" data-slide-up="${slide.id}" ${index === 0 ? 'disabled' : ''}>Up</button>
           <button class="small-btn" data-slide-down="${slide.id}" ${index === state.heroSlides.length - 1 ? 'disabled' : ''}>Down</button>
@@ -320,9 +343,9 @@ function addLinkRow(data = { platform_name: '', url: '', icon: 'link', sort_orde
   const row = document.createElement('div');
   row.className = 'link-row';
   row.innerHTML = `
-    <input placeholder="Platform name" value="${data.platform_name || ''}" data-link="name" />
-    <input placeholder="URL" value="${data.url || ''}" data-link="url" />
-    <input placeholder="Icon name" value="${data.icon || 'link'}" data-link="icon" />
+    <input placeholder="Platform name" value="${escapeHtml(data.platform_name)}" data-link="name" />
+    <input placeholder="URL" value="${escapeHtml(data.url)}" data-link="url" />
+    <input placeholder="Icon name" value="${escapeHtml(data.icon || 'link')}" data-link="icon" />
     <button type="button" class="small-btn warn" data-link-remove>Remove</button>
   `;
 
@@ -401,10 +424,10 @@ function addPageContentCard(page) {
   imageWrap.className = 'page-image-tools full';
   imageWrap.innerHTML = `
     <label>Feature image URL
-      <input data-page-field="imageUrl" value="${page.imageUrl || page.image_url || ''}" placeholder="/uploads/site/example.jpg" />
+      <input data-page-field="imageUrl" value="${escapeHtml(page.imageUrl || page.image_url)}" placeholder="/uploads/site/example.jpg" />
     </label>
     <div class="page-image-preview ${page.imageUrl || page.image_url ? 'has-image' : ''}">
-      ${(page.imageUrl || page.image_url) ? `<img src="${page.imageUrl || page.image_url}" alt="${pageLabel(page.slug)} feature preview" />` : '<span>No feature image yet</span>'}
+      ${(page.imageUrl || page.image_url) ? `<img src="${escapeHtml(page.imageUrl || page.image_url)}" alt="${escapeHtml(pageLabel(page.slug))} feature preview" />` : '<span>No feature image yet</span>'}
     </div>
     <div class="action-row">
       <input type="file" accept="image/*" data-page-field="imageFile" />
@@ -445,8 +468,8 @@ function addChatbotFaqRow(data = { question: '', answer: '', sort_order: 0 }) {
   const row = document.createElement('div');
   row.className = 'chatbot-faq-row';
   row.innerHTML = `
-    <input placeholder="Question" value="${data.question || ''}" data-chat-faq="question" />
-    <textarea placeholder="Answer" data-chat-faq="answer">${data.answer || ''}</textarea>
+    <input placeholder="Question" value="${escapeHtml(data.question)}" data-chat-faq="question" />
+    <textarea placeholder="Answer" data-chat-faq="answer">${escapeHtml(data.answer)}</textarea>
     <button type="button" class="small-btn warn" data-chat-faq-remove>Remove</button>
   `;
 
@@ -470,13 +493,13 @@ function renderBookings() {
     .map(
       (booking) => `
       <tr>
-        <td>${booking.booking_code}</td>
-        <td>${booking.room_name}</td>
-        <td>${booking.guest_name}<br/><small>${booking.guest_email}</small></td>
-        <td>${booking.check_in}<br/>to<br/>${booking.check_out}</td>
-        <td>${Number(booking.total_in_currency).toFixed(2)} ${booking.currency_code}</td>
-        <td>${paymentOptionLabel(booking.payment_option || 'pay_on_arrival')}<br/><small>${booking.payment_status}</small></td>
-        <td>${booking.booking_status}</td>
+        <td>${escapeHtml(booking.booking_code)}</td>
+        <td>${escapeHtml(booking.room_name)}</td>
+        <td>${escapeHtml(booking.guest_name)}<br/><small>${escapeHtml(booking.guest_email)}</small></td>
+        <td>${escapeHtml(booking.check_in)}<br/>to<br/>${escapeHtml(booking.check_out)}</td>
+        <td>${Number(booking.total_in_currency).toFixed(2)} ${escapeHtml(booking.currency_code)}</td>
+        <td>${paymentOptionLabel(booking.payment_option || 'pay_on_arrival')}<br/><small>${escapeHtml(booking.payment_status)}</small></td>
+        <td>${escapeHtml(booking.booking_status)}</td>
         <td>
           <div class="action-row">
             <button class="small-btn" data-status="confirm" data-booking-id="${booking.id}">Confirm</button>
@@ -766,6 +789,9 @@ dom.heroUploadForm.addEventListener('submit', async (event) => {
   const formData = new FormData();
   formData.append('image', dom.heroImage.files[0]);
 
+  const submitButton = event.submitter || dom.heroUploadForm.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+
   try {
     await api('/api/admin/settings/hero-image', {
       method: 'POST',
@@ -776,6 +802,8 @@ dom.heroUploadForm.addEventListener('submit', async (event) => {
     dom.heroUploadForm.reset();
   } catch (error) {
     setStatus(dom.heroStatus, error.message, false);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
   }
 });
 
@@ -795,6 +823,8 @@ dom.roomForm.addEventListener('submit', async (event) => {
   };
 
   const roomId = dom.roomId.value.trim();
+  const submitButton = event.submitter || dom.roomForm.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
 
   try {
     if (roomId) {
@@ -817,6 +847,8 @@ dom.roomForm.addEventListener('submit', async (event) => {
     await loadDashboard();
   } catch (error) {
     setStatus(dom.roomStatus, error.message, false);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
   }
 });
 
@@ -835,6 +867,9 @@ dom.roomImageForm.addEventListener('submit', async (event) => {
   formData.append('image', dom.roomImageFile.files[0]);
   formData.append('caption', dom.roomImageCaption.value.trim());
 
+  const submitButton = event.submitter || dom.roomImageForm.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+
   try {
     await api(`/api/admin/rooms/${roomId}/images`, {
       method: 'POST',
@@ -844,8 +879,11 @@ dom.roomImageForm.addEventListener('submit', async (event) => {
     setStatus(dom.roomImageStatus, 'Room photo uploaded and auto-optimized for quality and size.');
     dom.roomImageForm.reset();
     await loadDashboard();
+    dom.uploadRoomId.value = roomId;
   } catch (error) {
     setStatus(dom.roomImageStatus, error.message, false);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
   }
 });
 
@@ -862,6 +900,9 @@ dom.heroSlideForm.addEventListener('submit', async (event) => {
   formData.append('caption', dom.heroSlideCaption.value.trim());
   formData.append('sortOrder', String(Date.now()));
 
+  const submitButton = event.submitter || dom.heroSlideForm.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+
   try {
     await api('/api/admin/hero-slides', {
       method: 'POST',
@@ -873,23 +914,27 @@ dom.heroSlideForm.addEventListener('submit', async (event) => {
     await loadDashboard();
   } catch (error) {
     setStatus(dom.heroSlideStatus, error.message, false);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
   }
 });
 
 dom.addLinkRow.addEventListener('click', () => addLinkRow());
 
 dom.saveLinks.addEventListener('click', async () => {
-  const links = [...dom.linksFormWrap.querySelectorAll('.link-row')]
-    .map((row, index) => {
+  const allRows = [...dom.linksFormWrap.querySelectorAll('.link-row')]
+    .map((row) => {
       const inputs = row.querySelectorAll('input');
       return {
         platformName: inputs[0].value.trim(),
         url: inputs[1].value.trim(),
-        icon: inputs[2].value.trim() || 'link',
-        sortOrder: index + 1
+        icon: inputs[2].value.trim() || 'link'
       };
-    })
-    .filter((item) => item.platformName && item.url);
+    });
+  const links = allRows
+    .filter((item) => item.platformName && item.url)
+    .map((item, index) => ({ ...item, sortOrder: index + 1 }));
+  const droppedCount = allRows.length - links.length;
 
   try {
     await api('/api/admin/platform-links', {
@@ -898,7 +943,12 @@ dom.saveLinks.addEventListener('click', async () => {
       body: JSON.stringify({ links })
     });
 
-    setStatus(dom.linksStatus, 'Platform links saved.');
+    setStatus(
+      dom.linksStatus,
+      droppedCount > 0
+        ? `Platform links saved. ${droppedCount} incomplete row(s) were skipped — add both a name and URL to keep them.`
+        : 'Platform links saved.'
+    );
     await loadDashboard();
   } catch (error) {
     setStatus(dom.linksStatus, error.message, false);
@@ -965,7 +1015,7 @@ dom.pageContentWrap.addEventListener('click', async (event) => {
 
     imageUrlInput.value = result.imageUrl || '';
     preview.classList.add('has-image');
-    preview.innerHTML = `<img src="${result.imageUrl}" alt="${pageLabel(card.dataset.pageSlug)} feature preview" />`;
+    preview.innerHTML = `<img src="${escapeHtml(result.imageUrl)}" alt="${escapeHtml(pageLabel(card.dataset.pageSlug))} feature preview" />`;
     fileInput.value = '';
     setStatus(dom.pageContentStatus, 'Page image uploaded.');
     await loadDashboard();
@@ -1002,18 +1052,15 @@ dom.chatbotSettingsForm.addEventListener('submit', async (event) => {
 dom.addChatbotFaqRow.addEventListener('click', () => addChatbotFaqRow());
 
 dom.saveChatbotFaqs.addEventListener('click', async () => {
-  const faqs = [...dom.chatbotFaqWrap.querySelectorAll('.chatbot-faq-row')]
-    .map((row, index) => {
-      const question = row.querySelector('[data-chat-faq="question"]')?.value.trim() || '';
-      const answer = row.querySelector('[data-chat-faq="answer"]')?.value.trim() || '';
-
-      return {
-        question,
-        answer,
-        sortOrder: index + 1
-      };
-    })
-    .filter((item) => item.question && item.answer);
+  const allRows = [...dom.chatbotFaqWrap.querySelectorAll('.chatbot-faq-row')]
+    .map((row) => ({
+      question: row.querySelector('[data-chat-faq="question"]')?.value.trim() || '',
+      answer: row.querySelector('[data-chat-faq="answer"]')?.value.trim() || ''
+    }));
+  const faqs = allRows
+    .filter((item) => item.question && item.answer)
+    .map((item, index) => ({ ...item, sortOrder: index + 1 }));
+  const droppedCount = allRows.length - faqs.length;
 
   try {
     await api('/api/admin/chatbot-faqs', {
@@ -1022,7 +1069,12 @@ dom.saveChatbotFaqs.addEventListener('click', async () => {
       body: JSON.stringify({ faqs })
     });
 
-    setStatus(dom.chatbotFaqStatus, 'Quick answers saved.');
+    setStatus(
+      dom.chatbotFaqStatus,
+      droppedCount > 0
+        ? `Quick answers saved. ${droppedCount} incomplete row(s) were skipped — add both a question and answer to keep them.`
+        : 'Quick answers saved.'
+    );
     await loadDashboard();
   } catch (error) {
     setStatus(dom.chatbotFaqStatus, error.message, false);

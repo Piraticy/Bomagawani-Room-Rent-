@@ -18,6 +18,11 @@
   display: none !important;
 }
 
+:focus-visible {
+  outline: 3px solid rgba(18, 91, 102, 0.35);
+  outline-offset: 2px;
+}
+
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -194,13 +199,17 @@ h4 {
 }
 
 .ghost-btn {
-  background: #edf3fb;
-  color: #2c4162;
+  background: rgba(18, 91, 102, 0.08);
+  color: var(--primary);
 }
 
 .primary-btn:hover,
 .ghost-btn:hover {
   transform: translateY(-2px);
+}
+
+.ghost-btn:hover {
+  background: rgba(18, 91, 102, 0.14);
 }
 
 .wide {
@@ -949,7 +958,8 @@ h4 {
   padding: 11px 18px;
 }
 
-.room-actions .hero-text-link {
+.room-actions .hero-text-link,
+.eat-actions .hero-text-link {
   color: var(--primary);
 }
 
@@ -1635,6 +1645,14 @@ h4 {
   min-height: 356px;
   overflow: hidden;
   border-radius: 28px 28px 18px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, #dfecef, #edf5f7 54%, #dfe8eb);
+  padding: 16px 16px 0;
+  cursor: zoom-in;
 }
 
 .property-gallery-stage::after {
@@ -1646,7 +1664,14 @@ h4 {
   pointer-events: none;
 }
 
-.property-media-main img,
+.property-media-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
 .property-gallery-thumb img {
   width: 100%;
   height: 100%;
@@ -1740,6 +1765,108 @@ h4 {
   opacity: 1;
   border-color: #e3a34e;
   transform: translateY(-2px);
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.gallery-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 21, 35, 0.84);
+  backdrop-filter: blur(12px);
+}
+
+.gallery-lightbox-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, calc(100vw - 56px));
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: 18px;
+}
+
+.gallery-lightbox-figure {
+  margin: 0;
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #102435, #18374a);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.34);
+}
+
+.gallery-lightbox-figure img {
+  display: block;
+  width: 100%;
+  max-height: min(76vh, 980px);
+  object-fit: contain;
+  background: linear-gradient(180deg, #dfecef, #edf5f7 54%, #dfe8eb);
+}
+
+.gallery-lightbox-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 18px;
+  background: rgba(12, 27, 43, 0.88);
+  color: #fff;
+  font-weight: 800;
+}
+
+.gallery-lightbox-count {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.gallery-lightbox-close,
+.gallery-lightbox-control {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(12, 27, 43, 0.82);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.gallery-lightbox-close:hover,
+.gallery-lightbox-control:hover {
+  background: rgba(18, 91, 102, 0.92);
+  transform: scale(1.05);
+}
+
+.gallery-lightbox-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.gallery-lightbox-control {
+  width: 56px;
+  height: 56px;
+  font-size: 2.4rem;
+  line-height: 1;
 }
 
 .property-video-card,
@@ -2531,6 +2658,7 @@ textarea {
     min-height: 300px;
     height: auto;
     aspect-ratio: 4 / 3;
+    padding: 12px 12px 0;
   }
 
   .property-gallery-thumbs {
@@ -2549,6 +2677,42 @@ textarea {
   .property-gallery-count {
     left: 18px;
     right: auto;
+  }
+
+  .gallery-lightbox {
+    padding: 16px;
+  }
+
+  .gallery-lightbox-dialog {
+    width: min(100vw - 32px, 960px);
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .gallery-lightbox-figure img {
+    max-height: 66vh;
+  }
+
+  .gallery-lightbox-caption {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gallery-lightbox-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+  }
+
+  .gallery-lightbox-control.prev {
+    left: 10px;
+  }
+
+  .gallery-lightbox-control.next {
+    right: 10px;
   }
 
   .room-slider {

@@ -51,7 +51,7 @@ const translations = {
     'amenities.title': 'Amenities At A Glance',
     'amenities.subtitle': 'Everything you need for a comfortable stay.',
     'booking.title': 'Book Direct on Bomagawani.com',
-    'booking.subtitle': 'Select room, date, and currency. Your booking code is created instantly.',
+    'booking.subtitle': 'Select your room, dates, and currency. Your booking reference is prepared right away.',
     'form.room': 'Room',
     'form.checkIn': 'Check-in',
     'form.checkOut': 'Check-out',
@@ -67,15 +67,16 @@ const translations = {
     'form.notePlaceholder': 'Late arrival, special request',
     'form.submit': 'Send Booking Request',
     'tracking.title': 'Check your booking status',
-    'tracking.code': 'Booking code',
-    'tracking.button': 'Track Booking',
+    'tracking.code': 'Booking reference',
+    'tracking.button': 'Check booking',
     'location.title': 'Location & direction',
     'location.openMap': 'Open Map',
     'location.route': 'Use my location for route',
     'channels.title': 'Also listed on travel channels',
     'chatbot.answerPlaceholder': 'Tap a question to get a quick answer.',
-    'chatbot.whatsapp': 'Chat with human on WhatsApp',
-    'quote.empty': 'Enter dates to see your live quote.',
+    'chatbot.toggle': 'Chat',
+    'chatbot.whatsapp': 'Chat on WhatsApp',
+    'quote.empty': 'Enter dates to see your price estimate.',
     'quote.loading': 'Calculating quote...',
     'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
     'quote.unavailable': 'Could not get quote.',
@@ -88,7 +89,10 @@ const translations = {
     'status.bookingServiceDown': 'Booking service is currently unavailable.',
     'status.phoneInvalid': 'Please enter a valid phone number for selected country code.',
     'status.phoneLengthRange': 'Phone number must be between {min} and {max} digits.',
-    'status.bookingSuccessPrefix': 'Booking submitted. Your code is',
+    'status.bookingSuccessPrefix': 'Booking sent. Your reference is',
+    'form.loadingCountryCodes': 'Loading dialing codes...',
+    'footer.map': 'Map',
+    'eatSip.galleryCaption': 'Fresh coastal plates, prepared to order.',
     'status.openReceipt': 'Open receipt',
     'tracking.checking': 'Checking status...',
     'tracking.notFound': 'Booking not found.',
@@ -167,17 +171,18 @@ const translations = {
     'amenities.title': 'Ausstattung auf einen Blick',
     'amenities.subtitle': 'Alles, was Sie für einen angenehmen Aufenthalt brauchen.',
     'booking.title': 'Direkt auf Bomagawani.com buchen',
-    'booking.subtitle': 'Wählen Sie Zimmer, Datum und Währung. Ihr Buchungscode wird sofort erstellt.',
+    'booking.subtitle': 'Wählen Sie Zimmer, Reisedaten und Währung. Ihre Buchungsreferenz wird sofort vorbereitet.',
     'tracking.title': 'Buchungsstatus prüfen',
-    'tracking.code': 'Buchungscode',
-    'tracking.button': 'Buchung verfolgen',
+    'tracking.code': 'Buchungsreferenz',
+    'tracking.button': 'Buchung prüfen',
     'location.title': 'Lage & Wegbeschreibung',
     'location.openMap': 'Karte öffnen',
     'location.route': 'Meinen Standort für Route nutzen',
     'channels.title': 'Auch auf Reisekanälen gelistet',
     'chatbot.answerPlaceholder': 'Tippen Sie auf eine Frage für eine schnelle Antwort.',
-    'chatbot.whatsapp': 'Mit uns auf WhatsApp chatten',
-    'quote.empty': 'Reisedaten eingeben, um den Live-Preis zu sehen.',
+    'chatbot.toggle': 'Chat',
+    'chatbot.whatsapp': 'Auf WhatsApp schreiben',
+    'quote.empty': 'Reisedaten eingeben, um den Preis zu sehen.',
     'quote.loading': 'Preis wird berechnet...',
     'quote.conflict': 'Diese Daten sind für dieses Zimmer bereits bestätigt. Bitte wählen Sie andere Daten.',
     'quote.unavailable': 'Preis konnte nicht geladen werden.',
@@ -190,7 +195,10 @@ const translations = {
     'status.bookingServiceDown': 'Der Buchungsservice ist derzeit nicht erreichbar.',
     'status.phoneInvalid': 'Bitte eine gültige Telefonnummer für die gewählte Ländervorwahl eingeben.',
     'status.phoneLengthRange': 'Telefonnummer muss zwischen {min} und {max} Ziffern haben.',
-    'status.bookingSuccessPrefix': 'Buchung gesendet. Ihr Code ist',
+    'status.bookingSuccessPrefix': 'Buchung gesendet. Ihre Referenz ist',
+    'form.loadingCountryCodes': 'Ländervorwahlen werden geladen...',
+    'footer.map': 'Karte',
+    'eatSip.galleryCaption': 'Frische Küstengerichte, auf Bestellung zubereitet.',
     'status.openReceipt': 'Beleg öffnen',
     'tracking.checking': 'Status wird geprüft...',
     'tracking.notFound': 'Buchung nicht gefunden.',
@@ -224,7 +232,11 @@ const languageConfig = {
 
 const fallbackExchangeRates = {
   USD: 1,
-  EUR: 0.92
+  EUR: 0.92,
+  GBP: 0.79,
+  TZS: 2600,
+  AED: 3.67,
+  KES: 129
 };
 
 const PROPERTY_GALLERY_IMAGES = [
@@ -279,7 +291,9 @@ const copyTranslations = {
   de: {
     'Bomagawani House Rent': 'Bomagawani Hausvermietung',
     'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.': 'Ein ruhiger Rückzugsort in Kigombe mit privaten Zimmern, frischen lokalen Mahlzeiten, schattiger Veranda und einfacher Direktbuchung.',
+    'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple booking.': 'Ein ruhiger Rückzugsort in Kigombe mit privaten Zimmern, frischen lokalen Mahlzeiten, schattiger Veranda und einfacher Buchung.',
     'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.': 'Bomagawani House Rent verbindet private Zimmer, herzliche lokale Betreuung, Küstengerichte und klare Direktbuchung für Gäste in Kigombe an Tansanias nördlicher Swahili-Küste.',
+    'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.': 'Bomagawani House Rent verbindet private Zimmer, herzliche lokale Betreuung, Küstengerichte und klare Buchungsdetails für Gäste in Kigombe an Tansanias nördlicher Swahili-Küste.',
     'Our Rooms': 'Unsere Zimmer',
     'Master Bedroom': 'Master-Schlafzimmer',
     'Guest Room': 'Gästezimmer',
@@ -304,6 +318,7 @@ const copyTranslations = {
     'Contact': 'Kontakt',
     'Quick Help': 'Schnelle Hilfe',
     'Hi. Ask me anything about rooms, prices, check-in, or booking.': 'Hallo. Fragen Sie mich zu Zimmern, Preisen, Check-in oder Buchung.',
+    'Hi. Ask me anything about rooms, prices, arrival, or booking.': 'Hallo. Fragen Sie mich zu Zimmern, Preisen, Anreise oder Buchung.',
     'Call Us': 'Anrufen',
     'Email': 'E-Mail',
     'Map': 'Karte',
@@ -320,6 +335,7 @@ const copyTranslations = {
     'Bomagawani House For Sale': 'Bomagawani-Haus zu verkaufen',
     'A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.': 'Ein Küstenobjekt in Kigombe mit privaten Zimmern, gastfertigem Wohnen und Besichtigung für Käufer.',
     'Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.': 'Bomagawani ist mehr als eine Zimmervermietung. Das Haus steht auch zum Verkauf und bietet Küstencharakter, praktische Versorgung, schattige Wohnbereiche und Zugang zur Region Tanga. Käufer können vor dem Besuch vollständige Details, Fotos, Videos und einen Besichtigungstermin anfordern.',
+    'Bomagawani is more than a place to stay. The house is also available for sale, with coastal character, practical services, shaded living, and easy access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.': 'Bomagawani ist mehr als ein Ort zum Übernachten. Das Haus steht auch zum Verkauf und bietet Küstencharakter, praktische Versorgung, schattige Wohnbereiche und einen einfachen Zugang zur Region Tanga. Käufer können vor dem Besuch vollständige Details, Fotos, Videos und einen Besichtigungstermin anfordern.',
     'House for sale - price on request': 'Haus zu verkaufen – Preis auf Anfrage',
     'House for sale – price on request': 'Haus zu verkaufen – Preis auf Anfrage',
     'Key details from the property notes are kept simple here so buyers can understand the house quickly.': 'Die wichtigsten Details aus den Objektnotizen sind hier einfach gehalten, damit Käufer das Haus schnell verstehen.',
@@ -360,10 +376,16 @@ const copyTranslations = {
     'Tea, coffee, fruit, bread, eggs on request, fresh juice, and light morning options.': 'Tee, Kaffee, Obst, Brot, Eier auf Anfrage, frischer Saft und leichte Morgenoptionen.',
     'Fresh drinks': 'Frische Getränke',
     'Tropical juices, water, soft drinks, evening refreshments, and simple drinks for guests visiting.': 'Tropische Säfte, Wasser, Softdrinks, Erfrischungen am Abend und einfache Getränke für Besucher.',
-    'Pictures can be updated from Admin as your food photos grow.': 'Bilder können im Adminbereich aktualisiert werden, sobald neue Food-Fotos verfügbar sind.',
     'Food Booking': 'Essen buchen',
     'Tell us what you want to eat or drink.': 'Sagen Sie uns, was Sie essen oder trinken möchten.',
     'Send a request for dine-in food, guest meals, drinks, or a small group plan. We will confirm what is available and the best preparation time.': 'Senden Sie eine Anfrage für Essen vor Ort, Gästemahlzeiten, Getränke oder eine kleine Gruppe. Wir bestätigen Verfügbarkeit und passende Vorbereitungszeit.',
+    'Coastal meals, fresh drinks, and on-request food booking for guests and visitors.': 'Küstenmahlzeiten, frische Getränke und Essensanfragen für Gäste und Besucher.',
+    'Coastal meals, fresh drinks, and food requests for guests and visitors.': 'Küstenmahlzeiten, frische Getränke und Essensanfragen für Gäste und Besucher.',
+    'Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.': 'Eat & Sip ist für Hausgäste und Besucher gedacht, die einfache Küstenküche, frische Getränke oder beides zusammen genießen möchten. Kommen Sie zum Essen, vereinbaren Sie Frühstück, fragen Sie Mittag- oder Abendessen an oder bitten Sie um einen kleinen Speiseplan nach verfügbaren lokalen Zutaten.',
+    'Visitors can come just to eat, drink, or enjoy both together': 'Besucher können einfach nur zum Essen, Trinken oder für beides zusammen kommen',
+    'On-request breakfast, lunch, dinner, and small group meals': 'Frühstück, Mittagessen, Abendessen und kleine Gruppenmahlzeiten auf Anfrage',
+    'Tanzania coastal-style seafood, rice dishes, tea, coffee, and fresh juices': 'Meeresfrüchte, Reisgerichte, Tee, Kaffee und frische Säfte im Küstenstil Tansanias',
+    'Food preparation is confirmed based on availability and guest plans': 'Die Zubereitung wird je nach Verfügbarkeit und Gästewunsch bestätigt',
     'House For Sale': 'Haus zu verkaufen',
     'Price on request': 'Preis auf Anfrage',
     'Book a Viewing': 'Besichtigung buchen',
@@ -371,11 +393,11 @@ const copyTranslations = {
     'Ask for sale details': 'Verkaufsdetails anfragen',
     'Request the full house details, viewing time, photos, and video tour before visiting.': 'Fordern Sie vor dem Besuch vollständige Hausdetails, Besichtigungstermin, Fotos und Videotour an.',
     'Video Tour': 'Videotour',
-    'Request or add a walk-through video': 'Rundgangsvideo anfragen oder hinzufügen',
-    'Use this space to guide buyers to house videos, room walk-throughs, and viewing appointments.': 'Dieser Bereich führt Käufer zu Hausvideos, Rundgängen und Besichtigungsterminen.',
+    'Walk-through video on request': 'Rundgangsvideo auf Anfrage',
+    'Ask for a video tour of the house, rooms, and outdoor spaces before you plan a visit.': 'Fragen Sie vor Ihrem Besuch nach einer Videotour durch das Haus, die Zimmer und die Außenbereiche.',
     'Gallery Ready': 'Galerie bereit',
-    'Photos & viewing support': 'Fotos & Besichtigungshilfe',
-    'Show bedrooms, veranda areas, access roads, services, and surrounding coastal environment.': 'Zeigen Sie Schlafzimmer, Verandabereiche, Zufahrtswege, Versorgung und die umliegende Küstenumgebung.',
+    'Photos before you visit': 'Fotos vor Ihrem Besuch',
+    'See bedrooms, veranda areas, and the surrounding coastal setting through photos shared on request.': 'Sehen Sie Schlafzimmer, Verandabereiche und die Küstenumgebung anhand von Fotos, die auf Anfrage geteilt werden.',
     'A coastal home shaped for shade, airflow, and practical living.': 'Ein Küstenhaus, gestaltet für Schatten, Luftzirkulation und praktisches Wohnen.',
     'Located around Tanzania’s northern Swahili Coast near the protected Coelacanth marine park, with a calm natural setting.': 'Gelegen an Tansanias nördlicher Swahili-Küste nahe dem geschützten Coelacanth-Meerespark, in ruhiger Natur.',
     'Shaded veranda living, high ceilings, and natural airflow support comfortable coastal living.': 'Schattige Veranda-Bereiche, hohe Decken und natürliche Luftzirkulation unterstützen komfortables Küstenwohnen.',
@@ -383,6 +405,10 @@ const copyTranslations = {
     'Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.': 'Die Objektnotizen erwähnen Stromunterstützung, Brunnenwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
     'Contact Bomagawani': 'Bomagawani kontaktieren',
     'Reach us for room bookings, food requests, directions, and guest support.': 'Kontaktieren Sie uns für Zimmerbuchungen, Essensanfragen, Wegbeschreibung und Gästeservice.',
+    'Ask about rooms, food, directions, or arrange a house-sale viewing.': 'Fragen Sie nach Zimmern, Essen, Wegbeschreibung oder vereinbaren Sie eine Hausbesichtigung zum Kauf.',
+    'Send a quick inquiry and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.': 'Senden Sie eine kurze Anfrage und sagen Sie uns, was Sie brauchen: eine Zimmerbuchung, Essen und Getränke, Wegbeschreibung oder einen Termin zur Hausbesichtigung.',
+    'Ask about rooms, food, directions, or arrange a house viewing.': 'Fragen Sie nach Zimmern, Essen, Wegbeschreibung oder vereinbaren Sie eine Hausbesichtigung.',
+    'Send a quick message and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.': 'Senden Sie eine kurze Nachricht und sagen Sie uns, was Sie brauchen: eine Zimmerbuchung, Essen und Getränke, Wegbeschreibung oder einen Termin zur Hausbesichtigung.',
     'Best for quick inquiry': 'Ideal für schnelle Anfragen',
     'Rooms, food, directions, or house viewing.': 'Zimmer, Essen, Wegbeschreibung oder Hausbesichtigung.',
     'Tell us what you need and when you plan to visit.': 'Sagen Sie uns, was Sie brauchen und wann Sie kommen möchten.',
@@ -392,6 +418,19 @@ const copyTranslations = {
     'Request food, drinks, breakfast, dinner, or a small meal plan.': 'Fragen Sie Essen, Getränke, Frühstück, Abendessen oder einen kleinen Essensplan an.',
     'House sale viewing': 'Hausbesichtigung zum Kauf',
     'Ask for sale details, viewing time, photos, video, and buyer information.': 'Fragen Sie nach Verkaufsdetails, Besichtigungszeit, Fotos, Video und Käuferinformationen.',
+    'Room booking and arrival questions': 'Fragen zu Zimmerbuchung und Anreise',
+    'Food and drink requests': 'Anfragen zu Essen und Getränken',
+    'House sale viewing appointments': 'Besichtigungstermine für den Hauskauf',
+    'Photos, video, map, and buyer details': 'Fotos, Video, Karte und Käuferdetails',
+    'Which rooms are available?': 'Welche Zimmer sind verfügbar?',
+    'Master Bedroom and Guest Room are available. More can be added by admin.': 'Derzeit sind das Master Bedroom und das Guest Room verfügbar.',
+    'Master Bedroom and Guest Room are currently available.': 'Derzeit sind das Master Bedroom und das Guest Room verfügbar.',
+    'What time is check-in and check-out?': 'Wann sind Anreise und Abreise?',
+    'Check-in starts at 14:00 and check-out is 11:00.': 'Die Anreise beginnt um 14:00 Uhr und die Abreise ist um 11:00 Uhr.',
+    'How can I confirm my booking?': 'Wie bestätige ich meine Buchung?',
+    'Submit your booking request and our team will confirm quickly. You get a booking code instantly.': 'Senden Sie Ihre Buchungsanfrage, und unser Team bestätigt schnell. Sie erhalten sofort eine Buchungsreferenz.',
+    'Submit your booking request and our team will confirm quickly. You receive a booking reference right away.': 'Senden Sie Ihre Buchungsanfrage, und unser Team bestätigt schnell. Sie erhalten sofort eine Buchungsreferenz.',
+    'Hello Bomagawani, I need help with booking.': 'Hallo Bomagawani, ich brauche Hilfe bei einer Buchung.',
     'Enter dates to see your live quote.': 'Reisedaten eingeben, um den Live-Preis zu sehen.',
     'Loading country codes...': 'Ländervorwahlen werden geladen...',
     'Book Direct': 'Direkt buchen',
@@ -423,6 +462,8 @@ const state = {
   heroInterval: null,
   heroIndex: 0,
   propertyGalleryIndex: 0,
+  propertyLightboxOpen: false,
+  currencyManuallySet: false,
   heroRangePickerMonth: null,
   bookingRangePickerMonth: null
 };
@@ -470,6 +511,15 @@ const dom = {
   propertyGalleryThumbs: document.getElementById('property-gallery-thumbs'),
   propertyGalleryPrev: document.getElementById('property-gallery-prev'),
   propertyGalleryNext: document.getElementById('property-gallery-next'),
+  propertyGalleryStage: document.getElementById('property-gallery-stage'),
+  propertyLightbox: document.getElementById('property-lightbox'),
+  propertyLightboxBackdrop: document.getElementById('property-lightbox-backdrop'),
+  propertyLightboxImage: document.getElementById('property-lightbox-image'),
+  propertyLightboxCaption: document.getElementById('property-lightbox-caption'),
+  propertyLightboxCount: document.getElementById('property-lightbox-count'),
+  propertyLightboxClose: document.getElementById('property-lightbox-close'),
+  propertyLightboxPrev: document.getElementById('property-lightbox-prev'),
+  propertyLightboxNext: document.getElementById('property-lightbox-next'),
   propertySalePrice: document.getElementById('property-sale-price'),
   aboutSection: document.getElementById('about-section'),
   aboutNav: document.getElementById('about-nav'),
@@ -600,7 +650,6 @@ const amenityIconMap = {
   beach: 'waves',
   waves: 'waves',
   lock: 'shield-check',
-  utensils: 'utensils-crossed',
   wind: 'wind',
   zap: 'zap',
   'glass-water': 'glass-water'
@@ -785,7 +834,7 @@ function setLanguage(languageCode) {
   const nextLanguage = SUPPORTED_LANGUAGES.includes(languageCode) ? languageCode : 'en';
   state.language = nextLanguage;
   localStorage.setItem('preferred_language', nextLanguage);
-  if (dom.currencySelect) {
+  if (dom.currencySelect && !state.currencyManuallySet) {
     dom.currencySelect.value = currentCurrency();
   }
   loadExchangeRate(currentCurrency()).then(() => {
@@ -1261,6 +1310,44 @@ function renderLinks() {
   });
 }
 
+function navigateToPath(pathWithHash) {
+  const target = new URL(pathWithHash, window.location.origin);
+  if (target.pathname === window.location.pathname && target.hash === window.location.hash) return;
+
+  window.history.pushState({ path: target.pathname }, '', target.pathname + target.hash);
+  applyPageVisibility();
+  if (!target.hash) {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+}
+
+function configureClientRouting() {
+  document.body.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const link = event.target.closest('a[href]');
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+
+    let url;
+    try {
+      url = new URL(link.href, window.location.origin);
+    } catch (error) {
+      return;
+    }
+
+    if (url.origin !== window.location.origin) return;
+    if (!Object.prototype.hasOwnProperty.call(pageRoutes, url.pathname)) return;
+
+    event.preventDefault();
+    navigateToPath(url.pathname + url.hash);
+  });
+
+  window.addEventListener('popstate', () => {
+    applyPageVisibility();
+  });
+}
+
 function getCurrentPage() {
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
   return pageRoutes[pathname] || 'home';
@@ -1298,6 +1385,7 @@ function applyPageVisibility() {
 }
 
 function renderRooms() {
+  const previouslySelectedRoomId = dom.roomSelect.value;
   dom.roomsGrid.innerHTML = '';
   dom.roomSelect.innerHTML = '';
   const preferredCurrency = selectedCurrency();
@@ -1383,6 +1471,10 @@ function renderRooms() {
     option.textContent = `${translateCopy(room.name)} - ${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}${state.language === 'de' ? '/Nacht' : '/night'}`;
     dom.roomSelect.appendChild(option);
   });
+
+  if (previouslySelectedRoomId && state.rooms.some((room) => String(room.id) === previouslySelectedRoomId)) {
+    dom.roomSelect.value = previouslySelectedRoomId;
+  }
 
   dom.roomsGrid.querySelectorAll('[data-book-room]').forEach((button) => {
     button.addEventListener('click', (event) => {
@@ -1482,6 +1574,43 @@ function showPropertyGalleryImage(index) {
   dom.propertyGalleryThumbs?.querySelectorAll('[data-property-thumb]').forEach((button) => {
     button.classList.toggle('is-active', Number(button.dataset.propertyThumb) === state.propertyGalleryIndex);
   });
+
+  if (state.propertyLightboxOpen) {
+    syncPropertyLightbox();
+  }
+}
+
+function syncPropertyLightbox() {
+  if (!dom.propertyLightboxImage || !PROPERTY_GALLERY_IMAGES.length) return;
+
+  const image = PROPERTY_GALLERY_IMAGES[state.propertyGalleryIndex];
+  const caption = translateCopy(image.alt);
+  dom.propertyLightboxImage.src = image.src;
+  dom.propertyLightboxImage.alt = caption;
+  dom.propertyLightboxCaption.textContent = caption;
+  dom.propertyLightboxCount.textContent = `${state.propertyGalleryIndex + 1} / ${PROPERTY_GALLERY_IMAGES.length}`;
+}
+
+function openPropertyLightbox(index = state.propertyGalleryIndex) {
+  if (!dom.propertyLightbox || !PROPERTY_GALLERY_IMAGES.length) return;
+
+  showPropertyGalleryImage(index);
+  state.propertyLightboxOpen = true;
+  dom.propertyLightbox.hidden = false;
+  dom.propertyLightbox.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('lightbox-open');
+  syncPropertyLightbox();
+  dom.propertyLightboxClose?.focus();
+}
+
+function closePropertyLightbox() {
+  if (!dom.propertyLightbox) return;
+
+  state.propertyLightboxOpen = false;
+  dom.propertyLightbox.hidden = true;
+  dom.propertyLightbox.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('lightbox-open');
+  dom.propertyGalleryStage?.focus();
 }
 
 function renderPropertyGallery() {
@@ -1497,6 +1626,7 @@ function renderPropertyGallery() {
 
   dom.propertyGalleryThumbs.querySelectorAll('[data-property-thumb]').forEach((button) => {
     button.addEventListener('click', () => showPropertyGalleryImage(Number(button.dataset.propertyThumb)));
+    button.addEventListener('dblclick', () => openPropertyLightbox(Number(button.dataset.propertyThumb)));
   });
 
   showPropertyGalleryImage(state.propertyGalleryIndex);
@@ -1575,7 +1705,7 @@ function renderChatbot() {
   dom.chatbotTitle.textContent = translateCopy(chatbot.title || 'Quick Help');
   dom.chatbotGreeting.textContent = translateCopy(chatbot.greeting || 'Hi. Ask me anything about rooms, prices, check-in, or booking.');
   dom.chatbotWhatsapp.textContent = t('chatbot.whatsapp');
-  dom.chatbotWhatsapp.href = buildWhatsAppLink(chatbot.whatsapp_number, chatbot.whatsapp_message);
+  dom.chatbotWhatsapp.href = buildWhatsAppLink(chatbot.whatsapp_number, translateCopy(chatbot.whatsapp_message));
 
   dom.chatbotFaqList.innerHTML = '';
   const faqs = Array.isArray(state.chatbotFaqs) ? state.chatbotFaqs : [];
@@ -1756,28 +1886,35 @@ function applyBookingQueryParams() {
   }
 }
 
+let latestQuoteRequestId = 0;
+
 async function requestQuote() {
+  const requestId = ++latestQuoteRequestId;
   const roomId = dom.roomSelect.value;
   const checkIn = dom.checkIn.value;
   const checkOut = dom.checkOut.value;
   const currency = dom.currencySelect.value;
 
   if (!roomId || !checkIn || !checkOut) {
-    renderQuote(null);
+    if (requestId === latestQuoteRequestId) renderQuote(null);
     return;
   }
 
   if (!isDateRangeAvailable(roomId, checkIn, checkOut)) {
-    dom.quoteBox.textContent = t('quote.conflict');
-    state.currentQuote = null;
+    if (requestId === latestQuoteRequestId) {
+      dom.quoteBox.textContent = t('quote.conflict');
+      state.currentQuote = null;
+    }
     return;
   }
 
   try {
-    dom.quoteBox.textContent = t('quote.loading');
+    if (requestId === latestQuoteRequestId) dom.quoteBox.textContent = t('quote.loading');
     const response = await fetch(
       `/api/public/quote?roomId=${encodeURIComponent(roomId)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&currency=${encodeURIComponent(currency)}`
     );
+
+    if (requestId !== latestQuoteRequestId) return;
 
     if (!response.ok) {
       const payload = await response.json();
@@ -1787,44 +1924,55 @@ async function requestQuote() {
     }
 
     const quote = await response.json();
+    if (requestId !== latestQuoteRequestId) return;
     state.currentQuote = quote;
     renderQuote(quote);
   } catch (error) {
-    dom.quoteBox.textContent = t('quote.serviceDown');
-    state.currentQuote = null;
+    if (requestId === latestQuoteRequestId) {
+      dom.quoteBox.textContent = t('quote.serviceDown');
+      state.currentQuote = null;
+    }
   }
 }
 
+let bookingSubmitInFlight = false;
+
 async function submitBooking(event) {
   event.preventDefault();
-  dom.bookingStatus.textContent = '';
+  if (bookingSubmitInFlight) return;
 
-  await requestQuote();
-  if (!state.currentQuote) {
-    dom.bookingStatus.textContent = t('status.checkQuoteFirst');
-    return;
-  }
-
-  const fullGuestPhone = getValidatedGuestPhone();
-  if (!fullGuestPhone) {
-    dom.bookingStatus.textContent = t('status.phoneInvalid');
-    return;
-  }
-
-  const payload = {
-    roomId: Number(dom.roomSelect.value),
-    guestName: document.getElementById('guest-name').value.trim(),
-    guestEmail: document.getElementById('guest-email').value.trim(),
-    guestPhone: fullGuestPhone,
-    checkIn: dom.checkIn.value,
-    checkOut: dom.checkOut.value,
-    guestsCount: Number(dom.guestsCount.value),
-    note: document.getElementById('guest-note').value.trim(),
-    currencyCode: dom.currencySelect.value,
-    paymentOption: dom.paymentOption.value
-  };
+  bookingSubmitInFlight = true;
+  const submitButton = event.submitter || dom.bookingForm.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
 
   try {
+    dom.bookingStatus.textContent = '';
+
+    await requestQuote();
+    if (!state.currentQuote) {
+      dom.bookingStatus.textContent = t('status.checkQuoteFirst');
+      return;
+    }
+
+    const fullGuestPhone = getValidatedGuestPhone();
+    if (!fullGuestPhone) {
+      dom.bookingStatus.textContent = t('status.phoneInvalid');
+      return;
+    }
+
+    const payload = {
+      roomId: Number(dom.roomSelect.value),
+      guestName: document.getElementById('guest-name').value.trim(),
+      guestEmail: document.getElementById('guest-email').value.trim(),
+      guestPhone: fullGuestPhone,
+      checkIn: dom.checkIn.value,
+      checkOut: dom.checkOut.value,
+      guestsCount: Number(dom.guestsCount.value),
+      note: document.getElementById('guest-note').value.trim(),
+      currencyCode: dom.currencySelect.value,
+      paymentOption: dom.paymentOption.value
+    };
+
     dom.bookingStatus.textContent = t('status.submittingBooking');
 
     const response = await fetch('/api/public/bookings', {
@@ -1850,6 +1998,9 @@ async function submitBooking(event) {
     await boot();
   } catch (error) {
     dom.bookingStatus.textContent = t('status.bookingServiceDown');
+  } finally {
+    bookingSubmitInFlight = false;
+    if (submitButton) submitButton.disabled = false;
   }
 }
 
@@ -1927,6 +2078,7 @@ function configureDateInputs() {
 
   dom.roomSelect.addEventListener('change', requestQuote);
   dom.currencySelect.addEventListener('change', async () => {
+    state.currencyManuallySet = true;
     await loadExchangeRate(dom.currencySelect.value);
     renderRooms();
     refreshIcons();
@@ -2155,6 +2307,63 @@ function configurePropertyGallery() {
   dom.propertyGalleryNext?.addEventListener('click', () => {
     showPropertyGalleryImage(state.propertyGalleryIndex + 1);
   });
+
+  dom.propertyGalleryStage?.addEventListener('click', (event) => {
+    if (event.target.closest('.property-gallery-control')) return;
+    openPropertyLightbox(state.propertyGalleryIndex);
+  });
+
+  dom.propertyGalleryStage?.addEventListener('keydown', (event) => {
+    if (event.target.closest('.property-gallery-control')) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openPropertyLightbox(state.propertyGalleryIndex);
+    }
+  });
+
+  dom.propertyLightboxClose?.addEventListener('click', closePropertyLightbox);
+  dom.propertyLightboxBackdrop?.addEventListener('click', closePropertyLightbox);
+  dom.propertyLightboxPrev?.addEventListener('click', () => {
+    showPropertyGalleryImage(state.propertyGalleryIndex - 1);
+  });
+  dom.propertyLightboxNext?.addEventListener('click', () => {
+    showPropertyGalleryImage(state.propertyGalleryIndex + 1);
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (!state.propertyLightboxOpen) return;
+
+    if (event.key === 'Escape') {
+      closePropertyLightbox();
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      showPropertyGalleryImage(state.propertyGalleryIndex - 1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight') {
+      showPropertyGalleryImage(state.propertyGalleryIndex + 1);
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      const focusable = [dom.propertyLightboxClose, dom.propertyLightboxPrev, dom.propertyLightboxNext].filter(Boolean);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
 }
 
 function registerServiceWorker() {
@@ -2210,8 +2419,11 @@ configureInstallPrompt();
 registerServiceWorker();
 configureChatbot();
 configurePropertyGallery();
+configureClientRouting();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
 dom.trackingForm.addEventListener('submit', trackBooking);
+
+window.addEventListener('load', refreshIcons);
 
 boot();

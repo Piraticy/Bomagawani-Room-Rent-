@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bomagawani-v14';
+const CACHE_NAME = 'bomagawani-v16';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -28,11 +28,35 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+function isAppShellRequest(pathname) {
+  return pathname === '/' || pathname.endsWith('.html') || pathname === '/app.js' || pathname === '/styles.css';
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.pathname.startsWith('/api/')) return;
   if (url.pathname.startsWith('/receipt/')) return;
+
+  if (isAppShellRequest(url.pathname)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          const networkFetch = fetch(event.request)
+            .then((response) => {
+              cache.put(event.request, response.clone()).catch(() => {
+                // Some requests cannot be cached (opaque/cors), ignore safely
+              });
+              return response;
+            })
+            .catch(() => cached);
+
+          return cached || networkFetch;
+        })
+      )
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

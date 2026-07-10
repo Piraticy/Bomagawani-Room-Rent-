@@ -21,7 +21,8 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const isProduction = process.env.NODE_ENV === 'production';
 const forceSecureCookie = process.env.COOKIE_SECURE === '1';
-const maxUploadSizeMb = Math.max(1, Number(process.env.MAX_UPLOAD_SIZE_MB || 25));
+const parsedUploadSizeMb = Number(process.env.MAX_UPLOAD_SIZE_MB);
+const maxUploadSizeMb = Math.max(1, Number.isFinite(parsedUploadSizeMb) ? parsedUploadSizeMb : 25);
 const maxUploadSizeBytes = maxUploadSizeMb * 1024 * 1024;
 
 const publicDir = path.join(process.cwd(), 'public');
@@ -31,10 +32,6 @@ const siteUploadDir = path.join(uploadRootDir, 'site');
 const roomOriginalDir = path.join(uploadRootDir, 'originals', 'rooms');
 const siteOriginalDir = path.join(uploadRootDir, 'originals', 'site');
 const tempUploadDir = path.join(process.cwd(), 'tmp-uploads');
-const uploadRootRelativeToPublic = path.relative(publicDir, uploadRootDir);
-const uploadsInsidePublic =
-  (uploadRootRelativeToPublic === '' ||
-    (!uploadRootRelativeToPublic.startsWith('..') && !path.isAbsolute(uploadRootRelativeToPublic)));
 
 fs.mkdirSync(roomUploadDir, { recursive: true });
 fs.mkdirSync(siteUploadDir, { recursive: true });
@@ -110,11 +107,23 @@ app.use(
   })
 );
 
+const uploadsStaticOptions = { maxAge: '30d', immutable: true };
+const publicStaticOptions = { maxAge: '10m' };
+
 app.use('/api', apiLimiter);
-if (!uploadsInsidePublic) {
-  app.use('/uploads', express.static(uploadRootDir));
+app.use('/uploads/originals', (req, res) => res.status(404).end());
+app.use('/uploads', express.static(uploadRootDir, uploadsStaticOptions));
+app.use(express.static(publicDir, publicStaticOptions));
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
 }
-app.use(express.static(publicDir));
 
 function slugify(value) {
   return value
@@ -144,10 +153,11 @@ function normalizeContentPage(page) {
   };
 }
 
+const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'];
+
 function normalizeCurrency(code) {
-  return String(code || 'USD')
-    .trim()
-    .toUpperCase();
+  const value = String(code || 'USD').trim().toUpperCase();
+  return SUPPORTED_CURRENCIES.includes(value) ? value : 'USD';
 }
 
 function normalizePaymentOption(value) {
@@ -157,12 +167,19 @@ function normalizePaymentOption(value) {
 }
 
 function parseDateOnly(dateString) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateString || ''))) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateString || ''));
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
     return null;
   }
 
-  const date = new Date(`${dateString}T00:00:00Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
+  return date;
 }
 
 function nightsBetween(checkIn, checkOut) {
@@ -210,7 +227,10 @@ function removeFileIfExists(filePath) {
 function uploadUrlToAbsolutePath(uploadUrl) {
   if (!uploadUrl || !uploadUrl.startsWith('/uploads/')) return '';
   const relativeUploadPath = uploadUrl.replace(/^\/uploads\/?/, '');
-  return path.join(uploadRootDir, relativeUploadPath);
+  const resolvedPath = path.resolve(uploadRootDir, relativeUploadPath);
+  const relativeToRoot = path.relative(uploadRootDir, resolvedPath);
+  if (relativeToRoot.startsWith('..') || path.isAbsolute(relativeToRoot)) return '';
+  return resolvedPath;
 }
 
 function removeUploadByUrl(uploadUrl) {
@@ -485,9 +505,8 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
 
   const totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
   const converted = await convertFromUSD(totalUsd, currencyCode);
-  const code = bookingCode();
 
-  db.prepare(
+  const insertBooking = db.prepare(
     `INSERT INTO bookings (
       booking_code, room_id, guest_name, guest_email, guest_phone, check_in, check_out,
       nights, guests_count, note, price_per_night_usd, total_usd, currency_code,
@@ -497,24 +516,37 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
       @nights, @guests_count, @note, @price_per_night_usd, @total_usd, @currency_code,
       @exchange_rate, @total_in_currency, @payment_option, 'pending', 'pending'
     )`
-  ).run({
-    booking_code: code,
-    room_id: roomId,
-    guest_name: guestName,
-    guest_email: guestEmail,
-    guest_phone: guestPhone,
-    check_in: checkIn,
-    check_out: checkOut,
-    nights: dateCheck.nights,
-    guests_count: parsedGuests,
-    note,
-    price_per_night_usd: room.price_per_night_usd,
-    total_usd: totalUsd,
-    currency_code: converted.currency,
-    exchange_rate: converted.rate,
-    total_in_currency: converted.total,
-    payment_option: paymentOption
-  });
+  );
+
+  let code = '';
+  const maxAttempts = 5;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    code = bookingCode();
+    try {
+      insertBooking.run({
+        booking_code: code,
+        room_id: roomId,
+        guest_name: guestName,
+        guest_email: guestEmail,
+        guest_phone: guestPhone,
+        check_in: checkIn,
+        check_out: checkOut,
+        nights: dateCheck.nights,
+        guests_count: parsedGuests,
+        note,
+        price_per_night_usd: room.price_per_night_usd,
+        total_usd: totalUsd,
+        currency_code: converted.currency,
+        exchange_rate: converted.rate,
+        total_in_currency: converted.total,
+        payment_option: paymentOption
+      });
+      break;
+    } catch (error) {
+      const isDuplicateCode = /UNIQUE constraint failed: bookings.booking_code/i.test(error.message || '');
+      if (!isDuplicateCode || attempt === maxAttempts) throw error;
+    }
+  }
 
   return res.status(201).json({
     message: 'Booking request created successfully. Waiting for admin confirmation.',
@@ -602,26 +634,26 @@ app.get('/receipt/:code', (req, res) => {
         <div class="receipt">
           <div class="top">
             <div>
-              <h1>${settings.logo_text} - Booking Receipt</h1>
-              <div>${settings.site_name}</div>
+              <h1>${escapeHtml(settings.logo_text)} - Booking Receipt</h1>
+              <div>${escapeHtml(settings.site_name)}</div>
             </div>
-            <span class="badge">${booking.booking_status}</span>
+            <span class="badge">${escapeHtml(booking.booking_status)}</span>
           </div>
 
           <div class="grid">
-            <div><div class="label">Booking Code</div><div class="value">${booking.booking_code}</div></div>
-            <div><div class="label">Guest</div><div class="value">${booking.guest_name}</div></div>
-            <div><div class="label">Room</div><div class="value">${booking.room_name}</div></div>
-            <div><div class="label">Dates</div><div class="value">${booking.check_in} to ${booking.check_out}</div></div>
-            <div><div class="label">Nights</div><div class="value">${booking.nights}</div></div>
-            <div><div class="label">Guests</div><div class="value">${booking.guests_count}</div></div>
-            <div><div class="label">Contact</div><div class="value">${booking.guest_email}<br/>${booking.guest_phone}</div></div>
+            <div><div class="label">Booking Code</div><div class="value">${escapeHtml(booking.booking_code)}</div></div>
+            <div><div class="label">Guest</div><div class="value">${escapeHtml(booking.guest_name)}</div></div>
+            <div><div class="label">Room</div><div class="value">${escapeHtml(booking.room_name)}</div></div>
+            <div><div class="label">Dates</div><div class="value">${escapeHtml(booking.check_in)} to ${escapeHtml(booking.check_out)}</div></div>
+            <div><div class="label">Nights</div><div class="value">${escapeHtml(booking.nights)}</div></div>
+            <div><div class="label">Guests</div><div class="value">${escapeHtml(booking.guests_count)}</div></div>
+            <div><div class="label">Contact</div><div class="value">${escapeHtml(booking.guest_email)}<br/>${escapeHtml(booking.guest_phone)}</div></div>
             <div><div class="label">Payment Option</div><div class="value">${booking.payment_option === 'pay_online' ? 'Pay Online' : 'Pay On Arrival'}</div></div>
-            <div><div class="label">Payment Status</div><div class="value">${booking.payment_status}</div></div>
+            <div><div class="label">Payment Status</div><div class="value">${escapeHtml(booking.payment_status)}</div></div>
           </div>
 
-          <div class="amount">Total: ${booking.total_in_currency} ${booking.currency_code}</div>
-          <div class="footer">Generated on ${new Date().toISOString().slice(0, 10)} | Domain: ${settings.domain}</div>
+          <div class="amount">Total: ${escapeHtml(booking.total_in_currency)} ${escapeHtml(booking.currency_code)}</div>
+          <div class="footer">Generated on ${new Date().toISOString().slice(0, 10)} | Domain: ${escapeHtml(settings.domain)}</div>
         </div>
       </body>
     </html>
@@ -646,10 +678,17 @@ app.post('/api/admin/login', adminLoginLimiter, (req, res) => {
     return res.status(401).json({ error: 'Invalid login details.' });
   }
 
-  req.session.adminId = admin.id;
-  req.session.adminName = admin.full_name;
+  req.session.regenerate((regenerateError) => {
+    if (regenerateError) {
+      console.error(regenerateError);
+      return res.status(500).json({ error: 'Unexpected server error.' });
+    }
 
-  return res.json({ id: admin.id, fullName: admin.full_name, email: admin.email });
+    req.session.adminId = admin.id;
+    req.session.adminName = admin.full_name;
+
+    return res.json({ id: admin.id, fullName: admin.full_name, email: admin.email });
+  });
 });
 
 app.post('/api/admin/logout', requireAdmin, (req, res) => {
@@ -746,11 +785,11 @@ app.post('/api/admin/rooms', requireAdmin, (req, res) => {
   const active = req.body.active !== false;
   const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : [];
 
-  if (!name || !shortDescription || !longDescription || !pricePerNightUsd || !maxGuests || !sizeLabel) {
+  if (!name || !shortDescription || !longDescription || !sizeLabel) {
     return res.status(400).json({ error: 'Please fill all required room fields.' });
   }
 
-  if (pricePerNightUsd <= 0 || maxGuests < 1) {
+  if (!(pricePerNightUsd > 0) || !(maxGuests >= 1)) {
     return res.status(400).json({ error: 'Price and max guests must be valid positive values.' });
   }
 
@@ -807,7 +846,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
   const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : JSON.parse(room.amenities_json || '[]');
   const coverImage = req.body.coverImage === undefined ? room.cover_image || '' : String(req.body.coverImage || '').trim();
 
-  if (parsedPrice <= 0 || parsedMaxGuests < 1) {
+  if (!(parsedPrice > 0) || !(parsedMaxGuests >= 1)) {
     return res.status(400).json({ error: 'Price and max guests must be valid positive values.' });
   }
 
@@ -892,14 +931,17 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
+  let originalCopyPath = '';
+  let outputPath = '';
+
   try {
     const settings = getSettings();
     const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const outputFilename = `${baseName}.jpg`;
     const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
     const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    const outputPath = path.join(roomUploadDir, outputFilename);
-    const originalCopyPath = path.join(roomOriginalDir, `${baseName}-orig${safeExtension}`);
+    outputPath = path.join(roomUploadDir, outputFilename);
+    originalCopyPath = path.join(roomOriginalDir, `${baseName}-orig${safeExtension}`);
 
     await saveOriginalCopy(req.file.path, originalCopyPath);
     await watermarkImage(req.file.path, outputPath, settings.logo_text, 'room');
@@ -922,6 +964,8 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
     return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
   } catch (error) {
     removeFileIfExists(req.file?.path);
+    removeFileIfExists(originalCopyPath);
+    removeFileIfExists(outputPath);
     return res.status(500).json({ error: 'Image upload failed.' });
   }
 });
@@ -951,14 +995,17 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
+  let originalCopyPath = '';
+  let outputPath = '';
+
   try {
     const settings = getSettings();
     const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const outputFilename = `${baseName}.jpg`;
     const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
     const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    const outputPath = path.join(siteUploadDir, outputFilename);
-    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    outputPath = path.join(siteUploadDir, outputFilename);
+    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
 
     await saveOriginalCopy(req.file.path, originalCopyPath);
     await watermarkImage(req.file.path, outputPath, settings.logo_text, 'hero');
@@ -973,6 +1020,8 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
     return res.json({ imageUrl });
   } catch (error) {
     removeFileIfExists(req.file?.path);
+    removeFileIfExists(originalCopyPath);
+    removeFileIfExists(outputPath);
     return res.status(500).json({ error: 'Hero image upload failed.' });
   }
 });
@@ -982,14 +1031,17 @@ app.post('/api/admin/hero-slides', requireAdmin, upload.single('image'), async (
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
+  let originalCopyPath = '';
+  let outputPath = '';
+
   try {
     const settings = getSettings();
     const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const outputFilename = `${baseName}.jpg`;
     const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
     const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    const outputPath = path.join(siteUploadDir, outputFilename);
-    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    outputPath = path.join(siteUploadDir, outputFilename);
+    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
 
     await saveOriginalCopy(req.file.path, originalCopyPath);
     await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
@@ -1006,6 +1058,8 @@ app.post('/api/admin/hero-slides', requireAdmin, upload.single('image'), async (
     return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
   } catch (error) {
     removeFileIfExists(req.file?.path);
+    removeFileIfExists(originalCopyPath);
+    removeFileIfExists(outputPath);
     return res.status(500).json({ error: 'Hero slide upload failed.' });
   }
 });
@@ -1206,6 +1260,9 @@ app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('ima
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
+  let originalCopyPath = '';
+  let outputPath = '';
+
   try {
     const settings = getSettings();
     const page = db.prepare('SELECT * FROM content_pages WHERE slug = ?').get(slug);
@@ -1213,8 +1270,8 @@ app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('ima
     const outputFilename = `${baseName}.jpg`;
     const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
     const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    const outputPath = path.join(siteUploadDir, outputFilename);
-    const originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    outputPath = path.join(siteUploadDir, outputFilename);
+    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
 
     await saveOriginalCopy(req.file.path, originalCopyPath);
     await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
@@ -1242,6 +1299,8 @@ app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('ima
     return res.status(201).json({ imageUrl });
   } catch (error) {
     removeFileIfExists(req.file?.path);
+    removeFileIfExists(originalCopyPath);
+    removeFileIfExists(outputPath);
     return res.status(500).json({ error: 'Page image upload failed.' });
   }
 });

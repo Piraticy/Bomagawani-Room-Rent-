@@ -4,7 +4,8 @@ const db = require('../db');
 const CACHE_HOURS = 6;
 
 function hoursSince(dateString) {
-  const then = new Date(dateString).getTime();
+  const normalized = /Z$|[+-]\d{2}:?\d{2}$/.test(dateString) ? dateString : `${dateString}Z`;
+  const then = new Date(normalized.replace(' ', 'T')).getTime();
   return (Date.now() - then) / (1000 * 60 * 60);
 }
 
