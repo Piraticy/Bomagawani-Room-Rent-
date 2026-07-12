@@ -24,9 +24,9 @@ function safeLogoText(value) {
 }
 
 function normalizeTarget(mode) {
-  if (mode === 'hero') return { width: 1920, height: 1080, quality: 90 };
-  if (mode === 'slide') return { width: 1920, height: 1080, quality: 90 };
-  return { width: 1400, height: 960, quality: 88 };
+  if (mode === 'hero') return { width: 1920, height: 1080, quality: 95 };
+  if (mode === 'slide') return { width: 1920, height: 1080, quality: 95 };
+  return { width: 1600, height: 1100, quality: 94 };
 }
 
 function ensureDir(filePath) {
@@ -92,7 +92,7 @@ async function watermarkImage(filePath, outputPath, logoText, mode = 'room') {
         left: 0
       }
     ])
-    .jpeg({ quality: target.quality, mozjpeg: true, progressive: true })
+    .jpeg({ quality: target.quality, mozjpeg: true, progressive: true, chromaSubsampling: '4:4:4' })
     .toFile(outputPath);
 
   return {

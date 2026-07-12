@@ -488,6 +488,22 @@ function renderChatbotFaqs() {
   state.chatbotFaqs.forEach((item) => addChatbotFaqRow(item));
 }
 
+function bookingStatusMessage(booking) {
+  const statusText = {
+    confirmed: 'is confirmed',
+    cancelled: 'has been cancelled',
+    pending: 'is pending confirmation'
+  }[booking.booking_status] || 'has an update';
+
+  return `Hello ${booking.guest_name}, your Bomagawani booking ${booking.booking_code} for ${booking.room_name} (${booking.check_in} to ${booking.check_out}) ${statusText}.`;
+}
+
+function buildBookingWhatsAppLink(booking) {
+  const digits = String(booking.guest_phone || '').replace(/[^\d]/g, '');
+  if (!digits) return '';
+  return `https://wa.me/${digits}?text=${encodeURIComponent(bookingStatusMessage(booking))}`;
+}
+
 function renderBookings() {
   const rows = state.bookings
     .map(
@@ -505,6 +521,10 @@ function renderBookings() {
             <button class="small-btn" data-status="confirm" data-booking-id="${booking.id}">Confirm</button>
             <button class="small-btn warn" data-status="cancel" data-booking-id="${booking.id}">Cancel</button>
             <button class="small-btn" data-status="paid" data-booking-id="${booking.id}">Mark Paid</button>
+            ${buildBookingWhatsAppLink(booking)
+              ? `<a class="small-btn" href="${escapeHtml(buildBookingWhatsAppLink(booking))}" target="_blank" rel="noreferrer">Notify on WhatsApp</a>`
+              : ''}
+            <button class="small-btn warn" data-delete-booking="${booking.id}">Delete</button>
           </div>
         </td>
       </tr>
@@ -533,6 +553,22 @@ function renderBookings() {
   dom.bookingsTableWrap.querySelectorAll('[data-status]').forEach((button) => {
     button.addEventListener('click', () => updateBookingStatus(Number(button.dataset.bookingId), button.dataset.status));
   });
+
+  dom.bookingsTableWrap.querySelectorAll('[data-delete-booking]').forEach((button) => {
+    button.addEventListener('click', () => deleteBooking(Number(button.dataset.deleteBooking)));
+  });
+}
+
+async function deleteBooking(bookingId) {
+  const yes = window.confirm('Permanently delete this booking? This cannot be undone.');
+  if (!yes) return;
+
+  try {
+    await api(`/api/admin/bookings/${bookingId}`, { method: 'DELETE' });
+    await loadDashboard();
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
 function startRoomEdit(roomId) {

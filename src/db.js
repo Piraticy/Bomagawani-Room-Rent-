@@ -552,7 +552,7 @@ if (!settingsCount) {
     subheadline: 'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.',
     about_text: 'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.',
     address: 'Kigombe, Tanga, Tanzania',
-    map_link: 'https://www.google.com/maps?q=Kigombe,+Tanga,+Tanzania',
+    map_link: 'https://maps.app.goo.gl/vpY5krcPsqJaYbLR6',
     contact_phone: '+255 756 906 006',
     contact_email: 'stay@bomagawani.com',
     check_in_time: '14:00',

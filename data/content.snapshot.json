@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-05-27T12:08:53.786Z",
+  "exportedAt": "2026-07-12T10:58:57.478Z",
   "siteSettings": {
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
@@ -7,7 +7,7 @@
     "subheadline": "A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple booking.",
     "aboutText": "Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.",
     "address": "Kigombe, Tanga, Tanzania",
-    "mapLink": "https://maps.google.com/?q=Kigombe%20Tanga%20Tanzania",
+    "mapLink": "https://maps.app.goo.gl/vpY5krcPsqJaYbLR6",
     "contactPhone": "+255 756 906 006",
     "contactEmail": "stay@bomagawani.com",
     "checkInTime": "14:00",
@@ -153,31 +153,6 @@
       "sortOrder": 4
     }
   ],
-  "heroSlides": [],
-  "chatbot": {
-    "title": "Quick Help",
-    "greeting": "Hi. Ask me anything about rooms, prices, arrival, or booking.",
-    "whatsappNumber": "255756906006",
-    "whatsappMessage": "Hello Bomagawani, I need help with booking.",
-    "enabled": true
-  },
-  "chatbotFaqs": [
-    {
-      "question": "Which rooms are available?",
-      "answer": "Master Bedroom and Guest Room are currently available.",
-      "sortOrder": 1
-    },
-    {
-      "question": "What time is check-in and check-out?",
-      "answer": "Check-in starts at 14:00 and check-out is 11:00.",
-      "sortOrder": 2
-    },
-    {
-      "question": "How can I confirm my booking?",
-      "answer": "Submit your booking request and our team will confirm quickly. You receive a booking reference right away.",
-      "sortOrder": 3
-    }
-  ],
   "contentPages": [
     {
       "slug": "eat-sip",
@@ -229,6 +204,31 @@
       "icon": "phone-call",
       "sortOrder": 3,
       "active": true
+    }
+  ],
+  "heroSlides": [],
+  "chatbot": {
+    "title": "Quick Help",
+    "greeting": "Hi. Ask me anything about rooms, prices, arrival, or booking.",
+    "whatsappNumber": "255756906006",
+    "whatsappMessage": "Hello Bomagawani, I need help with booking.",
+    "enabled": true
+  },
+  "chatbotFaqs": [
+    {
+      "question": "Which rooms are available?",
+      "answer": "Master Bedroom and Guest Room are currently available.",
+      "sortOrder": 1
+    },
+    {
+      "question": "What time is check-in and check-out?",
+      "answer": "Check-in starts at 14:00 and check-out is 11:00.",
+      "sortOrder": 2
+    },
+    {
+      "question": "How can I confirm my booking?",
+      "answer": "Submit your booking request and our team will confirm quickly. You receive a booking reference right away.",
+      "sortOrder": 3
     }
   ]
 }

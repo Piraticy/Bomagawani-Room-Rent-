@@ -16,6 +16,7 @@ const db = require('./db');
 const { requireAdmin } = require('./middleware/auth');
 const { convertFromUSD, fetchRates } = require('./services/currency');
 const { watermarkImage, saveOriginalCopy } = require('./services/imageProcessor');
+const { sendBookingStatusEmail } = require('./services/email');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -771,6 +772,32 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
     payment_status: paymentStatus || null
   });
 
+  const statusKey = bookingStatus === 'confirmed' || bookingStatus === 'cancelled' ? bookingStatus : paymentStatus === 'paid' ? 'paid' : null;
+  if (statusKey) {
+    const updatedBooking = db
+      .prepare(
+        `SELECT b.*, r.name AS room_name
+         FROM bookings b
+         JOIN rooms r ON r.id = b.room_id
+         WHERE b.id = ?`
+      )
+      .get(bookingId);
+    sendBookingStatusEmail(updatedBooking, statusKey).catch((error) => {
+      console.error('[email] Unexpected error sending booking status email:', error.message);
+    });
+  }
+
+  return res.json({ ok: true });
+});
+
+app.delete('/api/admin/bookings/:id', requireAdmin, (req, res) => {
+  const bookingId = Number(req.params.id);
+  const booking = db.prepare('SELECT id FROM bookings WHERE id = ?').get(bookingId);
+  if (!booking) {
+    return res.status(404).json({ error: 'Booking not found.' });
+  }
+
+  db.prepare('DELETE FROM bookings WHERE id = ?').run(bookingId);
   return res.json({ ok: true });
 });
 

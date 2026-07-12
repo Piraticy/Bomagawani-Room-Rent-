@@ -402,10 +402,19 @@
             <h2 id="about-title">Contact Bomagawani</h2>
             <p class="story-subtitle" id="about-subtitle">Reach us for room bookings, food requests, directions, and guest support.</p>
             <p id="about-body"></p>
-            <div class="contact-actions">
-              <a class="primary-btn" id="contact-phone-link" href="#">Call Us</a>
-              <a class="ghost-btn" id="contact-email-link" href="#">Email</a>
-              <a class="ghost-btn" id="contact-map-link" href="#" target="_blank" rel="noreferrer">Open Map</a>
+            <div class="contact-actions contact-actions-icons">
+              <a class="primary-btn icon-btn" id="contact-phone-link" href="#" aria-label="Call us">
+                <i data-lucide="phone"></i><span data-i18n="contact.call">Call</span>
+              </a>
+              <a class="ghost-btn icon-btn" id="contact-whatsapp-link" href="#" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">
+                <i data-lucide="message-circle"></i><span>WhatsApp</span>
+              </a>
+              <a class="ghost-btn icon-btn" id="contact-email-link" href="#" aria-label="Email us">
+                <i data-lucide="mail"></i><span data-i18n="footer.email">Email</span>
+              </a>
+              <a class="ghost-btn icon-btn" id="contact-map-link" href="#" target="_blank" rel="noreferrer" aria-label="Open map">
+                <i data-lucide="map-pin"></i><span data-i18n="footer.map">Map</span>
+              </a>
             </div>
           </div>
           <div class="contact-inquiry-box">
@@ -493,10 +502,17 @@
 
             <label>
               <span data-i18n="form.paymentOption">Payment option</span>
-              <select id="payment-option" required>
-                <option value="pay_on_arrival" data-i18n="form.payOnArrival">Pay on arrival</option>
-                <option value="pay_online" data-i18n="form.payOnlineLater">Pay online later</option>
-              </select>
+              <div class="payment-option-group" id="payment-option-group" role="group" aria-label="Payment option">
+                <button type="button" class="payment-option-btn is-selected" data-payment-option="pay_on_arrival">
+                  <i data-lucide="wallet"></i>
+                  <span data-i18n="form.payOnArrival">Pay on arrival</span>
+                </button>
+                <button type="button" class="payment-option-btn" data-payment-option="pay_online">
+                  <i data-lucide="credit-card"></i>
+                  <span data-i18n="form.payOnlineLater">Pay online later</span>
+                </button>
+              </div>
+              <input type="hidden" id="payment-option" value="pay_on_arrival" required />
             </label>
 
             <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to see your live quote.</div>

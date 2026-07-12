@@ -24,6 +24,7 @@ const translations = {
     'date.selectRange': 'Select check-in and check-out',
     'date.selectArrival': 'Select your arrival date.',
     'date.selectDeparture': 'Now select your departure date.',
+    'date.roomBooked': 'Already booked',
     'shortcut.stay': 'Stay',
     'shortcut.taste': 'Taste',
     'shortcut.discover': 'Discover',
@@ -80,6 +81,7 @@ const translations = {
     'quote.empty': 'Enter dates to see your price estimate.',
     'quote.loading': 'Calculating quote...',
     'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
+    'quote.conflictNextAvailable': 'This room is booked for those dates. It is next available from {date}.',
     'quote.unavailable': 'Could not get quote.',
     'quote.serviceDown': 'Quote service unavailable. Try again.',
     'quote.nights': '{nights} night(s) x {price}',
@@ -93,6 +95,8 @@ const translations = {
     'status.bookingSuccessPrefix': 'Booking sent. Your reference is',
     'form.loadingCountryCodes': 'Loading dialing codes...',
     'footer.map': 'Map',
+    'footer.email': 'Email',
+    'contact.call': 'Call',
     'eatSip.galleryCaption': 'Fresh coastal plates, prepared to order.',
     'status.openReceipt': 'Open receipt',
     'tracking.checking': 'Checking status...',
@@ -155,6 +159,7 @@ const translations = {
     'date.selectRange': 'Anreise und Abreise auswählen',
     'date.selectArrival': 'Wählen Sie Ihr Anreisedatum.',
     'date.selectDeparture': 'Wählen Sie jetzt Ihr Abreisedatum.',
+    'date.roomBooked': 'Bereits gebucht',
     'shortcut.stay': 'Wohnen',
     'shortcut.taste': 'Genießen',
     'shortcut.discover': 'Entdecken',
@@ -187,6 +192,7 @@ const translations = {
     'quote.empty': 'Reisedaten eingeben, um den Preis zu sehen.',
     'quote.loading': 'Preis wird berechnet...',
     'quote.conflict': 'Diese Daten sind für dieses Zimmer bereits bestätigt. Bitte wählen Sie andere Daten.',
+    'quote.conflictNextAvailable': 'Dieses Zimmer ist für diese Daten gebucht. Nächste Verfügbarkeit ab {date}.',
     'quote.unavailable': 'Preis konnte nicht geladen werden.',
     'quote.serviceDown': 'Preisservice nicht erreichbar. Bitte erneut versuchen.',
     'quote.nights': '{nights} Nacht/Nächte x {price}',
@@ -200,6 +206,8 @@ const translations = {
     'status.bookingSuccessPrefix': 'Buchung gesendet. Ihre Referenz ist',
     'form.loadingCountryCodes': 'Ländervorwahlen werden geladen...',
     'footer.map': 'Karte',
+    'footer.email': 'E-Mail',
+    'contact.call': 'Anrufen',
     'eatSip.galleryCaption': 'Frische Küstengerichte, auf Bestellung zubereitet.',
     'status.openReceipt': 'Beleg öffnen',
     'tracking.checking': 'Status wird geprüft...',
@@ -231,6 +239,8 @@ const languageConfig = {
   en: { label: 'English', locale: 'en-US', currency: 'USD' },
   de: { label: 'Deutsch', locale: 'de-DE', currency: 'EUR' }
 };
+
+const PROPERTY_COORDS = { lat: -5.271999, lng: 39.067505 };
 
 const fallbackExchangeRates = {
   USD: 1,
@@ -531,6 +541,7 @@ const dom = {
   aboutHighlights: document.getElementById('about-highlights'),
   contactPhoneLink: document.getElementById('contact-phone-link'),
   contactEmailLink: document.getElementById('contact-email-link'),
+  contactWhatsappLink: document.getElementById('contact-whatsapp-link'),
   contactMapLink: document.getElementById('contact-map-link'),
   footerPhoneLink: document.getElementById('footer-phone-link'),
   footerEmailLink: document.getElementById('footer-email-link'),
@@ -565,6 +576,7 @@ const dom = {
   guestsCount: document.getElementById('guests-count'),
   currencySelect: document.getElementById('currency-select'),
   paymentOption: document.getElementById('payment-option'),
+  paymentOptionGroup: document.getElementById('payment-option-group'),
   quoteBox: document.getElementById('quote-box'),
   bookingForm: document.getElementById('booking-form'),
   bookingStatus: document.getElementById('booking-status'),
@@ -639,21 +651,31 @@ const FALLBACK_PHONE_COUNTRIES = [
 const amenityIconMap = {
   wifi: 'wifi',
   snowflake: 'snowflake',
+  ac: 'snowflake',
   bath: 'bath',
   coffee: 'coffee',
+  breakfast: 'coffee',
   tv: 'tv',
   fan: 'fan',
   shirt: 'shirt',
   car: 'car',
   parking: 'car',
   utensils: 'utensils',
+  kitchen: 'cooking-pot',
   bed: 'bed',
   pool: 'waves',
   beach: 'waves',
   waves: 'waves',
   lock: 'shield-check',
+  safe: 'lock-keyhole',
   wind: 'wind',
   zap: 'zap',
+  heater: 'flame',
+  gym: 'dumbbell',
+  balcony: 'door-open',
+  workspace: 'briefcase',
+  petFriendly: 'dog',
+  elevator: 'move-vertical',
   'glass-water': 'glass-water'
 };
 
@@ -1056,6 +1078,34 @@ function hideBookingDateRangePicker() {
   dom.bookingDateRangeTrigger.setAttribute('aria-expanded', 'false');
 }
 
+function getSelectedRoomUnavailableRanges() {
+  const room = state.rooms.find((item) => String(item.id) === String(dom.roomSelect.value));
+  return room?.unavailable || [];
+}
+
+function isDateUnavailable(dateIso, ranges) {
+  return ranges.some((range) => dateIso >= range.check_in && dateIso < range.check_out);
+}
+
+function findNextAvailableDate(roomId, fromDateIso) {
+  const room = state.rooms.find((item) => String(item.id) === String(roomId));
+  const ranges = room?.unavailable || [];
+  let candidate = fromDateIso;
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    ranges.forEach((range) => {
+      if (candidate >= range.check_in && candidate < range.check_out) {
+        candidate = range.check_out;
+        changed = true;
+      }
+    });
+  }
+
+  return candidate;
+}
+
 function renderBookingDateRangePicker() {
   if (!dom.bookingDateRangeGrid || dom.bookingDateRangePicker.hidden) return;
 
@@ -1068,6 +1118,7 @@ function renderBookingDateRangePicker() {
 
   const checkIn = parseIsoDate(dom.checkIn.value);
   const checkOut = parseIsoDate(dom.checkOut.value);
+  const unavailableRanges = getSelectedRoomUnavailableRanges();
 
   dom.bookingDateRangeMonth.textContent = monthStart.toLocaleDateString(currentLocale(), {
     month: 'long',
@@ -1085,18 +1136,21 @@ function renderBookingDateRangePicker() {
     const isStart = isSameDay(currentDate, checkIn);
     const isEnd = isSameDay(currentDate, checkOut);
     const isInRange = checkIn && checkOut && currentDate > checkIn && currentDate < checkOut;
+    const isUnavailable = !isStart && isDateUnavailable(currentIso, unavailableRanges);
 
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'date-day';
     button.dataset.date = currentIso;
     button.textContent = String(currentDate.getDate());
-    button.disabled = isPast;
+    button.disabled = isPast || isUnavailable;
     button.classList.toggle('is-muted', isOutsideMonth);
     button.classList.toggle('is-start', isStart);
     button.classList.toggle('is-end', isEnd);
     button.classList.toggle('is-in-range', isInRange);
     button.classList.toggle('is-today', isSameDay(currentDate, today));
+    button.classList.toggle('is-unavailable', isUnavailable);
+    if (isUnavailable) button.title = t('date.roomBooked');
 
     button.addEventListener('click', () => selectBookingRangeDate(currentIso));
     dom.bookingDateRangeGrid.appendChild(button);
@@ -1745,6 +1799,10 @@ function applySettings() {
   dom.mapLink.href = state.settings.map_link;
   dom.contactPhoneLink.href = `tel:${String(state.settings.contact_phone || '').replace(/[^\d+]/g, '')}`;
   dom.contactEmailLink.href = `mailto:${state.settings.contact_email || ''}`;
+  dom.contactWhatsappLink.href = buildWhatsAppLink(
+    state.chatbot?.whatsapp_number,
+    'Hello Bomagawani, I would like to ask about rooms, food, or directions.'
+  );
   dom.contactMapLink.href = state.settings.map_link;
   dom.eatSipRequestLink.href = '/contact';
   dom.footerPhoneLink.href = dom.contactPhoneLink.href;
@@ -1753,8 +1811,7 @@ function applySettings() {
   dom.footerEmailLink.textContent = state.settings.contact_email || 'Email';
   dom.footerMapLink.href = state.settings.map_link;
 
-  const mapQuery = encodeURIComponent(state.settings.address || 'Kigombe, Tanga, Tanzania');
-  dom.mapEmbed.src = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
+  dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&output=embed`;
 
   if (dom.statRooms) {
     dom.statRooms.textContent = `${state.rooms.length} ${t('nav.rooms')}`;
@@ -1904,7 +1961,10 @@ async function requestQuote() {
 
   if (!isDateRangeAvailable(roomId, checkIn, checkOut)) {
     if (requestId === latestQuoteRequestId) {
-      dom.quoteBox.textContent = t('quote.conflict');
+      const nextAvailable = findNextAvailableDate(roomId, checkIn);
+      dom.quoteBox.textContent = nextAvailable !== checkIn
+        ? t('quote.conflictNextAvailable', { date: formatShortDate(nextAvailable) })
+        : t('quote.conflict');
       state.currentQuote = null;
     }
     return;
@@ -1992,7 +2052,7 @@ async function submitBooking(event) {
     dom.bookingStatus.innerHTML = `${t('status.bookingSuccessPrefix')} <strong>${result.bookingCode}</strong>. <a href="${result.receiptUrl}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>.`;
     dom.bookingForm.reset();
     setBookingDateRange('', '');
-    dom.paymentOption.value = 'pay_on_arrival';
+    setPaymentOption('pay_on_arrival');
     updatePhoneInputRules();
     state.currentQuote = null;
     renderQuote(null);
@@ -2079,7 +2139,10 @@ function configureDateInputs() {
     if (event.key === 'Escape') hideBookingDateRangePicker();
   });
 
-  dom.roomSelect.addEventListener('change', requestQuote);
+  dom.roomSelect.addEventListener('change', () => {
+    renderBookingDateRangePicker();
+    requestQuote();
+  });
   dom.currencySelect.addEventListener('change', async () => {
     state.currencyManuallySet = true;
     await loadExchangeRate(dom.currencySelect.value);
@@ -2160,6 +2223,21 @@ function configureHeroBookingShortcut() {
   });
 }
 
+function setPaymentOption(value) {
+  dom.paymentOption.value = value;
+  dom.paymentOptionGroup?.querySelectorAll('[data-payment-option]').forEach((item) => {
+    item.classList.toggle('is-selected', item.dataset.paymentOption === value);
+  });
+}
+
+function configurePaymentOptionButtons() {
+  if (!dom.paymentOptionGroup) return;
+
+  dom.paymentOptionGroup.querySelectorAll('[data-payment-option]').forEach((button) => {
+    button.addEventListener('click', () => setPaymentOption(button.dataset.paymentOption));
+  });
+}
+
 function configurePhoneInput() {
   dom.phoneCountry.addEventListener('change', () => {
     updatePhoneInputRules();
@@ -2198,8 +2276,7 @@ function configureLocationRoute() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        const destination = encodeURIComponent(state.settings.address);
-        const routeUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${destination}`;
+        const routeUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}`;
         dom.mapLink.href = routeUrl;
         dom.locationStatus.textContent = t('location.ready');
       },
@@ -2418,6 +2495,7 @@ configureLanguagePreference();
 configureDateInputs();
 configureHeroBookingShortcut();
 configurePhoneInput();
+configurePaymentOptionButtons();
 configureLocationRoute();
 configureInstallPrompt();
 registerServiceWorker();
