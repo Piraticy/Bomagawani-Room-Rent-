@@ -523,6 +523,7 @@ function seedContentPages() {
 }
 
 const settingsCount = db.prepare('SELECT COUNT(*) AS count FROM site_settings').get().count;
+const isFreshDatabase = !settingsCount;
 if (!settingsCount) {
   db.prepare(`
     INSERT INTO site_settings (
@@ -752,46 +753,6 @@ if (!roomsCount) {
   });
 }
 
-function ensureGuestRoomDefaultImages() {
-  const guestRoom = db.prepare("SELECT id, cover_image FROM rooms WHERE slug = 'guest-room'").get();
-  if (!guestRoom) return;
-
-  const guestImages = db
-    .prepare('SELECT image_url FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id ASC')
-    .all(guestRoom.id);
-
-  const defaultImages = [
-    { image_url: '/uploads/rooms/guest-room-main.jpg', caption: 'Guest Room main view', sort_order: 1 },
-    { image_url: '/uploads/rooms/guest-room-alt.jpg', caption: 'Guest Room bed view', sort_order: 2 }
-  ];
-
-  const hasDefaultImages = defaultImages.every((image) => guestImages.some((row) => row.image_url === image.image_url));
-  const needsDefaultImages = !guestImages.length || !guestRoom.cover_image || String(guestRoom.cover_image).includes('images.unsplash.com');
-
-  if (!needsDefaultImages && hasDefaultImages) return;
-
-  const replaceImages = db.transaction(() => {
-    db.prepare('DELETE FROM room_images WHERE room_id = ?').run(guestRoom.id);
-    const insertImage = db.prepare(
-      'INSERT INTO room_images (room_id, image_url, caption, sort_order) VALUES (@room_id, @image_url, @caption, @sort_order)'
-    );
-
-    defaultImages.forEach((image) => {
-      insertImage.run({
-        room_id: guestRoom.id,
-        image_url: image.image_url,
-        caption: image.caption,
-        sort_order: image.sort_order
-      });
-    });
-
-    db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(defaultImages[0].image_url, guestRoom.id);
-  });
-
-  replaceImages();
-}
-
-ensureGuestRoomDefaultImages();
 
 const linksCount = db.prepare('SELECT COUNT(*) AS count FROM platform_links').get().count;
 if (!linksCount) {
@@ -886,28 +847,23 @@ applyAmenityUpgrade();
 
 const heroSlidesCount = db.prepare('SELECT COUNT(*) AS count FROM hero_slides').get().count;
 if (!heroSlidesCount) {
-  const insertSlide = db.prepare('INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (?, ?, ?)');
+  // Only ever fall back to the single site hero image, never room photos -
+  // the homepage hero slideshow should show dedicated hero content only.
   const settings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get();
-  const roomCovers = db.prepare("SELECT cover_image FROM rooms WHERE cover_image IS NOT NULL AND cover_image != '' ORDER BY featured DESC, id ASC").all();
-
-  const uniqueImages = [];
-  const seen = new Set();
-
-  const pushImage = (imageUrl) => {
-    if (!imageUrl || seen.has(imageUrl)) return;
-    seen.add(imageUrl);
-    uniqueImages.push(imageUrl);
-  };
-
-  pushImage(settings?.hero_image);
-  roomCovers.forEach((row) => pushImage(row.cover_image));
-
-  uniqueImages.forEach((imageUrl, index) => {
-    insertSlide.run(imageUrl, '', index + 1);
-  });
+  if (settings?.hero_image) {
+    db.prepare('INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (?, ?, ?)').run(settings.hero_image, '', 1);
+  }
 }
 
-applyContentSnapshot(readContentSnapshot());
+if (isFreshDatabase) {
+  // Only seed from the git-committed snapshot on a genuinely new database (e.g.
+  // first boot, or a host with no persistent disk across redeploys). Re-running
+  // this against an already-populated database - which happens any time a
+  // separate process requires this module, including the content:export script
+  // itself - would silently revert live admin edits (rooms, photos, settings)
+  // back to whatever was last exported.
+  applyContentSnapshot(readContentSnapshot());
+}
 applyAmenityUpgrade();
 
 const syncedSettings = db.prepare('SELECT headline FROM site_settings WHERE id = 1').get();

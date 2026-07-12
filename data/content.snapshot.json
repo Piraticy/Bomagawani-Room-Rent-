@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-07-12T10:58:57.478Z",
+  "exportedAt": "2026-07-12T12:58:56.746Z",
   "siteSettings": {
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
@@ -14,7 +14,7 @@
     "checkOutTime": "11:00",
     "baseCurrency": "USD",
     "logoText": "Bomagawani.com",
-    "heroImage": ""
+    "heroImage": "/uploads/site/1778153675379-aff79a8f.jpg"
   },
   "rooms": [
     {
@@ -27,7 +27,7 @@
       "sizeLabel": "38 m²",
       "featured": true,
       "active": true,
-      "coverImage": "",
+      "coverImage": "/uploads/rooms/1783860675446-ff60ddb2.jpg",
       "amenities": [
         {
           "icon": "wifi",
@@ -62,7 +62,33 @@
           "label": "Drinks"
         }
       ],
-      "images": []
+      "images": [
+        {
+          "imageUrl": "/uploads/rooms/1783860675446-ff60ddb2.jpg",
+          "caption": "",
+          "sortOrder": 1
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783860677694-d65f335e.jpg",
+          "caption": "",
+          "sortOrder": 2
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783860679853-a780cb40.jpg",
+          "caption": "",
+          "sortOrder": 3
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783860682018-495899e6.jpg",
+          "caption": "",
+          "sortOrder": 4
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783860684210-6e9bb150.jpg",
+          "caption": "",
+          "sortOrder": 5
+        }
+      ]
     },
     {
       "name": "Guest Room",
@@ -74,7 +100,7 @@
       "sizeLabel": "24 m²",
       "featured": false,
       "active": true,
-      "coverImage": "/uploads/rooms/guest-room-main.jpg",
+      "coverImage": "/uploads/rooms/1783861084607-48ed2a03.jpg",
       "amenities": [
         {
           "icon": "wifi",
@@ -115,14 +141,24 @@
       ],
       "images": [
         {
-          "imageUrl": "/uploads/rooms/guest-room-main.jpg",
-          "caption": "Guest Room main view",
+          "imageUrl": "/uploads/rooms/1783861084607-48ed2a03.jpg",
+          "caption": "",
           "sortOrder": 1
         },
         {
-          "imageUrl": "/uploads/rooms/guest-room-alt.jpg",
-          "caption": "Guest Room bed view",
+          "imageUrl": "/uploads/rooms/1783861087016-83cddbfc.jpg",
+          "caption": "",
           "sortOrder": 2
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783861090388-ef7c9a08.jpg",
+          "caption": "",
+          "sortOrder": 3
+        },
+        {
+          "imageUrl": "/uploads/rooms/1783861089200-fbbe91fb.jpg",
+          "caption": "",
+          "sortOrder": 5
         }
       ]
     }
@@ -206,7 +242,58 @@
       "active": true
     }
   ],
-  "heroSlides": [],
+  "heroSlides": [
+    {
+      "imageUrl": "/uploads/site/1783860601035-435d1359.jpg",
+      "caption": "",
+      "sortOrder": 1
+    },
+    {
+      "imageUrl": "/uploads/site/1783860606566-7760bc6f.jpg",
+      "caption": "",
+      "sortOrder": 2
+    },
+    {
+      "imageUrl": "/uploads/site/1783860612079-2cc84f2a.jpg",
+      "caption": "",
+      "sortOrder": 3
+    },
+    {
+      "imageUrl": "/uploads/site/1783860617558-69eb5036.jpg",
+      "caption": "",
+      "sortOrder": 4
+    },
+    {
+      "imageUrl": "/uploads/site/1783860622784-4f5e8ac6.jpg",
+      "caption": "",
+      "sortOrder": 5
+    },
+    {
+      "imageUrl": "/uploads/site/1783860625389-d927635e.jpg",
+      "caption": "",
+      "sortOrder": 6
+    },
+    {
+      "imageUrl": "/uploads/site/1783860630676-692bf105.jpg",
+      "caption": "",
+      "sortOrder": 7
+    },
+    {
+      "imageUrl": "/uploads/site/1783860635943-b0bd3314.jpg",
+      "caption": "",
+      "sortOrder": 8
+    },
+    {
+      "imageUrl": "/uploads/site/1783860640618-dbf69a52.jpg",
+      "caption": "",
+      "sortOrder": 9
+    },
+    {
+      "imageUrl": "/uploads/site/1783860644951-e8cbf053.jpg",
+      "caption": "",
+      "sortOrder": 10
+    }
+  ],
   "chatbot": {
     "title": "Quick Help",
     "greeting": "Hi. Ask me anything about rooms, prices, arrival, or booking.",
