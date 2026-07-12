@@ -1821,10 +1821,17 @@ function applySettings() {
   }
   document.title = `${state.settings.domain} | ${pageTitleForCurrentPage()}`;
 
+  if (dom.heroRoomCount) {
+    const maxRooms = Math.max(1, state.rooms.length);
+    dom.heroRoomCount.max = String(maxRooms);
+    if (Number(dom.heroRoomCount.value || 1) > maxRooms) {
+      dom.heroRoomCount.value = String(maxRooms);
+    }
+  }
+
   const heroImages = [
     ...(state.heroSlides || []).map((slide) => slide.image_url),
-    state.settings.hero_image,
-    ...state.rooms.map((room) => room.cover_image)
+    state.settings.hero_image
   ];
 
   setupHeroSlider(heroImages.filter(Boolean));
@@ -2210,13 +2217,15 @@ function configureHeroBookingShortcut() {
 
     const adults = Math.max(1, Number(dom.heroAdults.value || 1));
     const children = Math.max(0, Number(dom.heroChildren.value || 0));
+    const maxRooms = Math.max(1, state.rooms.length);
+    const roomCount = Math.min(maxRooms, Math.max(1, Number(dom.heroRoomCount.value || 1)));
     const params = new URLSearchParams();
 
     if (dom.heroCheckIn.value) params.set('checkIn', dom.heroCheckIn.value);
     if (dom.heroCheckOut.value) params.set('checkOut', dom.heroCheckOut.value);
     params.set('adults', String(adults));
     params.set('children', String(children));
-    params.set('rooms', String(Math.max(1, Number(dom.heroRoomCount.value || 1))));
+    params.set('rooms', String(roomCount));
     params.set('guests', String(adults + children));
 
     window.location.href = `/rooms?${params.toString()}#booking`;
