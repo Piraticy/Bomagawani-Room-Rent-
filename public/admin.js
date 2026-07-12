@@ -112,6 +112,48 @@ function escapeHtml(value) {
   }[char]));
 }
 
+function setupDropzone(dropzoneEl) {
+  if (!dropzoneEl) return;
+  const input = dropzoneEl.querySelector('input[type="file"]');
+  const filenameEl = dropzoneEl.querySelector('.dropzone-filename');
+  if (!input) return;
+
+  const updateFilename = () => {
+    if (filenameEl) filenameEl.textContent = input.files?.[0]?.name || '';
+  };
+  input.addEventListener('change', updateFilename);
+
+  ['dragenter', 'dragover'].forEach((eventName) => {
+    dropzoneEl.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      dropzoneEl.classList.add('is-dragover');
+    });
+  });
+
+  ['dragleave', 'dragend', 'drop'].forEach((eventName) => {
+    dropzoneEl.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      dropzoneEl.classList.remove('is-dragover');
+    });
+  });
+
+  dropzoneEl.addEventListener('drop', (event) => {
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    input.files = dataTransfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
+function setupStaticDropzones() {
+  document.querySelectorAll('.dropzone[data-dropzone]').forEach(setupDropzone);
+}
+
 const SESSION_EXEMPT_PATHS = new Set(['/api/admin/session', '/api/admin/login']);
 
 function handleSessionExpired() {
@@ -429,12 +471,20 @@ function addPageContentCard(page) {
     <div class="page-image-preview ${page.imageUrl || page.image_url ? 'has-image' : ''}">
       ${(page.imageUrl || page.image_url) ? `<img src="${escapeHtml(page.imageUrl || page.image_url)}" alt="${escapeHtml(pageLabel(page.slug))} feature preview" />` : '<span>No feature image yet</span>'}
     </div>
+    <div class="dropzone" data-dropzone>
+      <input type="file" accept="image/*" data-page-field="imageFile" class="dropzone-input" />
+      <div class="dropzone-content">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A5 5 0 0 1 6 5.3 6 6 0 0 1 17.7 7 4.5 4.5 0 0 1 18 16H7a3 3 0 0 1-3-3Z"/><path d="M12 12v6"/><path d="m9 15 3-3 3 3"/></svg>
+        <p><strong>Click to upload</strong> or drag and drop an image</p>
+        <small class="dropzone-filename"></small>
+      </div>
+    </div>
     <div class="action-row">
-      <input type="file" accept="image/*" data-page-field="imageFile" />
       <button class="ghost-btn" type="button" data-upload-page-image="${page.slug}">Upload Page Image</button>
     </div>
   `;
   card.appendChild(imageWrap);
+  setupDropzone(imageWrap.querySelector('[data-dropzone]'));
 
   const activeLabel = document.createElement('label');
   activeLabel.className = 'inline';
@@ -1117,4 +1167,5 @@ dom.saveChatbotFaqs.addEventListener('click', async () => {
   }
 });
 
+setupStaticDropzones();
 checkSessionAndInit();

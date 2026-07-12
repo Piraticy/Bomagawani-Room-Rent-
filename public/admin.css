@@ -312,6 +312,58 @@ select {
   padding: 12px;
 }
 
+.dropzone {
+  position: relative;
+  margin-top: 10px;
+  border: 2px dashed #c4d4ea;
+  border-radius: 14px;
+  padding: 22px 16px;
+  text-align: center;
+  background: #f7fbff;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.dropzone.is-dragover {
+  border-color: var(--primary);
+  background: rgba(18, 91, 102, 0.08);
+}
+
+.dropzone-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.dropzone-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.dropzone-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.dropzone-filename {
+  color: var(--muted);
+  font-weight: 700;
+  min-height: 1.1em;
+}
+
 .page-image-preview {
   min-height: 130px;
   margin-top: 10px;
