@@ -1,11 +1,11 @@
 {
-  "exportedAt": "2026-07-12T12:58:56.746Z",
+  "exportedAt": "2026-07-20T00:00:00.000Z",
   "siteSettings": {
     "siteName": "Bomagawani House Rent",
     "domain": "Bomagawani.com",
     "headline": "Bomagawani House Rent",
     "subheadline": "A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple booking.",
-    "aboutText": "Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.",
+    "aboutText": "Experience the unspoiled beauty of the Swahili Coast in northern Tanzania. Located directly on the Indian Ocean, a place of tranquility, warm hospitality, and unique natural beauty awaits you. Whether you're looking for a relaxing holiday, camping by the sea, or unforgettable discoveries – Bomagawani is your home away from home on the East African coast.",
     "address": "Kigombe, Tanga, Tanzania",
     "mapLink": "https://maps.app.goo.gl/vpY5krcPsqJaYbLR6",
     "contactPhone": "+255 756 906 006",
@@ -194,7 +194,7 @@
       "slug": "eat-sip",
       "navLabel": "Eat & Sip",
       "title": "Eat & Sip by the Coast",
-      "subtitle": "Coastal meals, fresh drinks, and food requests for guests and visitors.",
+      "subtitle": "Fresh ingredients, regional specialties, and warm hospitality make every meal a special experience. Look forward to freshly caught fish, tropical fruits, and lovingly prepared dishes in a relaxed atmosphere.",
       "body": "Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.",
       "highlights": [
         "Visitors can come just to eat, drink, or enjoy both together",
@@ -210,11 +210,11 @@
     {
       "slug": "property",
       "navLabel": "Bomagawani",
-      "title": "Bomagawani House For Sale",
-      "subtitle": "A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.",
-      "body": "Bomagawani is more than a place to stay. The house is also available for sale, with coastal character, practical services, shaded living, and easy access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.",
+      "title": "Bomagawani – The Exclusive Villa on the Indian Ocean",
+      "subtitle": "An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.",
+      "body": "Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.",
       "highlights": [
-        "House for sale - price on request",
+        "Traditional Afro-Arab architecture with modern comfort",
         "Private rooms and guest-ready layout",
         "Near Tanzania's northern Swahili Coast",
         "Viewing, photos, and video tour available on request"
@@ -228,8 +228,8 @@
       "slug": "about",
       "navLabel": "Contact",
       "title": "Contact Bomagawani",
-      "subtitle": "Ask about rooms, food, directions, or arrange a house viewing.",
-      "body": "Send a quick message and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.",
+      "subtitle": "We look forward to welcoming you to Bomagawani.",
+      "body": "We are happy to answer your questions and help you plan your stay. Contact us – we will assist you personally and easily with your booking.",
       "highlights": [
         "Room booking and arrival questions",
         "Food and drink requests",

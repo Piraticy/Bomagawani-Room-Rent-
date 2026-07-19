@@ -6,3 +6,4 @@ public/uploads/originals/*
 !public/uploads/originals/.gitkeep
 tmp-uploads
 .DS_Store
+.tunnel

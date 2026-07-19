@@ -9,7 +9,7 @@ const translations = {
     'nav.eatSip': 'Eat & Sip',
     'nav.bomagawani': 'Bomagawani',
     'nav.contact': 'Contact',
-    'home.heroKicker': 'Private Coastal Stay • Swahili Coast',
+    'home.heroKicker': 'Welcome to Bomagawani – Holiday & Adventure at the Swahili Coast.',
     'home.viewRooms': 'View Rooms',
     'home.exploreHouse': 'Explore the house',
     'home.welcome': 'Welcome',
@@ -28,15 +28,15 @@ const translations = {
     'shortcut.stay': 'Stay',
     'shortcut.taste': 'Taste',
     'shortcut.discover': 'Discover',
-    'shortcut.roomsText': 'Private rooms with photos, prices, amenities, and direct booking.',
+    'shortcut.roomsText': 'Private rooms with photos, amenities, and direct booking.',
     'shortcut.roomsAction': 'Explore rooms',
     'shortcut.eatText': 'Fresh coastal foods, drinks, and meal preparation for your stay.',
     'shortcut.eatAction': 'View menu story',
     'shortcut.houseText': 'See the house details, location, and guest support.',
     'shortcut.houseAction': 'See details',
     'footer.tagline': 'Coastal stays, fresh flavors, easy booking.',
-    'property.bookViewing': 'Book a Viewing',
-    'property.requestPrice': 'Request price',
+    'property.bookViewing': 'Book Viewing',
+    'property.requestPrice': 'Request Price',
     'property.zoomHint': 'Tap to enlarge',
     'hero.roomsLabel': 'Ready to book',
     'hero.supportLabel': 'Guest support',
@@ -61,7 +61,6 @@ const translations = {
     'form.currency': 'Currency',
     'form.paymentOption': 'Payment option',
     'form.payOnArrival': 'Pay on arrival',
-    'form.payOnlineLater': 'Pay online later',
     'form.fullName': 'Full name',
     'form.email': 'Email',
     'form.phone': 'Phone',
@@ -78,14 +77,14 @@ const translations = {
     'chatbot.answerPlaceholder': 'Tap a question to get a quick answer.',
     'chatbot.toggle': 'Chat',
     'chatbot.whatsapp': 'Chat on WhatsApp',
-    'quote.empty': 'Enter dates to see your price estimate.',
-    'quote.loading': 'Calculating quote...',
+    'quote.empty': 'Enter dates to check availability.',
+    'quote.loading': 'Checking availability...',
     'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
     'quote.conflictNextAvailable': 'This room is booked for those dates. It is next available from {date}.',
-    'quote.unavailable': 'Could not get quote.',
-    'quote.serviceDown': 'Quote service unavailable. Try again.',
-    'quote.nights': '{nights} night(s) x {price}',
-    'quote.total': 'Total: {total}',
+    'quote.unavailable': 'Could not check availability.',
+    'quote.serviceDown': 'Availability service unavailable. Try again.',
+    'quote.nights': '{nights} night(s) selected',
+    'quote.priceOnRequest': "We'll confirm your total price directly.",
     'status.checkQuoteFirst': 'Please check dates and quote first.',
     'status.submittingBooking': 'Submitting booking request...',
     'status.bookingFailed': 'Booking failed.',
@@ -130,7 +129,7 @@ const translations = {
     'nav.eatSip': 'Essen & Trinken',
     'nav.bomagawani': 'Bomagawani',
     'nav.contact': 'Kontakt',
-    'home.heroKicker': 'Privater Küstenaufenthalt • Swahili-Küste',
+    'home.heroKicker': 'Willkommen bei Bomagawani – Urlaub & Abenteuer an der Swahili-Küste.',
     'home.viewRooms': 'Zimmer ansehen',
     'home.exploreHouse': 'Haus entdecken',
     'home.welcome': 'Willkommen',
@@ -149,7 +148,6 @@ const translations = {
     'form.currency': 'Währung',
     'form.paymentOption': 'Zahlungsart',
     'form.payOnArrival': 'Bei Ankunft bezahlen',
-    'form.payOnlineLater': 'Später online bezahlen',
     'form.fullName': 'Vollständiger Name',
     'form.email': 'E-Mail',
     'form.phone': 'Telefon',
@@ -163,7 +161,7 @@ const translations = {
     'shortcut.stay': 'Wohnen',
     'shortcut.taste': 'Genießen',
     'shortcut.discover': 'Entdecken',
-    'shortcut.roomsText': 'Private Zimmer mit Fotos, Preisen, Ausstattung und direkter Buchung.',
+    'shortcut.roomsText': 'Private Zimmer mit Fotos, Ausstattung und direkter Buchung.',
     'shortcut.roomsAction': 'Zimmer entdecken',
     'shortcut.eatText': 'Frische Küstengerichte, Getränke und Mahlzeiten nach Wunsch.',
     'shortcut.eatAction': 'Speisen ansehen',
@@ -189,14 +187,14 @@ const translations = {
     'chatbot.answerPlaceholder': 'Tippen Sie auf eine Frage für eine schnelle Antwort.',
     'chatbot.toggle': 'Chat',
     'chatbot.whatsapp': 'Auf WhatsApp schreiben',
-    'quote.empty': 'Reisedaten eingeben, um den Preis zu sehen.',
-    'quote.loading': 'Preis wird berechnet...',
+    'quote.empty': 'Reisedaten eingeben, um die Verfügbarkeit zu prüfen.',
+    'quote.loading': 'Verfügbarkeit wird geprüft...',
     'quote.conflict': 'Diese Daten sind für dieses Zimmer bereits bestätigt. Bitte wählen Sie andere Daten.',
     'quote.conflictNextAvailable': 'Dieses Zimmer ist für diese Daten gebucht. Nächste Verfügbarkeit ab {date}.',
-    'quote.unavailable': 'Preis konnte nicht geladen werden.',
-    'quote.serviceDown': 'Preisservice nicht erreichbar. Bitte erneut versuchen.',
-    'quote.nights': '{nights} Nacht/Nächte x {price}',
-    'quote.total': 'Gesamt: {total}',
+    'quote.unavailable': 'Verfügbarkeit konnte nicht geprüft werden.',
+    'quote.serviceDown': 'Verfügbarkeitsservice nicht erreichbar. Bitte erneut versuchen.',
+    'quote.nights': '{nights} Nacht/Nächte ausgewählt',
+    'quote.priceOnRequest': 'Wir bestätigen Ihnen den Gesamtpreis direkt.',
     'status.checkQuoteFirst': 'Bitte zuerst Daten und Preis prüfen.',
     'status.submittingBooking': 'Buchungsanfrage wird gesendet...',
     'status.bookingFailed': 'Buchung fehlgeschlagen.',
@@ -304,8 +302,7 @@ const copyTranslations = {
     'Bomagawani House Rent': 'Bomagawani Hausvermietung',
     'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.': 'Ein ruhiger Rückzugsort in Kigombe mit privaten Zimmern, frischen lokalen Mahlzeiten, schattiger Veranda und einfacher Direktbuchung.',
     'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple booking.': 'Ein ruhiger Rückzugsort in Kigombe mit privaten Zimmern, frischen lokalen Mahlzeiten, schattiger Veranda und einfacher Buchung.',
-    'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.': 'Bomagawani House Rent verbindet private Zimmer, herzliche lokale Betreuung, Küstengerichte und klare Direktbuchung für Gäste in Kigombe an Tansanias nördlicher Swahili-Küste.',
-    'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.': 'Bomagawani House Rent verbindet private Zimmer, herzliche lokale Betreuung, Küstengerichte und klare Buchungsdetails für Gäste in Kigombe an Tansanias nördlicher Swahili-Küste.',
+    'Experience the unspoiled beauty of the Swahili Coast in northern Tanzania. Located directly on the Indian Ocean, a place of tranquility, warm hospitality, and unique natural beauty awaits you. Whether you\'re looking for a relaxing holiday, camping by the sea, or unforgettable discoveries – Bomagawani is your home away from home on the East African coast.': 'Erleben Sie die unberührte Schönheit der Swahili-Küste im Norden Tansanias. Direkt am Indischen Ozean gelegen, erwartet Sie ein Ort der Ruhe, herzlicher Gastfreundschaft und einzigartiger Naturschönheit. Ob entspannter Urlaub, Camping am Meer oder unvergessliche Entdeckungen – Bomagawani ist Ihr Zuhause fernab der Heimat an der ostafrikanischen Küste.',
     'Our Rooms': 'Unsere Zimmer',
     'Master Bedroom': 'Master-Schlafzimmer',
     'Guest Room': 'Gästezimmer',
@@ -344,12 +341,10 @@ const copyTranslations = {
     'Garden with trees and coastal view': 'Garten mit Bäumen und Küstenblick',
     'Green garden path around the property': 'Grüner Gartenweg rund um das Grundstück',
     'Nearby coast sunset view': 'Sonnenuntergang an der nahen Küste',
-    'Bomagawani House For Sale': 'Bomagawani-Haus zu verkaufen',
-    'A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.': 'Ein Küstenobjekt in Kigombe mit privaten Zimmern, gastfertigem Wohnen und Besichtigung für Käufer.',
-    'Bomagawani is more than a room-rent stay. The house is also available for sale, with coastal character, practical services, shaded living, and access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.': 'Bomagawani ist mehr als eine Zimmervermietung. Das Haus steht auch zum Verkauf und bietet Küstencharakter, praktische Versorgung, schattige Wohnbereiche und Zugang zur Region Tanga. Käufer können vor dem Besuch vollständige Details, Fotos, Videos und einen Besichtigungstermin anfordern.',
-    'Bomagawani is more than a place to stay. The house is also available for sale, with coastal character, practical services, shaded living, and easy access to the Tanga area. Buyers can request the full details, photos, videos, and a viewing appointment before visiting.': 'Bomagawani ist mehr als ein Ort zum Übernachten. Das Haus steht auch zum Verkauf und bietet Küstencharakter, praktische Versorgung, schattige Wohnbereiche und einen einfachen Zugang zur Region Tanga. Käufer können vor dem Besuch vollständige Details, Fotos, Videos und einen Besichtigungstermin anfordern.',
-    'House for sale - price on request': 'Haus zu verkaufen – Preis auf Anfrage',
-    'House for sale – price on request': 'Haus zu verkaufen – Preis auf Anfrage',
+    'Bomagawani – The Exclusive Villa on the Indian Ocean': 'Bomagawani – Die exklusive Villa am Indischen Ozean',
+    'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.': 'Eine außergewöhnliche Villa in atemberaubender Lage erwartet Sie direkt an der Swahili-Küste. Umgeben von tropischer Natur und dem türkisfarbenen Wasser des Indischen Ozeans, verbindet sie traditionelle Architektur mit modernem Komfort – ein Ort der Ruhe, Entspannung und unvergesslicher Momente.',
+    'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.': 'Bomagawani entstand aus einem gemeinsamen Traum von Eva und Hermann. Mit großer Leidenschaft, persönlichem Einsatz und echter Gastfreundschaft haben wir einen Ort geschaffen, an dem sich Gäste aus aller Welt willkommen und zu Hause fühlen.',
+    'Traditional Afro-Arab architecture with modern comfort': 'Traditionelle afro-arabische Architektur mit modernem Komfort',
     'Key details from the property notes are kept simple here so buyers can understand the house quickly.': 'Die wichtigsten Details aus den Objektnotizen sind hier einfach gehalten, damit Käufer das Haus schnell verstehen.',
     'Property Notes': 'Objektnotizen',
     'A coastal home shaped by nature, shade, and slow living.': 'Ein Küstenhaus geprägt von Natur, Schatten und ruhigem Leben.',
@@ -391,8 +386,7 @@ const copyTranslations = {
     'Food Booking': 'Essen buchen',
     'Tell us what you want to eat or drink.': 'Sagen Sie uns, was Sie essen oder trinken möchten.',
     'Send a request for dine-in food, guest meals, drinks, or a small group plan. We will confirm what is available and the best preparation time.': 'Senden Sie eine Anfrage für Essen vor Ort, Gästemahlzeiten, Getränke oder eine kleine Gruppe. Wir bestätigen Verfügbarkeit und passende Vorbereitungszeit.',
-    'Coastal meals, fresh drinks, and on-request food booking for guests and visitors.': 'Küstenmahlzeiten, frische Getränke und Essensanfragen für Gäste und Besucher.',
-    'Coastal meals, fresh drinks, and food requests for guests and visitors.': 'Küstenmahlzeiten, frische Getränke und Essensanfragen für Gäste und Besucher.',
+    'Fresh ingredients, regional specialties, and warm hospitality make every meal a special experience. Look forward to freshly caught fish, tropical fruits, and lovingly prepared dishes in a relaxed atmosphere.': 'Frische Zutaten, regionale Spezialitäten und herzliche Gastfreundschaft machen jede Mahlzeit zu einem besonderen Erlebnis. Freuen Sie sich auf frisch gefangenen Fisch, tropische Früchte und liebevoll zubereitete Gerichte in entspannter Atmosphäre.',
     'Eat & Sip is for house guests and visitors who want simple coastal food, fresh drinks, or both together. Come for a meal, arrange breakfast, request lunch or dinner, or ask for a small food plan prepared around available local ingredients.': 'Eat & Sip ist für Hausgäste und Besucher gedacht, die einfache Küstenküche, frische Getränke oder beides zusammen genießen möchten. Kommen Sie zum Essen, vereinbaren Sie Frühstück, fragen Sie Mittag- oder Abendessen an oder bitten Sie um einen kleinen Speiseplan nach verfügbaren lokalen Zutaten.',
     'Visitors can come just to eat, drink, or enjoy both together': 'Besucher können einfach nur zum Essen, Trinken oder für beides zusammen kommen',
     'On-request breakfast, lunch, dinner, and small group meals': 'Frühstück, Mittagessen, Abendessen und kleine Gruppenmahlzeiten auf Anfrage',
@@ -416,11 +410,8 @@ const copyTranslations = {
     'Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access.': 'Tanga ist etwa 30 km entfernt und bietet Märkte, frische Produkte, Banken, Ärzte, Einkaufsmöglichkeiten, Flughafen und Hafen.',
     'Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.': 'Die Objektnotizen erwähnen Stromunterstützung, Brunnenwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
     'Contact Bomagawani': 'Bomagawani kontaktieren',
-    'Reach us for room bookings, food requests, directions, and guest support.': 'Kontaktieren Sie uns für Zimmerbuchungen, Essensanfragen, Wegbeschreibung und Gästeservice.',
-    'Ask about rooms, food, directions, or arrange a house-sale viewing.': 'Fragen Sie nach Zimmern, Essen, Wegbeschreibung oder vereinbaren Sie eine Hausbesichtigung zum Kauf.',
-    'Send a quick inquiry and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.': 'Senden Sie eine kurze Anfrage und sagen Sie uns, was Sie brauchen: eine Zimmerbuchung, Essen und Getränke, Wegbeschreibung oder einen Termin zur Hausbesichtigung.',
-    'Ask about rooms, food, directions, or arrange a house viewing.': 'Fragen Sie nach Zimmern, Essen, Wegbeschreibung oder vereinbaren Sie eine Hausbesichtigung.',
-    'Send a quick message and tell us what you need: a room booking, food and drinks, directions, or a time to view the house for sale.': 'Senden Sie eine kurze Nachricht und sagen Sie uns, was Sie brauchen: eine Zimmerbuchung, Essen und Getränke, Wegbeschreibung oder einen Termin zur Hausbesichtigung.',
+    'We look forward to welcoming you to Bomagawani.': 'Wir freuen uns, Sie in Bomagawani willkommen zu heißen.',
+    'We are happy to answer your questions and help you plan your stay. Contact us – we will assist you personally and easily with your booking.': 'Wir beantworten gerne Ihre Fragen und helfen Ihnen bei der Planung Ihres Aufenthalts. Kontaktieren Sie uns – wir unterstützen Sie persönlich und unkompliziert bei Ihrer Buchung.',
     'Best for quick inquiry': 'Ideal für schnelle Anfragen',
     'Rooms, food, directions, or house viewing.': 'Zimmer, Essen, Wegbeschreibung oder Hausbesichtigung.',
     'Tell us what you need and when you plan to visit.': 'Sagen Sie uns, was Sie brauchen und wann Sie kommen möchten.',
@@ -443,7 +434,7 @@ const copyTranslations = {
     'Submit your booking request and our team will confirm quickly. You get a booking code instantly.': 'Senden Sie Ihre Buchungsanfrage, und unser Team bestätigt schnell. Sie erhalten sofort eine Buchungsreferenz.',
     'Submit your booking request and our team will confirm quickly. You receive a booking reference right away.': 'Senden Sie Ihre Buchungsanfrage, und unser Team bestätigt schnell. Sie erhalten sofort eine Buchungsreferenz.',
     'Hello Bomagawani, I need help with booking.': 'Hallo Bomagawani, ich brauche Hilfe bei einer Buchung.',
-    'Enter dates to see your live quote.': 'Reisedaten eingeben, um den Live-Preis zu sehen.',
+    'Enter dates to check availability.': 'Reisedaten eingeben, um die Verfügbarkeit zu prüfen.',
     'Loading country codes...': 'Ländervorwahlen werden geladen...',
     'Book Direct': 'Direkt buchen',
     'Booking.com': 'Booking.com',
@@ -733,11 +724,6 @@ function applyCopyTranslations() {
     const core = original.trim();
     node.nodeValue = `${leading}${translateCopy(core)}${trailing}`;
   }
-}
-
-function displayPriceFromUsd(value, currency = currentCurrency()) {
-  const rate = state.exchangeRates[currency] || fallbackExchangeRates[currency] || 1;
-  return Number(value || 0) * rate;
 }
 
 async function loadExchangeRate(currency = currentCurrency()) {
@@ -1181,18 +1167,6 @@ function selectBookingRangeDate(dateString) {
   setTimeout(hideBookingDateRangePicker, 120);
 }
 
-function formatAmount(value, currency) {
-  try {
-    return new Intl.NumberFormat(currentLocale(), {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 2
-    }).format(value);
-  } catch (error) {
-    return `${Number(value).toFixed(2)} ${currency}`;
-  }
-}
-
 function isDateRangeAvailable(roomId, checkIn, checkOut) {
   const room = state.rooms.find((item) => item.id === Number(roomId));
   if (!room || !checkIn || !checkOut) return true;
@@ -1444,7 +1418,6 @@ function renderRooms() {
   const previouslySelectedRoomId = dom.roomSelect.value;
   dom.roomsGrid.innerHTML = '';
   dom.roomSelect.innerHTML = '';
-  const preferredCurrency = selectedCurrency();
 
   state.rooms.forEach((room) => {
     const gallery = [room.cover_image, ...(room.images || []).map((image) => image.image_url)].filter(Boolean);
@@ -1508,7 +1481,6 @@ function renderRooms() {
         <p class="room-kicker">${translateCopy('Private coastal room')}</p>
         <div class="room-top">
           <h3>${translateCopy(room.name)}</h3>
-          <strong><span>${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}</span><small>${state.language === 'de' ? '/ Nacht' : '/ night'}</small></strong>
         </div>
         <p>${translateCopy(room.short_description)}</p>
         <div class="room-badges">${badges.join('')}</div>
@@ -1524,7 +1496,7 @@ function renderRooms() {
 
     const option = document.createElement('option');
     option.value = String(room.id);
-    option.textContent = `${translateCopy(room.name)} - ${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}${state.language === 'de' ? '/Nacht' : '/night'}`;
+    option.textContent = translateCopy(room.name);
     dom.roomSelect.appendChild(option);
   });
 
@@ -1722,7 +1694,7 @@ function renderPageContent() {
     setText(dom.propertyBody, translateCopy(property.body));
     renderIconHighlights(dom.propertyHighlights, translateList(property.highlights || []), property.icon);
     const priceHighlight = (property.highlights || []).find((item) => /price|usd|tzs|\$|sale/i.test(item));
-    if (priceHighlight) {
+    if (priceHighlight && dom.propertySalePrice) {
       dom.propertySalePrice.textContent = translateCopy(priceHighlight);
     }
     updateMenuLabel('[data-page-link="bomagawani"]', translateCopy(property.nav_label));
@@ -1795,8 +1767,8 @@ function applySettings() {
   dom.subheadline.textContent = translateCopy(state.settings.subheadline);
   dom.aboutText.textContent = translateCopy(state.settings.about_text);
   setFooterYear();
-  dom.locationLine.textContent = state.settings.address;
-  dom.mapLink.href = state.settings.map_link;
+  if (dom.locationLine) dom.locationLine.textContent = state.settings.address;
+  if (dom.mapLink) dom.mapLink.href = state.settings.map_link;
   dom.contactPhoneLink.href = `tel:${String(state.settings.contact_phone || '').replace(/[^\d+]/g, '')}`;
   dom.contactEmailLink.href = `mailto:${state.settings.contact_email || ''}`;
   dom.contactWhatsappLink.href = buildWhatsAppLink(
@@ -1811,7 +1783,7 @@ function applySettings() {
   dom.footerEmailLink.textContent = state.settings.contact_email || 'Email';
   dom.footerMapLink.href = state.settings.map_link;
 
-  dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&output=embed`;
+  if (dom.mapEmbed) dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&output=embed`;
 
   if (dom.statRooms) {
     dom.statRooms.textContent = `${state.rooms.length} ${t('nav.rooms')}`;
@@ -1902,9 +1874,7 @@ function updateStructuredData() {
         '@type': 'Room',
         name: room.name,
         description: room.short_description
-      },
-      priceCurrency: 'USD',
-      price: room.price_per_night_usd
+      }
     }))
   };
 
@@ -1919,8 +1889,8 @@ function renderQuote(quote) {
 
   dom.quoteBox.innerHTML = `
     <strong>${quote.roomName}</strong><br/>
-    ${t('quote.nights', { nights: quote.nights, price: formatAmount(quote.pricePerNightUsd, 'USD') })}<br/>
-    <strong>${t('quote.total', { total: formatAmount(quote.totalInCurrency, quote.currency) })}</strong>
+    ${t('quote.nights', { nights: quote.nights })}<br/>
+    <em>${t('quote.priceOnRequest')}</em>
   `;
 }
 
@@ -2274,6 +2244,7 @@ function configurePhoneInput() {
 }
 
 function configureLocationRoute() {
+  if (!dom.useLocation) return;
   dom.useLocation.addEventListener('click', () => {
     if (!navigator.geolocation) {
       dom.locationStatus.textContent = t('location.noSupport');

@@ -472,7 +472,7 @@ function seedContentPages() {
       slug: 'eat-sip',
       nav_label: 'Eat & Sip',
       title: 'Eat & Sip by the Coast',
-      subtitle: 'Fresh coastal foods, cool drinks, and flavors prepared with local care.',
+      subtitle: 'Fresh ingredients, regional specialties, and warm hospitality make every meal a special experience. Look forward to freshly caught fish, tropical fruits, and lovingly prepared dishes in a relaxed atmosphere.',
       body: 'Enjoy delicious coastal meals inspired by Tanga flavors: seafood, rice dishes, grilled bites, fresh fruit, tropical juices, tea, coffee, and relaxed evening drinks. The experience is warm, simple, and made for guests who want to taste the place they are staying in.',
       highlights: [
         'Fresh seafood and coastal home-style cooking',
@@ -551,7 +551,7 @@ if (!settingsCount) {
     domain: 'Bomagawani.com',
     headline: 'Bomagawani House Rent',
     subheadline: 'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.',
-    about_text: 'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.',
+    about_text: 'Experience the unspoiled beauty of the Swahili Coast in northern Tanzania. Located directly on the Indian Ocean, a place of tranquility, warm hospitality, and unique natural beauty awaits you. Whether you\'re looking for a relaxing holiday, camping by the sea, or unforgettable discoveries – Bomagawani is your home away from home on the East African coast.',
     address: 'Kigombe, Tanga, Tanzania',
     map_link: 'https://maps.app.goo.gl/vpY5krcPsqJaYbLR6',
     contact_phone: '+255 756 906 006',
@@ -595,6 +595,21 @@ if (
   });
 }
 
+const eatSipSubtitle = db.prepare("SELECT subtitle FROM content_pages WHERE slug = 'eat-sip'").get();
+if (
+  eatSipSubtitle?.subtitle === 'Coastal meals, fresh drinks, and on-request food booking for guests and visitors.' ||
+  eatSipSubtitle?.subtitle === 'Coastal meals, fresh drinks, and food requests for guests and visitors.'
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET subtitle = ?,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'eat-sip'`
+  ).run(
+    'Fresh ingredients, regional specialties, and warm hospitality make every meal a special experience. Look forward to freshly caught fish, tropical fruits, and lovingly prepared dishes in a relaxed atmosphere.'
+  );
+}
+
 const propertyPage = db.prepare("SELECT title, body FROM content_pages WHERE slug = 'property'").get();
 if (
   propertyPage?.title === 'Bomagawani House Details' &&
@@ -622,6 +637,33 @@ if (
     ]),
     image_url: '/uploads/property/property-house-front.webp',
     icon: 'home'
+  });
+}
+
+const propertyStoryPage = db.prepare("SELECT title, subtitle FROM content_pages WHERE slug = 'property'").get();
+if (
+  propertyStoryPage?.title === 'Bomagawani House For Sale' &&
+  (propertyStoryPage?.subtitle === 'A coastal Kigombe property with private rooms, guest-ready living, and buyer viewing available.' ||
+    propertyStoryPage?.subtitle === 'A coastal house-rent stay designed for comfort, privacy, and easy hosting.')
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET title = @title,
+         subtitle = @subtitle,
+         body = @body,
+         highlights_json = @highlights_json,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'property'`
+  ).run({
+    title: 'Bomagawani – The Exclusive Villa on the Indian Ocean',
+    subtitle: 'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.',
+    body: 'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.',
+    highlights_json: JSON.stringify([
+      'Traditional Afro-Arab architecture with modern comfort',
+      'Private rooms and guest-ready layout',
+      'Near Tanzania’s northern Swahili Coast',
+      'Viewing, photos, and video tour available on request'
+    ])
   });
 }
 
@@ -676,6 +718,21 @@ if (
   );
 }
 
+const currentAboutText = db.prepare('SELECT about_text FROM site_settings WHERE id = 1').get();
+if (
+  currentAboutText?.about_text === 'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear direct booking for guests visiting Kigombe on Tanzania’s northern Swahili Coast.' ||
+  currentAboutText?.about_text === 'Bomagawani House Rent combines private rooms, warm local hosting, coastal meals, and clear booking details for guests visiting Kigombe on Tanzania’s northern Swahili Coast.'
+) {
+  db.prepare(
+    `UPDATE site_settings
+     SET about_text = ?,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE id = 1`
+  ).run(
+    'Experience the unspoiled beauty of the Swahili Coast in northern Tanzania. Located directly on the Indian Ocean, a place of tranquility, warm hospitality, and unique natural beauty awaits you. Whether you\'re looking for a relaxing holiday, camping by the sea, or unforgettable discoveries – Bomagawani is your home away from home on the East African coast.'
+  );
+}
+
 const contactPage = db.prepare("SELECT nav_label, title FROM content_pages WHERE slug = 'about'").get();
 if (contactPage?.nav_label === 'About Us' && contactPage?.title === 'About Bomagawani') {
   db.prepare(
@@ -701,6 +758,26 @@ if (contactPage?.nav_label === 'About Us' && contactPage?.title === 'About Bomag
     ]),
     icon: 'phone-call'
   });
+}
+
+const contactIntro = db.prepare("SELECT subtitle, body FROM content_pages WHERE slug = 'about'").get();
+if (
+  [
+    'Ask about rooms, food, directions, or arrange a house viewing.',
+    'Ask about rooms, food, directions, or arrange a house-sale viewing.',
+    'Reach us for room bookings, food requests, directions, and guest support.'
+  ].includes(contactIntro?.subtitle)
+) {
+  db.prepare(
+    `UPDATE content_pages
+     SET subtitle = ?,
+         body = ?,
+         updated_at = CURRENT_TIMESTAMP
+     WHERE slug = 'about'`
+  ).run(
+    'We look forward to welcoming you to Bomagawani.',
+    'We are happy to answer your questions and help you plan your stay. Contact us – we will assist you personally and easily with your booking.'
+  );
 }
 
 const roomsCount = db.prepare('SELECT COUNT(*) AS count FROM rooms').get().count;

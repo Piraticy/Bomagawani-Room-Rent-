@@ -653,7 +653,7 @@ app.get('/receipt/:code', (req, res) => {
             <div><div class="label">Payment Status</div><div class="value">${escapeHtml(booking.payment_status)}</div></div>
           </div>
 
-          <div class="amount">Total: ${escapeHtml(booking.total_in_currency)} ${escapeHtml(booking.currency_code)}</div>
+          <div class="amount">Your total price will be confirmed with you directly.</div>
           <div class="footer">Generated on ${new Date().toISOString().slice(0, 10)} | Domain: ${escapeHtml(settings.domain)}</div>
         </div>
       </body>
