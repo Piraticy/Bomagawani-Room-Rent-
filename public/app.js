@@ -345,6 +345,19 @@ const copyTranslations = {
     'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.': 'Eine außergewöhnliche Villa in atemberaubender Lage erwartet Sie direkt an der Swahili-Küste. Umgeben von tropischer Natur und dem türkisfarbenen Wasser des Indischen Ozeans, verbindet sie traditionelle Architektur mit modernem Komfort – ein Ort der Ruhe, Entspannung und unvergesslicher Momente.',
     'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.': 'Bomagawani entstand aus einem gemeinsamen Traum von Eva und Hermann. Mit großer Leidenschaft, persönlichem Einsatz und echter Gastfreundschaft haben wir einen Ort geschaffen, an dem sich Gäste aus aller Welt willkommen und zu Hause fühlen.',
     'Traditional Afro-Arab architecture with modern comfort': 'Traditionelle afro-arabische Architektur mit modernem Komfort',
+    'Private rooms and guest-ready layout': 'Private Zimmer und gastfertiger Grundriss',
+    'Near Tanzania’s northern Swahili Coast': 'In der Nähe von Tansanias nördlicher Swahili-Küste',
+    "Near Tanzania's northern Swahili Coast": 'In der Nähe von Tansanias nördlicher Swahili-Küste',
+    'Viewing, photos, and video tour available on request': 'Besichtigung, Fotos und Videotour auf Anfrage verfügbar',
+    'Excursions': 'Ausflüge',
+    'Kigombe – Excursions & Experiences': 'Kigombe – Ausflüge & Erlebnisse',
+    'Discover the fascinating diversity of the Kigombe region. Dreamlike beaches, mangroves, traditional fishing villages, the Coelacanth Marine Park, and many other destinations will make your stay an unforgettable experience.': 'Entdecken Sie die faszinierende Vielfalt der Region Kigombe. Traumhafte Strände, Mangroven, traditionelle Fischerdörfer, der Coelacanth-Meerespark und viele weitere Ziele machen Ihren Aufenthalt zu einem unvergesslichen Erlebnis.',
+    'Comfort & Style': 'Komfort & Stil',
+    'Enjoy your stay in our comfortable rooms furnished in a traditional Afro-Arab style. Spacious rooms, shaded verandas, and the peaceful location create the ideal setting for relaxing days on the Indian Ocean.': 'Genießen Sie Ihren Aufenthalt in unseren komfortablen Zimmern im traditionellen afro-arabischen Stil. Geräumige Zimmer, schattige Veranden und die ruhige Lage schaffen den idealen Rahmen für erholsame Tage am Indischen Ozean.',
+    'Bomagawani For Sale': 'Bomagawani zu verkaufen',
+    "After many years of passionately building and developing Bomagawani, Hermann has decided that it is time to enjoy more personal freedom and pursue new plans for the future. For this reason, this exceptional villa on Tanzania's beautiful Swahili Coast is now offered for sale.": 'Nach vielen Jahren leidenschaftlichen Aufbaus und der Weiterentwicklung von Bomagawani hat Hermann entschieden, dass es Zeit ist, mehr persönliche Freiheit zu genießen und neue Zukunftspläne zu verfolgen. Aus diesem Grund wird diese außergewöhnliche Villa an Tansanias wunderschöner Swahili-Küste nun zum Verkauf angeboten.',
+    'Built to a high standard of quality, the villa combines spacious living with the unique atmosphere of the Indian Ocean. It is the perfect home for those seeking peace, nature, and the relaxed lifestyle that makes the Swahili Coast such a special place to live.': 'Mit hohem Qualitätsstandard erbaut, verbindet die Villa großzügiges Wohnen mit der einzigartigen Atmosphäre des Indischen Ozeans. Sie ist das perfekte Zuhause für alle, die Ruhe, Natur und den entspannten Lebensstil suchen, der die Swahili-Küste zu einem so besonderen Ort zum Leben macht.',
+    'If you are interested in this unique property, Hermann or Eva will be delighted to provide you with further information and arrange a personal viewing. The asking price is negotiable.': 'Wenn Sie an dieser einzigartigen Immobilie interessiert sind, geben Ihnen Hermann oder Eva gerne weitere Informationen und vereinbaren eine persönliche Besichtigung. Der Verkaufspreis ist verhandelbar.',
     'Key details from the property notes are kept simple here so buyers can understand the house quickly.': 'Die wichtigsten Details aus den Objektnotizen sind hier einfach gehalten, damit Käufer das Haus schnell verstehen.',
     'Property Notes': 'Objektnotizen',
     'A coastal home shaped by nature, shade, and slow living.': 'Ein Küstenhaus geprägt von Natur, Schatten und ruhigem Leben.',
@@ -485,6 +498,7 @@ const dom = {
   subheadline: document.getElementById('subheadline'),
   aboutText: document.getElementById('about-text'),
   footerText: document.getElementById('footer-text'),
+  footerCopyright: document.getElementById('footer-copyright'),
   mapLink: document.getElementById('map-link'),
   mapEmbed: document.getElementById('map-embed'),
   locationLine: document.getElementById('location-line'),
@@ -696,6 +710,16 @@ function translateCopy(value) {
   return copyTranslations[state.language]?.[text] || text;
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
 function translateList(items = []) {
   return items.map((item) => translateCopy(item));
 }
@@ -814,7 +838,9 @@ async function loadPhoneCountries() {
 }
 
 function setFooterYear() {
-  dom.footerText.textContent = `Bomagawani ${new Date().getFullYear()}`;
+  const year = new Date().getFullYear();
+  dom.footerText.textContent = `Bomagawani ${year}`;
+  if (dom.footerCopyright) dom.footerCopyright.textContent = `© ${year} Bomagawani.com. All rights reserved.`;
 }
 
 function applyTranslations() {
@@ -1183,7 +1209,7 @@ function setupHeroSlider(images) {
     .map(
       (src, index) => `
       <div class="hero-slide ${index === 0 ? 'is-active' : ''}">
-        <img src="${src}" alt="Bomagawani hero slide" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" />
+        <img src="${escapeHtml(src)}" alt="Bomagawani hero slide" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `
     )
@@ -1326,7 +1352,7 @@ function renderLinks() {
       top.href = link.url;
       top.target = '_blank';
       top.rel = 'noreferrer';
-      top.innerHTML = `<i data-lucide="${icon}"></i> ${link.platform_name}`;
+      top.innerHTML = `<i data-lucide="${escapeHtml(icon)}"></i> ${escapeHtml(link.platform_name)}`;
       dom.platformLinks.appendChild(top);
     }
 
@@ -1335,7 +1361,7 @@ function renderLinks() {
     channel.className = 'channel-item';
     channel.target = '_blank';
     channel.rel = 'noreferrer';
-    channel.innerHTML = `<span><i data-lucide="${icon}"></i> ${link.platform_name}</span><i data-lucide="external-link"></i>`;
+    channel.innerHTML = `<span><i data-lucide="${escapeHtml(icon)}"></i> ${escapeHtml(link.platform_name)}</span><i data-lucide="external-link"></i>`;
     dom.channelList.appendChild(channel);
   });
 }
@@ -1440,7 +1466,7 @@ function renderRooms() {
 
     const slidesHtml = imageSources
       .map(
-        (src, index) => `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${src}" alt="${room.name}" loading="lazy" decoding="async" />`
+        (src, index) => `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${escapeHtml(src)}" alt="${escapeHtml(room.name)}" loading="lazy" decoding="async" />`
       )
       .join('');
 
@@ -1448,8 +1474,8 @@ function renderRooms() {
       .slice(0, 5)
       .map(
         (src, index) => `
-          <button class="room-thumb ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="${room.name} photo ${index + 1}">
-            <img src="${src}" alt="" loading="lazy" decoding="async" />
+          <button class="room-thumb ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="${escapeHtml(room.name)} photo ${index + 1}">
+            <img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" />
           </button>
         `
       )
@@ -1464,7 +1490,7 @@ function renderRooms() {
 
     const amenityHighlights = (room.amenities || [])
       .slice(0, 4)
-      .map((amenity) => `<span><i data-lucide="${amenityIconMap[amenity.icon] || 'check'}"></i>${translateCopy(amenity.label)}</span>`)
+      .map((amenity) => `<span><i data-lucide="${amenityIconMap[amenity.icon] || 'check'}"></i>${escapeHtml(translateCopy(amenity.label))}</span>`)
       .join('');
 
     const card = document.createElement('article');
@@ -1480,9 +1506,9 @@ function renderRooms() {
       <div class="room-content">
         <p class="room-kicker">${translateCopy('Private coastal room')}</p>
         <div class="room-top">
-          <h3>${translateCopy(room.name)}</h3>
+          <h3>${escapeHtml(translateCopy(room.name))}</h3>
         </div>
-        <p>${translateCopy(room.short_description)}</p>
+        <p>${escapeHtml(translateCopy(room.short_description))}</p>
         <div class="room-badges">${badges.join('')}</div>
         <div class="room-amenity-strip">${amenityHighlights}</div>
         <div class="room-actions">
@@ -1531,7 +1557,7 @@ function renderAmenities() {
   [...seenAmenities.values()].forEach((amenity) => {
     const iconName = amenityIconMap[amenity.icon] || 'sparkles';
     const item = document.createElement('article');
-    item.innerHTML = `<i data-lucide="${iconName}"></i><span>${translateCopy(amenity.label)}</span>`;
+    item.innerHTML = `<i data-lucide="${iconName}"></i><span>${escapeHtml(translateCopy(amenity.label))}</span>`;
     dom.amenityWall.appendChild(item);
   });
 }
@@ -1577,7 +1603,7 @@ function renderIconHighlights(container, highlights = [], icon = 'sparkles') {
   container.innerHTML = '';
   highlights.forEach((highlight) => {
     const item = document.createElement('article');
-    item.innerHTML = `<i data-lucide="${amenityIconMap[icon] || icon || 'sparkles'}"></i><span></span>`;
+    item.innerHTML = `<i data-lucide="${escapeHtml(amenityIconMap[icon] || icon || 'sparkles')}"></i><span></span>`;
     item.querySelector('span').textContent = highlight;
     container.appendChild(item);
   });
@@ -1763,8 +1789,8 @@ function renderCurrencies() {
 }
 
 function applySettings() {
-  dom.headline.textContent = translateCopy(state.settings.headline);
-  dom.subheadline.textContent = translateCopy(state.settings.subheadline);
+  if (dom.headline) dom.headline.textContent = translateCopy(state.settings.headline);
+  if (dom.subheadline) dom.subheadline.textContent = translateCopy(state.settings.subheadline);
   dom.aboutText.textContent = translateCopy(state.settings.about_text);
   setFooterYear();
   if (dom.locationLine) dom.locationLine.textContent = state.settings.address;
@@ -1888,7 +1914,7 @@ function renderQuote(quote) {
   }
 
   dom.quoteBox.innerHTML = `
-    <strong>${quote.roomName}</strong><br/>
+    <strong>${escapeHtml(quote.roomName)}</strong><br/>
     ${t('quote.nights', { nights: quote.nights })}<br/>
     <em>${t('quote.priceOnRequest')}</em>
   `;
@@ -2061,7 +2087,7 @@ async function trackBooking(event) {
 
     dom.trackingResult.innerHTML = `
       <strong>${t('tracking.status')}:</strong> ${result.booking_status}<br/>
-      <strong>${t('tracking.room')}:</strong> ${result.room_name}<br/>
+      <strong>${t('tracking.room')}:</strong> ${escapeHtml(result.room_name)}<br/>
       <strong>${t('tracking.dates')}:</strong> ${result.check_in} to ${result.check_out}<br/>
       <strong>${t('tracking.payment')}:</strong> ${result.payment_status}<br/>
       <strong>${t('tracking.paymentOption')}:</strong> ${paymentLabel(result.payment_option)}<br/>

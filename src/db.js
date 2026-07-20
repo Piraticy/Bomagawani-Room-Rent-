@@ -844,7 +844,7 @@ const adminCount = db.prepare('SELECT COUNT(*) AS count FROM admins').get().coun
 if (!adminCount) {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@bomagawani.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
-  const passwordHash = bcrypt.hashSync(adminPassword, 10);
+  const passwordHash = bcrypt.hashSync(adminPassword, 12);
   db.prepare('INSERT INTO admins (full_name, email, password_hash) VALUES (?, ?, ?)').run('Main Admin', adminEmail, passwordHash);
 }
 

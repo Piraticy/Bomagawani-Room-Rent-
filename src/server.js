@@ -49,8 +49,21 @@ app.use(morgan(isProduction ? 'combined' : 'dev'));
 app.use(compression());
 app.use(
   helmet({
-    contentSecurityPolicy: false,
-    crossOriginResourcePolicy: false
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", 'https://unpkg.com'],
+        styleSrc: ["'self'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"]
+      }
+    },
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
   })
 );
 
@@ -92,11 +105,20 @@ const upload = multer({
   }
 });
 
+const knownPlaceholderSecrets = new Set(['replace-with-long-random-secret', 'change-this-session-secret']);
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret || knownPlaceholderSecrets.has(sessionSecret)) {
+  if (isProduction) {
+    throw new Error('SESSION_SECRET must be set to a unique random value before running in production.');
+  }
+  console.warn('Warning: SESSION_SECRET is missing or using a known placeholder value. Set a unique random value before deploying.');
+}
+
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'change-this-session-secret',
+    secret: sessionSecret || 'change-this-session-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -592,7 +614,7 @@ app.get('/api/public/exchange', async (req, res) => {
   }
 });
 
-app.get('/receipt/:code', (req, res) => {
+app.get('/receipt/:code', apiLimiter, (req, res) => {
   const booking = db
     .prepare(
       `SELECT b.*, r.name AS room_name
@@ -608,7 +630,7 @@ app.get('/receipt/:code', (req, res) => {
 
   const settings = getSettings();
 
-  const statusColor = booking.booking_status === 'confirmed' ? '#177245' : booking.booking_status === 'cancelled' ? '#8d1f31' : '#815a19';
+  const statusClass = booking.booking_status === 'confirmed' ? 'badge-confirmed' : booking.booking_status === 'cancelled' ? 'badge-cancelled' : 'badge-pending';
 
   res.type('html').send(`
     <!doctype html>
@@ -617,19 +639,7 @@ app.get('/receipt/:code', (req, res) => {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Receipt ${booking.booking_code}</title>
-        <style>
-          body { font-family: Arial, sans-serif; background:#f4f6f9; margin:0; padding:24px; color:#1d2430; }
-          .receipt { max-width:760px; margin:auto; background:#fff; border-radius:14px; padding:28px; box-shadow:0 18px 45px rgba(0,0,0,0.08); }
-          .top { display:flex; justify-content:space-between; align-items:flex-start; }
-          h1 { margin:0; font-size:24px; }
-          .badge { background:${statusColor}; color:white; border-radius:999px; padding:7px 12px; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
-          .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; margin-top:24px; }
-          .label { color:#6a7280; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
-          .value { margin-top:4px; font-size:15px; font-weight:600; }
-          .amount { margin-top:24px; border-top:1px solid #e4e7ec; padding-top:16px; font-size:20px; font-weight:700; }
-          .footer { margin-top:24px; color:#4e5969; font-size:13px; }
-          @media print { body { background:white; padding:0; } .receipt { box-shadow:none; border-radius:0; } }
-        </style>
+        <link rel="stylesheet" href="/receipt.css" />
       </head>
       <body>
         <div class="receipt">
@@ -638,7 +648,7 @@ app.get('/receipt/:code', (req, res) => {
               <h1>${escapeHtml(settings.logo_text)} - Booking Receipt</h1>
               <div>${escapeHtml(settings.site_name)}</div>
             </div>
-            <span class="badge">${escapeHtml(booking.booking_status)}</span>
+            <span class="badge ${statusClass}">${escapeHtml(booking.booking_status)}</span>
           </div>
 
           <div class="grid">

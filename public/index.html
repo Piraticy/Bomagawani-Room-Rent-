@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://unpkg.com" />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/lucide@1.25.0/dist/umd/lucide.min.js" defer></script>
   </head>
   <body>
     <header class="topbar">
@@ -46,7 +46,6 @@
             <strong>DE</strong>
           </button>
         </div>
-        <a class="ghost-btn" href="/admin" data-i18n="nav.admin">Admin</a>
         <a class="primary-btn" href="/rooms#booking" data-i18n="nav.bookNow">Book Now</a>
       </div>
     </header>
@@ -59,9 +58,8 @@
         <button class="hero-control next" id="hero-next" type="button" aria-label="Next hero image">›</button>
         <div class="hero-content hero-home-layout">
           <div class="hero-copy">
+            <h1 class="sr-only">Bomagawani House Rent</h1>
             <p class="hero-kicker" data-i18n="home.heroKicker">Welcome to Bomagawani – Holiday &amp; Adventure at the Swahili Coast.</p>
-            <h1 id="headline">Bomagawani House Rent</h1>
-            <p id="subheadline">A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.</p>
 
             <div class="hero-cta-row">
               <a class="primary-btn" href="/rooms" data-i18n="home.viewRooms">View Rooms</a>
@@ -510,20 +508,9 @@
               </label>
             </div>
 
-            <label>
-              <span data-i18n="form.paymentOption">Payment option</span>
-              <div class="payment-option-group" id="payment-option-group" role="group" aria-label="Payment option">
-                <button type="button" class="payment-option-btn is-selected" data-payment-option="pay_on_arrival">
-                  <i data-lucide="wallet"></i>
-                  <span data-i18n="form.payOnArrival">Pay on arrival</span>
-                </button>
-              </div>
-              <input type="hidden" id="payment-option" value="pay_on_arrival" required />
-            </label>
+            <input type="hidden" id="payment-option" value="pay_on_arrival" required />
 
             <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to check availability.</div>
-
-            <hr />
 
             <label>
               <span data-i18n="form.fullName">Full name</span>
@@ -590,14 +577,20 @@
     </main>
 
     <footer class="footer">
-      <div class="footer-brand">
-        <strong id="footer-text">Bomagawani</strong>
-        <span id="footer-tagline" data-i18n="footer.tagline">Coastal stays, fresh flavors, easy booking.</span>
+      <div class="footer-main">
+        <div class="footer-brand">
+          <strong id="footer-text">Bomagawani</strong>
+          <span id="footer-tagline" data-i18n="footer.tagline">Coastal stays, fresh flavors, easy booking.</span>
+        </div>
+        <div class="footer-contact">
+          <a id="footer-phone-link" href="#">Call</a>
+          <a id="footer-email-link" href="#">Email</a>
+          <a id="footer-map-link" href="#" target="_blank" rel="noreferrer" data-i18n="footer.map">Map</a>
+        </div>
       </div>
-      <div class="footer-contact">
-        <a id="footer-phone-link" href="#">Call</a>
-        <a id="footer-email-link" href="#">Email</a>
-        <a id="footer-map-link" href="#" target="_blank" rel="noreferrer" data-i18n="footer.map">Map</a>
+      <div class="footer-meta">
+        <span id="footer-copyright"></span>
+        <a class="footer-admin-link" href="/admin" data-i18n="nav.admin">Admin</a>
       </div>
     </footer>
 
@@ -656,6 +649,6 @@
     <script id="seo-structured-data" type="application/ld+json">
       {}
     </script>
-    <script src="/app.js"></script>
+    <script src="/app.js" defer></script>
   </body>
 </html>

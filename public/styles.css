@@ -18,6 +18,18 @@
   display: none !important;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 :focus-visible {
   outline: 3px solid rgba(18, 91, 102, 0.35);
   outline-offset: 2px;
@@ -353,7 +365,7 @@ h4 {
   z-index: 2;
   color: #fff;
   max-width: 1200px;
-  padding: 64px 6vw 92px;
+  padding: 64px 6vw 40px;
   animation: slideIn 0.8s ease both;
 }
 
@@ -2202,7 +2214,7 @@ body.lightbox-open {
 .booking-card {
   position: relative;
   overflow: visible;
-  padding: clamp(24px, 3vw, 34px);
+  padding: clamp(20px, 2.4vw, 26px);
   background:
     radial-gradient(circle at 100% 0%, rgba(18, 91, 102, 0.12), transparent 34%),
     linear-gradient(180deg, #ffffff, #fbfdff);
@@ -2211,18 +2223,18 @@ body.lightbox-open {
 
 .booking-card h2,
 .quick-card h3 {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .booking-card h2 {
-  font-size: clamp(1.8rem, 3vw, 2.65rem);
-  line-height: 1.06;
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+  line-height: 1.12;
 }
 
 .booking-card > p {
   max-width: 680px;
   color: var(--muted);
-  font-size: 1.03rem;
+  font-size: 0.94rem;
 }
 
 .booking-card .primary-btn,
@@ -2235,9 +2247,9 @@ body.lightbox-open {
 label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 0.95rem;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 0.9rem;
 }
 
 .booking-card label span {
@@ -2256,9 +2268,9 @@ button {
 input,
 select,
 textarea {
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid #cbd9ea;
-  padding: 12px;
+  padding: 10px 12px;
   background: #fbfdff;
   color: #12213a;
 }
@@ -2333,13 +2345,13 @@ textarea {
 }
 
 .quote-box {
-  margin-top: 14px;
+  margin-top: 10px;
   background:
     linear-gradient(135deg, rgba(18, 91, 102, 0.08), rgba(255, 216, 160, 0.14)),
     #f7fbff;
   border: 1px dashed rgba(18, 91, 102, 0.38);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 12px 14px;
   color: #304463;
   font-weight: 850;
 }
@@ -2399,13 +2411,47 @@ textarea {
 }
 
 .footer {
-  margin: 24px 5vw;
-  padding: 20px 0 26px;
+  margin: 24px 5vw 0;
+  padding: 20px 0 0;
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid rgba(204, 218, 232, 0.9);
+}
+
+.footer-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border-top: 1px solid rgba(204, 218, 232, 0.9);
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0 22px;
+  border-top: 1px solid rgba(204, 218, 232, 0.6);
+}
+
+.footer-meta span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.footer-admin-link {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.footer-admin-link:hover {
+  color: var(--primary);
+  opacity: 1;
 }
 
 .footer-brand {
@@ -2729,7 +2775,7 @@ textarea {
   }
 
   .hero-content {
-    padding: 40px 18px 64px;
+    padding: 40px 18px 28px;
   }
 
   .hero-home-layout {
@@ -2899,9 +2945,15 @@ textarea {
     margin-right: 12px;
   }
 
-  .footer {
+  .footer-main {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .footer-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .date-grid {
