@@ -57,6 +57,7 @@ app.use(
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
         connectSrc: ["'self'"],
+        frameSrc: ["'self'", 'https://www.google.com'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
