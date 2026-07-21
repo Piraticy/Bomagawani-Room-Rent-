@@ -35,6 +35,7 @@ const translations = {
     'shortcut.houseText': 'See the house details, location, and guest support.',
     'shortcut.houseAction': 'See details',
     'footer.tagline': 'Coastal stays, fresh flavors, easy booking.',
+    'property.ourStory': 'Our Story',
     'property.bookViewing': 'Book Viewing',
     'property.requestPrice': 'Request Price',
     'property.zoomHint': 'Tap to enlarge',
@@ -168,6 +169,7 @@ const translations = {
     'shortcut.houseText': 'Hausdetails, Lage und Gästeservice ansehen.',
     'shortcut.houseAction': 'Details ansehen',
     'footer.tagline': 'Küstenaufenthalt, frische Küche, einfache Buchung.',
+    'property.ourStory': 'Unsere Geschichte',
     'property.bookViewing': 'Besichtigung buchen',
     'property.requestPrice': 'Preis anfragen',
     'property.zoomHint': 'Zum Vergrößern tippen',
@@ -467,6 +469,7 @@ const state = {
   contentPages: [],
   currentPage: 'home',
   heroSlides: [],
+  activeHeroImages: [],
   chatbot: null,
   chatbotFaqs: [],
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
@@ -1202,10 +1205,10 @@ function isDateRangeAvailable(roomId, checkIn, checkOut) {
 function setupHeroSlider(images) {
   const fallback = 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1800&q=80';
   const unique = [...new Set((images || []).filter(Boolean))];
-  state.heroSlides = unique.length ? unique : [fallback];
+  state.activeHeroImages = unique.length ? unique : [fallback];
   state.heroIndex = 0;
 
-  dom.heroSlider.innerHTML = state.heroSlides
+  dom.heroSlider.innerHTML = state.activeHeroImages
     .map(
       (src, index) => `
       <div class="hero-slide ${index === 0 ? 'is-active' : ''}">
@@ -1215,7 +1218,7 @@ function setupHeroSlider(images) {
     )
     .join('');
 
-  dom.heroDots.innerHTML = state.heroSlides
+  dom.heroDots.innerHTML = state.activeHeroImages
     .map(
       (_, index) => `<button type="button" class="hero-dot ${index === 0 ? 'is-active' : ''}" data-hero-dot="${index}" aria-label="Hero image ${index + 1}"></button>`
     )
@@ -1233,9 +1236,9 @@ function setupHeroSlider(images) {
 }
 
 function showHeroSlide(index) {
-  if (!state.heroSlides.length) return;
+  if (!state.activeHeroImages.length) return;
 
-  state.heroIndex = (index + state.heroSlides.length) % state.heroSlides.length;
+  state.heroIndex = (index + state.activeHeroImages.length) % state.activeHeroImages.length;
 
   dom.heroSlider.querySelectorAll('.hero-slide').forEach((slide, slideIndex) => {
     slide.classList.toggle('is-active', slideIndex === state.heroIndex);
@@ -1251,7 +1254,7 @@ function restartHeroAutoSlide() {
     clearInterval(state.heroInterval);
   }
 
-  if (state.heroSlides.length > 1) {
+  if (state.activeHeroImages.length > 1) {
     state.heroInterval = setInterval(() => {
       showHeroSlide(state.heroIndex + 1);
     }, 5500);

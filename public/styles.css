@@ -734,6 +734,27 @@ h4 {
   letter-spacing: -0.02em;
 }
 
+.home-story-card.plain-intro {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 16px;
+}
+
+.home-story-card.plain-intro h2 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.home-story-card.plain-intro .home-welcome-copy p {
+  font-size: 0.98rem;
+}
+
 .home-welcome-copy {
   display: grid;
   gap: 10px;
@@ -1755,6 +1776,29 @@ h4 {
   font-size: 1.04rem;
   line-height: 1.72;
   max-width: 820px;
+}
+
+.villa-story-heading {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+#property-title.villa-intro-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+#property-subtitle.villa-intro-subtitle {
+  font-size: 0.98rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 780px;
 }
 
 .villa-sale-card .property-sale-actions {
