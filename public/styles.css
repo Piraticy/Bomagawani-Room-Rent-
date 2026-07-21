@@ -740,7 +740,9 @@ h4 {
   box-shadow: none;
   border-radius: 0;
   padding: 0;
-  gap: 16px;
+  gap: 8px;
+  grid-template-columns: 1fr;
+  align-items: start;
 }
 
 .home-story-card.plain-intro h2 {
