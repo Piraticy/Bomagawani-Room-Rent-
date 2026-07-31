@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bomagawani-v19';
+const CACHE_NAME = 'bomagawani-v20';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
