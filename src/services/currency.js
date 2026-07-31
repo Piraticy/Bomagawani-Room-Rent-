@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const db = require('../db');
+const { db } = require('../db');
 
 const CACHE_HOURS = 6;
 
@@ -11,7 +11,7 @@ function hoursSince(dateString) {
 
 async function fetchRates(baseCurrency = 'USD') {
   const base = (baseCurrency || 'USD').toUpperCase();
-  const cached = db.prepare('SELECT rates_json, updated_at FROM exchange_cache WHERE base_currency = ?').get(base);
+  const cached = await db.prepare('SELECT rates_json, updated_at FROM exchange_cache WHERE base_currency = ?').get(base);
 
   if (cached && hoursSince(cached.updated_at) <= CACHE_HOURS) {
     return JSON.parse(cached.rates_json);
@@ -32,7 +32,7 @@ async function fetchRates(baseCurrency = 'USD') {
     }
 
     const rates = payload.rates;
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO exchange_cache (base_currency, rates_json, updated_at)
       VALUES (@base_currency, @rates_json, CURRENT_TIMESTAMP)
       ON CONFLICT(base_currency)

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Bomagawani House Rent booking and admin platform",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
@@ -21,8 +24,9 @@
   },
   "homepage": "https://github.com/Piraticy/Bomagawani-Room-Rent-#readme",
   "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "@vercel/blob": "^2.6.1",
     "bcrypt": "^6.0.0",
-    "better-sqlite3": "^12.9.0",
     "compression": "^1.8.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -33,6 +37,6 @@
     "multer": "^2.1.1",
     "node-fetch": "^2.7.0",
     "nodemailer": "^9.0.3",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.3"
   }
 }

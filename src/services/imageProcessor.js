@@ -1,6 +1,4 @@
 const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
 
 function createWatermarkSvg(width, height, logoText) {
   const boxWidth = Math.max(210, Math.floor(width * 0.32));
@@ -29,18 +27,15 @@ function normalizeTarget(mode) {
   return { width: 1600, height: 1100, quality: 94 };
 }
 
-function ensureDir(filePath) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+// `input` is either a Buffer (from multer memory storage) or a file path -
+// sharp() accepts both transparently, so callers can pass whichever they have.
+async function saveOriginalCopy(input) {
+  return sharp(input).rotate().withMetadata().toBuffer();
 }
 
-async function saveOriginalCopy(filePath, outputPath) {
-  ensureDir(outputPath);
-  await sharp(filePath).rotate().withMetadata().toFile(outputPath);
-}
-
-async function watermarkImage(filePath, outputPath, logoText, mode = 'room') {
+async function watermarkImage(input, logoText, mode = 'room') {
   const target = normalizeTarget(mode);
-  const base = sharp(filePath).rotate();
+  const base = sharp(input).rotate();
   const metadata = await base.metadata();
 
   const width = metadata.width || 1200;
@@ -65,9 +60,7 @@ async function watermarkImage(filePath, outputPath, logoText, mode = 'room') {
   const top = Math.max(0, Math.round((target.height - fgHeight) / 2));
   const watermarkSvg = createWatermarkSvg(target.width, target.height, safeLogoText(logoText));
 
-  ensureDir(outputPath);
-
-  await sharp({
+  const buffer = await sharp({
     create: {
       width: target.width,
       height: target.height,
@@ -93,9 +86,10 @@ async function watermarkImage(filePath, outputPath, logoText, mode = 'room') {
       }
     ])
     .jpeg({ quality: target.quality, mozjpeg: true, progressive: true, chromaSubsampling: '4:4:4' })
-    .toFile(outputPath);
+    .toBuffer();
 
   return {
+    buffer,
     originalWidth: width,
     originalHeight: height,
     outputWidth: target.width,

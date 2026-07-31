@@ -12,15 +12,18 @@ const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
-const db = require('./db');
+const { db, ready } = require('./db');
 const { requireAdmin } = require('./middleware/auth');
 const { convertFromUSD, fetchRates } = require('./services/currency');
 const { watermarkImage, saveOriginalCopy } = require('./services/imageProcessor');
 const { sendBookingStatusEmail } = require('./services/email');
+const TursoSessionStore = require('./middleware/tursoSessionStore');
+const blobStorage = require('./services/blobStorage');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const isProduction = process.env.NODE_ENV === 'production';
+const isVercel = !!process.env.VERCEL;
 const forceSecureCookie = process.env.COOKIE_SECURE === '1';
 const parsedUploadSizeMb = Number(process.env.MAX_UPLOAD_SIZE_MB);
 const maxUploadSizeMb = Math.max(1, Number.isFinite(parsedUploadSizeMb) ? parsedUploadSizeMb : 25);
@@ -32,13 +35,16 @@ const roomUploadDir = path.join(uploadRootDir, 'rooms');
 const siteUploadDir = path.join(uploadRootDir, 'site');
 const roomOriginalDir = path.join(uploadRootDir, 'originals', 'rooms');
 const siteOriginalDir = path.join(uploadRootDir, 'originals', 'site');
-const tempUploadDir = path.join(process.cwd(), 'tmp-uploads');
 
-fs.mkdirSync(roomUploadDir, { recursive: true });
-fs.mkdirSync(siteUploadDir, { recursive: true });
-fs.mkdirSync(roomOriginalDir, { recursive: true });
-fs.mkdirSync(siteOriginalDir, { recursive: true });
-fs.mkdirSync(tempUploadDir, { recursive: true });
+// Local disk directories are only needed when Blob storage isn't configured -
+// Vercel's filesystem outside /tmp isn't writable/persistent anyway, so this
+// only matters for local dev, Docker, and Render.
+if (!blobStorage.isEnabled) {
+  fs.mkdirSync(roomUploadDir, { recursive: true });
+  fs.mkdirSync(siteUploadDir, { recursive: true });
+  fs.mkdirSync(roomOriginalDir, { recursive: true });
+  fs.mkdirSync(siteOriginalDir, { recursive: true });
+}
 
 if (isProduction || process.env.TRUST_PROXY === '1') {
   app.set('trust proxy', 1);
@@ -55,7 +61,7 @@ app.use(
         scriptSrc: ["'self'", 'https://unpkg.com'],
         styleSrc: ["'self'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
+        imgSrc: ["'self'", 'data:', 'https://images.unsplash.com', 'https://*.public.blob.vercel-storage.com'],
         connectSrc: ["'self'"],
         frameSrc: ["'self'", 'https://www.google.com'],
         objectSrc: ["'none'"],
@@ -93,7 +99,7 @@ const adminLoginLimiter = rateLimit({
 });
 
 const upload = multer({
-  dest: tempUploadDir,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: maxUploadSizeBytes
   },
@@ -105,6 +111,33 @@ const upload = multer({
     return callback(null, true);
   }
 });
+
+// Watermarks an uploaded image buffer, saves it (Blob or local disk depending
+// on blobStorage.isEnabled), and returns the URL to store in the DB. Also
+// best-effort saves an unwatermarked backup copy when using local disk only -
+// Blob storage has no private/hidden access tier, so we skip the original
+// there rather than publish an un-watermarked copy at a guessable URL.
+async function processAndSaveUpload({ buffer, originalname, relativeFolder, originalsDir, logoText, mode }) {
+  const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  const outputFilename = `${baseName}.jpg`;
+
+  const { buffer: watermarkedBuffer } = await watermarkImage(buffer, logoText, mode);
+  const imageUrl = await blobStorage.saveUpload(watermarkedBuffer, `${relativeFolder}/${outputFilename}`, uploadRootDir);
+
+  if (!blobStorage.isEnabled && originalsDir) {
+    try {
+      const sourceExtension = (path.extname(originalname || '') || '.jpg').toLowerCase();
+      const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
+      const originalBuffer = await saveOriginalCopy(buffer);
+      fs.mkdirSync(originalsDir, { recursive: true });
+      fs.writeFileSync(path.join(originalsDir, `${baseName}-orig${safeExtension}`), originalBuffer);
+    } catch (error) {
+      console.error('[upload] Failed to save original backup copy (non-fatal):', error.message);
+    }
+  }
+
+  return imageUrl;
+}
 
 const knownPlaceholderSecrets = new Set(['replace-with-long-random-secret', 'change-this-session-secret']);
 const sessionSecret = process.env.SESSION_SECRET;
@@ -119,6 +152,7 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
+    store: new TursoSessionStore(db),
     secret: sessionSecret || 'change-this-session-secret',
     resave: false,
     saveUninitialized: false,
@@ -130,6 +164,13 @@ app.use(
     }
   })
 );
+
+// Every request waits for the database (schema + seed data) to finish
+// initializing before touching any route. On a warm serverless instance
+// `ready` is already resolved, so this is a no-op after the first request.
+app.use((req, res, next) => {
+  ready.then(() => next()).catch(next);
+});
 
 const uploadsStaticOptions = { maxAge: '30d', immutable: true };
 const publicStaticOptions = { maxAge: '10m' };
@@ -257,13 +298,15 @@ function uploadUrlToAbsolutePath(uploadUrl) {
   return resolvedPath;
 }
 
-function removeUploadByUrl(uploadUrl) {
-  const filePath = uploadUrlToAbsolutePath(uploadUrl);
-  if (!filePath) return;
-  removeFileIfExists(filePath);
+async function removeUploadByUrl(uploadUrl) {
+  await blobStorage.deleteUpload(uploadUrl, (url) => {
+    const filePath = uploadUrlToAbsolutePath(url);
+    if (filePath) removeFileIfExists(filePath);
+  });
 }
 
 function removeRelatedOriginalByProcessedUrl(processedUrl) {
+  if (blobStorage.isEnabled) return; // Originals are only ever saved to local disk.
   const absoluteProcessedPath = uploadUrlToAbsolutePath(processedUrl);
   if (!absoluteProcessedPath) return;
   const directory = path.dirname(absoluteProcessedPath);
@@ -283,63 +326,65 @@ function removeRelatedOriginalByProcessedUrl(processedUrl) {
   }
 }
 
-function getSettings() {
+async function getSettings() {
   return db.prepare('SELECT * FROM site_settings WHERE id = 1').get();
 }
 
-function getRoomImages(roomId) {
+async function getRoomImages(roomId) {
   return db
     .prepare('SELECT id, image_url, caption, sort_order FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id DESC')
     .all(roomId);
 }
 
-function getPublicRooms() {
-  const rooms = db.prepare('SELECT * FROM rooms WHERE active = 1 ORDER BY featured DESC, id ASC').all();
-  return rooms.map((room) => {
-    const normalized = normalizeRoom(room);
-    return {
-      ...normalized,
-      images: getRoomImages(room.id)
-    };
-  });
+async function getPublicRooms() {
+  const rooms = await db.prepare('SELECT * FROM rooms WHERE active = 1 ORDER BY featured DESC, id ASC').all();
+  return Promise.all(
+    rooms.map(async (room) => {
+      const normalized = normalizeRoom(room);
+      return {
+        ...normalized,
+        images: await getRoomImages(room.id)
+      };
+    })
+  );
 }
 
-function getAllRooms() {
-  const rooms = db.prepare('SELECT * FROM rooms ORDER BY featured DESC, id ASC').all();
-  return rooms.map((room) => {
-    const normalized = normalizeRoom(room);
-    return {
-      ...normalized,
-      images: getRoomImages(room.id)
-    };
-  });
+async function getAllRooms() {
+  const rooms = await db.prepare('SELECT * FROM rooms ORDER BY featured DESC, id ASC').all();
+  return Promise.all(
+    rooms.map(async (room) => {
+      const normalized = normalizeRoom(room);
+      return {
+        ...normalized,
+        images: await getRoomImages(room.id)
+      };
+    })
+  );
 }
 
-function getPlatformLinks() {
+async function getPlatformLinks() {
   return db.prepare('SELECT * FROM platform_links ORDER BY sort_order ASC, id ASC').all();
 }
 
-function getContentPages({ activeOnly = false } = {}) {
+async function getContentPages({ activeOnly = false } = {}) {
   const where = activeOnly ? 'WHERE active = 1' : '';
-  return db
-    .prepare(`SELECT * FROM content_pages ${where} ORDER BY sort_order ASC, id ASC`)
-    .all()
-    .map(normalizeContentPage);
+  const pages = await db.prepare(`SELECT * FROM content_pages ${where} ORDER BY sort_order ASC, id ASC`).all();
+  return pages.map(normalizeContentPage);
 }
 
-function getHeroSlides() {
+async function getHeroSlides() {
   return db.prepare('SELECT id, image_url, caption, sort_order FROM hero_slides ORDER BY sort_order ASC, id ASC').all();
 }
 
-function getChatbotSettings() {
+async function getChatbotSettings() {
   return db.prepare('SELECT id, title, greeting, whatsapp_number, whatsapp_message, enabled FROM chatbot_settings WHERE id = 1').get();
 }
 
-function getChatbotFaqs() {
+async function getChatbotFaqs() {
   return db.prepare('SELECT id, question, answer, sort_order FROM chatbot_faqs ORDER BY sort_order ASC, id ASC').all();
 }
 
-function getConfirmedRanges(roomId) {
+async function getConfirmedRanges(roomId) {
   return db
     .prepare(
       `SELECT check_in, check_out
@@ -351,8 +396,8 @@ function getConfirmedRanges(roomId) {
     .all(roomId);
 }
 
-function isRoomAvailable(roomId, checkIn, checkOut, ignoreBookingId = null) {
-  const overlap = db
+async function isRoomAvailable(roomId, checkIn, checkOut, ignoreBookingId = null) {
+  const overlap = await db
     .prepare(
       `SELECT COUNT(*) AS count
        FROM bookings
@@ -366,10 +411,10 @@ function isRoomAvailable(roomId, checkIn, checkOut, ignoreBookingId = null) {
   return overlap.count === 0;
 }
 
-function adminSummary() {
-  const pending = db.prepare("SELECT COUNT(*) AS count FROM bookings WHERE booking_status = 'pending'").get().count;
-  const confirmed = db.prepare("SELECT COUNT(*) AS count FROM bookings WHERE booking_status = 'confirmed'").get().count;
-  const revenue = db.prepare("SELECT COALESCE(SUM(total_usd), 0) AS total FROM bookings WHERE booking_status = 'confirmed'").get().total;
+async function adminSummary() {
+  const pending = (await db.prepare("SELECT COUNT(*) AS count FROM bookings WHERE booking_status = 'pending'").get()).count;
+  const confirmed = (await db.prepare("SELECT COUNT(*) AS count FROM bookings WHERE booking_status = 'confirmed'").get()).count;
+  const revenue = (await db.prepare("SELECT COALESCE(SUM(total_usd), 0) AS total FROM bookings WHERE booking_status = 'confirmed'").get()).total;
 
   return {
     pending,
@@ -412,35 +457,39 @@ app.get('/robots.txt', (req, res) => {
   res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: /sitemap.xml\n');
 });
 
-app.get('/sitemap.xml', (req, res) => {
-  const settings = getSettings();
+app.get('/sitemap.xml', async (req, res) => {
+  const settings = await getSettings();
   const base = settings.domain.startsWith('http') ? settings.domain : `https://${settings.domain}`;
-  const rooms = db.prepare('SELECT slug FROM rooms WHERE active = 1').all();
+  const rooms = await db.prepare('SELECT slug FROM rooms WHERE active = 1').all();
 
   res.type('application/xml').send(buildSitemapXml(base, rooms));
 });
 
 app.get('/api/public/bootstrap', async (req, res) => {
   try {
-    const settings = getSettings();
-    const rooms = getPublicRooms().map((room) => ({
-      ...room,
-      unavailable: getConfirmedRanges(room.id)
-    }));
+    const settings = await getSettings();
+    const publicRooms = await getPublicRooms();
+    const rooms = await Promise.all(
+      publicRooms.map(async (room) => ({
+        ...room,
+        unavailable: await getConfirmedRanges(room.id)
+      }))
+    );
 
     const rates = await fetchRates('USD');
 
     res.json({
       settings,
       rooms,
-      links: getPlatformLinks(),
-      contentPages: getContentPages(),
-      heroSlides: getHeroSlides(),
-      chatbot: getChatbotSettings(),
-      chatbotFaqs: getChatbotFaqs(),
+      links: await getPlatformLinks(),
+      contentPages: await getContentPages(),
+      heroSlides: await getHeroSlides(),
+      chatbot: await getChatbotSettings(),
+      chatbotFaqs: await getChatbotFaqs(),
       currencies: Object.keys(rates).filter((c) => ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'].includes(c))
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Failed to load public data.' });
   }
 });
@@ -455,7 +504,7 @@ app.get('/api/public/quote', async (req, res) => {
     return res.status(400).json({ error: 'roomId, checkIn, and checkOut are required.' });
   }
 
-  const room = db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(roomId);
+  const room = await db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(roomId);
   if (!room) {
     return res.status(404).json({ error: 'Room not found.' });
   }
@@ -465,7 +514,7 @@ app.get('/api/public/quote', async (req, res) => {
     return res.status(400).json({ error: dateCheck.error });
   }
 
-  if (!isRoomAvailable(roomId, checkIn, checkOut)) {
+  if (!(await isRoomAvailable(roomId, checkIn, checkOut))) {
     return res.status(409).json({ error: 'Selected dates are not available.' });
   }
 
@@ -509,7 +558,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Guest name or phone seems invalid.' });
   }
 
-  const room = db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(roomId);
+  const room = await db.prepare('SELECT * FROM rooms WHERE id = ? AND active = 1').get(roomId);
   if (!room) {
     return res.status(404).json({ error: 'Room not found.' });
   }
@@ -523,7 +572,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     return res.status(400).json({ error: dateCheck.error });
   }
 
-  if (!isRoomAvailable(roomId, checkIn, checkOut)) {
+  if (!(await isRoomAvailable(roomId, checkIn, checkOut))) {
     return res.status(409).json({ error: 'These dates are already booked. Please choose different dates.' });
   }
 
@@ -547,7 +596,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     code = bookingCode();
     try {
-      insertBooking.run({
+      await insertBooking.run({
         booking_code: code,
         room_id: roomId,
         guest_name: guestName,
@@ -579,8 +628,8 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   });
 });
 
-app.get('/api/public/bookings/:code', (req, res) => {
-  const booking = db
+app.get('/api/public/bookings/:code', async (req, res) => {
+  const booking = await db
     .prepare(
       `SELECT b.*, r.name AS room_name
        FROM bookings b
@@ -596,13 +645,13 @@ app.get('/api/public/bookings/:code', (req, res) => {
   return res.json(booking);
 });
 
-app.get('/api/public/rooms/:roomId/unavailable', (req, res) => {
+app.get('/api/public/rooms/:roomId/unavailable', async (req, res) => {
   const roomId = Number(req.params.roomId);
   if (!roomId) {
     return res.status(400).json({ error: 'Invalid room id.' });
   }
 
-  return res.json({ ranges: getConfirmedRanges(roomId) });
+  return res.json({ ranges: await getConfirmedRanges(roomId) });
 });
 
 app.get('/api/public/exchange', async (req, res) => {
@@ -615,8 +664,8 @@ app.get('/api/public/exchange', async (req, res) => {
   }
 });
 
-app.get('/receipt/:code', apiLimiter, (req, res) => {
-  const booking = db
+app.get('/receipt/:code', apiLimiter, async (req, res) => {
+  const booking = await db
     .prepare(
       `SELECT b.*, r.name AS room_name
        FROM bookings b
@@ -629,7 +678,7 @@ app.get('/receipt/:code', apiLimiter, (req, res) => {
     return res.status(404).send('Receipt not found.');
   }
 
-  const settings = getSettings();
+  const settings = await getSettings();
 
   const statusClass = booking.booking_status === 'confirmed' ? 'badge-confirmed' : booking.booking_status === 'cancelled' ? 'badge-cancelled' : 'badge-pending';
 
@@ -672,7 +721,7 @@ app.get('/receipt/:code', apiLimiter, (req, res) => {
   `);
 });
 
-app.post('/api/admin/login', adminLoginLimiter, (req, res) => {
+app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
   const email = String(req.body.email || '').trim();
   const password = String(req.body.password || '').trim();
 
@@ -680,7 +729,7 @@ app.post('/api/admin/login', adminLoginLimiter, (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
 
-  const admin = db.prepare('SELECT id, email, full_name, password_hash FROM admins WHERE lower(email) = lower(?)').get(email);
+  const admin = await db.prepare('SELECT id, email, full_name, password_hash FROM admins WHERE lower(email) = lower(?)').get(email);
   if (!admin) {
     return res.status(401).json({ error: 'Invalid login details.' });
   }
@@ -717,21 +766,21 @@ app.get('/api/admin/session', (req, res) => {
   return res.json({ authenticated: true, fullName: req.session.adminName });
 });
 
-app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
+app.get('/api/admin/dashboard', requireAdmin, async (req, res) => {
   res.json({
-    summary: adminSummary(),
-    settings: getSettings(),
-    rooms: getAllRooms(),
-    links: getPlatformLinks(),
-    contentPages: getContentPages(),
-    heroSlides: getHeroSlides(),
-    chatbot: getChatbotSettings(),
-    chatbotFaqs: getChatbotFaqs()
+    summary: await adminSummary(),
+    settings: await getSettings(),
+    rooms: await getAllRooms(),
+    links: await getPlatformLinks(),
+    contentPages: await getContentPages(),
+    heroSlides: await getHeroSlides(),
+    chatbot: await getChatbotSettings(),
+    chatbotFaqs: await getChatbotFaqs()
   });
 });
 
-app.get('/api/admin/bookings', requireAdmin, (req, res) => {
-  const bookings = db
+app.get('/api/admin/bookings', requireAdmin, async (req, res) => {
+  const bookings = await db
     .prepare(
       `SELECT b.*, r.name AS room_name
        FROM bookings b
@@ -743,7 +792,7 @@ app.get('/api/admin/bookings', requireAdmin, (req, res) => {
   return res.json({ bookings });
 });
 
-app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
+app.patch('/api/admin/bookings/:id/status', requireAdmin, async (req, res) => {
   const bookingId = Number(req.params.id);
   const bookingStatus = req.body.bookingStatus;
   const paymentStatus = req.body.paymentStatus;
@@ -759,19 +808,19 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Invalid payment status.' });
   }
 
-  const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(bookingId);
+  const booking = await db.prepare('SELECT * FROM bookings WHERE id = ?').get(bookingId);
   if (!booking) {
     return res.status(404).json({ error: 'Booking not found.' });
   }
 
   if (bookingStatus === 'confirmed') {
-    const free = isRoomAvailable(booking.room_id, booking.check_in, booking.check_out, bookingId);
+    const free = await isRoomAvailable(booking.room_id, booking.check_in, booking.check_out, bookingId);
     if (!free) {
       return res.status(409).json({ error: 'Cannot confirm. The room has overlapping confirmed dates.' });
     }
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE bookings
      SET booking_status = COALESCE(@booking_status, booking_status),
          payment_status = COALESCE(@payment_status, payment_status),
@@ -785,7 +834,7 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
 
   const statusKey = bookingStatus === 'confirmed' || bookingStatus === 'cancelled' ? bookingStatus : paymentStatus === 'paid' ? 'paid' : null;
   if (statusKey) {
-    const updatedBooking = db
+    const updatedBooking = await db
       .prepare(
         `SELECT b.*, r.name AS room_name
          FROM bookings b
@@ -801,18 +850,18 @@ app.patch('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-app.delete('/api/admin/bookings/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/bookings/:id', requireAdmin, async (req, res) => {
   const bookingId = Number(req.params.id);
-  const booking = db.prepare('SELECT id FROM bookings WHERE id = ?').get(bookingId);
+  const booking = await db.prepare('SELECT id FROM bookings WHERE id = ?').get(bookingId);
   if (!booking) {
     return res.status(404).json({ error: 'Booking not found.' });
   }
 
-  db.prepare('DELETE FROM bookings WHERE id = ?').run(bookingId);
+  await db.prepare('DELETE FROM bookings WHERE id = ?').run(bookingId);
   return res.json({ ok: true });
 });
 
-app.post('/api/admin/rooms', requireAdmin, (req, res) => {
+app.post('/api/admin/rooms', requireAdmin, async (req, res) => {
   const name = String(req.body.name || '').trim();
   const shortDescription = String(req.body.shortDescription || '').trim();
   const longDescription = String(req.body.longDescription || '').trim();
@@ -835,12 +884,12 @@ app.post('/api/admin/rooms', requireAdmin, (req, res) => {
   let slug = slugBase;
   let i = 1;
 
-  while (db.prepare('SELECT id FROM rooms WHERE slug = ?').get(slug)) {
+  while (await db.prepare('SELECT id FROM rooms WHERE slug = ?').get(slug)) {
     i += 1;
     slug = `${slugBase}-${i}`;
   }
 
-  const result = db
+  const result = await db
     .prepare(
       `INSERT INTO rooms (
         name, slug, short_description, long_description, price_per_night_usd,
@@ -866,9 +915,9 @@ app.post('/api/admin/rooms', requireAdmin, (req, res) => {
   return res.status(201).json({ id: result.lastInsertRowid, slug });
 });
 
-app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
+app.put('/api/admin/rooms/:id', requireAdmin, async (req, res) => {
   const roomId = Number(req.params.id);
-  const room = db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId);
+  const room = await db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId);
   if (!room) {
     return res.status(404).json({ error: 'Room not found.' });
   }
@@ -888,7 +937,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Price and max guests must be valid positive values.' });
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE rooms
      SET name = @name,
          short_description = @short_description,
@@ -919,7 +968,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-app.put('/api/admin/rooms/:roomId/cover', requireAdmin, (req, res) => {
+app.put('/api/admin/rooms/:roomId/cover', requireAdmin, async (req, res) => {
   const roomId = Number(req.params.roomId);
   const imageId = Number(req.body.imageId);
 
@@ -927,41 +976,40 @@ app.put('/api/admin/rooms/:roomId/cover', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'roomId and imageId are required.' });
   }
 
-  const image = db.prepare('SELECT * FROM room_images WHERE id = ? AND room_id = ?').get(imageId, roomId);
+  const image = await db.prepare('SELECT * FROM room_images WHERE id = ? AND room_id = ?').get(imageId, roomId);
   if (!image) {
     return res.status(404).json({ error: 'Image not found in this room.' });
   }
 
-  db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(image.image_url, roomId);
+  await db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(image.image_url, roomId);
 
   return res.json({ ok: true, coverImage: image.image_url });
 });
 
-app.delete('/api/admin/rooms/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/rooms/:id', requireAdmin, async (req, res) => {
   const roomId = Number(req.params.id);
 
-  const hasBookings = db.prepare('SELECT COUNT(*) AS count FROM bookings WHERE room_id = ?').get(roomId).count;
+  const hasBookings = (await db.prepare('SELECT COUNT(*) AS count FROM bookings WHERE room_id = ?').get(roomId)).count;
   if (hasBookings > 0) {
     return res.status(400).json({ error: 'Room has bookings. Set it as inactive instead of deleting.' });
   }
 
-  const images = db.prepare('SELECT image_url FROM room_images WHERE room_id = ?').all(roomId);
-  images.forEach((row) => {
-    removeUploadByUrl(row.image_url);
+  const images = await db.prepare('SELECT image_url FROM room_images WHERE room_id = ?').all(roomId);
+  for (const row of images) {
+    await removeUploadByUrl(row.image_url);
     removeRelatedOriginalByProcessedUrl(row.image_url);
-  });
+  }
 
-  db.prepare('DELETE FROM room_images WHERE room_id = ?').run(roomId);
-  db.prepare('DELETE FROM rooms WHERE id = ?').run(roomId);
+  await db.prepare('DELETE FROM room_images WHERE room_id = ?').run(roomId);
+  await db.prepare('DELETE FROM rooms WHERE id = ?').run(roomId);
 
   return res.json({ ok: true });
 });
 
 app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), async (req, res) => {
   const roomId = Number(req.params.id);
-  const room = db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId);
+  const room = await db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId);
   if (!room) {
-    removeFileIfExists(req.file?.path);
     return res.status(404).json({ error: 'Room not found.' });
   }
 
@@ -969,24 +1017,20 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
-  let originalCopyPath = '';
-  let outputPath = '';
+  let imageUrl = '';
 
   try {
-    const settings = getSettings();
-    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-    const outputFilename = `${baseName}.jpg`;
-    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
-    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    outputPath = path.join(roomUploadDir, outputFilename);
-    originalCopyPath = path.join(roomOriginalDir, `${baseName}-orig${safeExtension}`);
+    const settings = await getSettings();
+    imageUrl = await processAndSaveUpload({
+      buffer: req.file.buffer,
+      originalname: req.file.originalname,
+      relativeFolder: 'rooms',
+      originalsDir: roomOriginalDir,
+      logoText: settings.logo_text,
+      mode: 'room'
+    });
 
-    await saveOriginalCopy(req.file.path, originalCopyPath);
-    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'room');
-
-    const imageUrl = `/uploads/rooms/${outputFilename}`;
-
-    const result = db
+    const result = await db
       .prepare(
         `INSERT INTO room_images (room_id, image_url, caption, sort_order)
          VALUES (?, ?, ?, ?)`
@@ -994,35 +1038,31 @@ app.post('/api/admin/rooms/:id/images', requireAdmin, upload.single('image'), as
       .run(roomId, imageUrl, String(req.body.caption || '').trim(), Number(req.body.sortOrder || 0));
 
     if (!room.cover_image) {
-      db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(imageUrl, roomId);
+      await db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(imageUrl, roomId);
     }
-
-    removeFileIfExists(req.file.path);
 
     return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
   } catch (error) {
-    removeFileIfExists(req.file?.path);
-    removeFileIfExists(originalCopyPath);
-    removeFileIfExists(outputPath);
+    if (imageUrl) await removeUploadByUrl(imageUrl);
     return res.status(500).json({ error: 'Image upload failed.' });
   }
 });
 
-app.delete('/api/admin/images/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/images/:id', requireAdmin, async (req, res) => {
   const imageId = Number(req.params.id);
-  const image = db.prepare('SELECT * FROM room_images WHERE id = ?').get(imageId);
+  const image = await db.prepare('SELECT * FROM room_images WHERE id = ?').get(imageId);
   if (!image) {
     return res.status(404).json({ error: 'Image not found.' });
   }
 
-  db.prepare('DELETE FROM room_images WHERE id = ?').run(imageId);
-  removeUploadByUrl(image.image_url);
+  await db.prepare('DELETE FROM room_images WHERE id = ?').run(imageId);
+  await removeUploadByUrl(image.image_url);
   removeRelatedOriginalByProcessedUrl(image.image_url);
 
-  const room = db.prepare('SELECT id, cover_image FROM rooms WHERE id = ?').get(image.room_id);
+  const room = await db.prepare('SELECT id, cover_image FROM rooms WHERE id = ?').get(image.room_id);
   if (room && room.cover_image === image.image_url) {
-    const fallback = db.prepare('SELECT image_url FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id DESC LIMIT 1').get(image.room_id);
-    db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(fallback?.image_url || '', image.room_id);
+    const fallback = await db.prepare('SELECT image_url FROM room_images WHERE room_id = ? ORDER BY sort_order ASC, id DESC LIMIT 1').get(image.room_id);
+    await db.prepare('UPDATE rooms SET cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(fallback?.image_url || '', image.room_id);
   }
 
   return res.json({ ok: true });
@@ -1033,33 +1073,27 @@ app.post('/api/admin/settings/hero-image', requireAdmin, upload.single('image'),
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
-  let originalCopyPath = '';
-  let outputPath = '';
+  let imageUrl = '';
 
   try {
-    const settings = getSettings();
-    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-    const outputFilename = `${baseName}.jpg`;
-    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
-    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    outputPath = path.join(siteUploadDir, outputFilename);
-    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    const settings = await getSettings();
+    imageUrl = await processAndSaveUpload({
+      buffer: req.file.buffer,
+      originalname: req.file.originalname,
+      relativeFolder: 'site',
+      originalsDir: siteOriginalDir,
+      logoText: settings.logo_text,
+      mode: 'hero'
+    });
 
-    await saveOriginalCopy(req.file.path, originalCopyPath);
-    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'hero');
+    await db.prepare('UPDATE site_settings SET hero_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(imageUrl);
 
-    const imageUrl = `/uploads/site/${outputFilename}`;
-    db.prepare('UPDATE site_settings SET hero_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(imageUrl);
-
-    removeFileIfExists(req.file.path);
-    removeUploadByUrl(settings.hero_image);
+    await removeUploadByUrl(settings.hero_image);
     removeRelatedOriginalByProcessedUrl(settings.hero_image);
 
     return res.json({ imageUrl });
   } catch (error) {
-    removeFileIfExists(req.file?.path);
-    removeFileIfExists(originalCopyPath);
-    removeFileIfExists(outputPath);
+    if (imageUrl) await removeUploadByUrl(imageUrl);
     return res.status(500).json({ error: 'Hero image upload failed.' });
   }
 });
@@ -1069,80 +1103,74 @@ app.post('/api/admin/hero-slides', requireAdmin, upload.single('image'), async (
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
-  let originalCopyPath = '';
-  let outputPath = '';
+  let imageUrl = '';
 
   try {
-    const settings = getSettings();
-    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-    const outputFilename = `${baseName}.jpg`;
-    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
-    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    outputPath = path.join(siteUploadDir, outputFilename);
-    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    const settings = await getSettings();
+    imageUrl = await processAndSaveUpload({
+      buffer: req.file.buffer,
+      originalname: req.file.originalname,
+      relativeFolder: 'site',
+      originalsDir: siteOriginalDir,
+      logoText: settings.logo_text,
+      mode: 'slide'
+    });
 
-    await saveOriginalCopy(req.file.path, originalCopyPath);
-    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
-
-    const imageUrl = `/uploads/site/${outputFilename}`;
     const sortOrder = Number(req.body.sortOrder || Date.now());
     const caption = String(req.body.caption || '').trim();
 
-    const result = db
+    const result = await db
       .prepare('INSERT INTO hero_slides (image_url, caption, sort_order) VALUES (?, ?, ?)')
       .run(imageUrl, caption, sortOrder);
 
-    removeFileIfExists(req.file.path);
     return res.status(201).json({ id: result.lastInsertRowid, imageUrl });
   } catch (error) {
-    removeFileIfExists(req.file?.path);
-    removeFileIfExists(originalCopyPath);
-    removeFileIfExists(outputPath);
+    if (imageUrl) await removeUploadByUrl(imageUrl);
     return res.status(500).json({ error: 'Hero slide upload failed.' });
   }
 });
 
-app.put('/api/admin/hero-slides/order', requireAdmin, (req, res) => {
+app.put('/api/admin/hero-slides/order', requireAdmin, async (req, res) => {
   const slideIds = Array.isArray(req.body.slideIds) ? req.body.slideIds.map((id) => Number(id)).filter(Boolean) : [];
   if (!slideIds.length) {
     return res.status(400).json({ error: 'slideIds is required.' });
   }
 
   const updateSort = db.prepare('UPDATE hero_slides SET sort_order = ? WHERE id = ?');
-  const trx = db.transaction(() => {
-    slideIds.forEach((id, index) => {
-      updateSort.run(index + 1, id);
-    });
+  const trx = db.transaction(async () => {
+    for (const [index, id] of slideIds.entries()) {
+      await updateSort.run(index + 1, id);
+    }
   });
 
-  trx();
+  await trx();
   return res.json({ ok: true });
 });
 
-app.delete('/api/admin/hero-slides/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/hero-slides/:id', requireAdmin, async (req, res) => {
   const slideId = Number(req.params.id);
-  const slide = db.prepare('SELECT * FROM hero_slides WHERE id = ?').get(slideId);
+  const slide = await db.prepare('SELECT * FROM hero_slides WHERE id = ?').get(slideId);
   if (!slide) {
     return res.status(404).json({ error: 'Hero slide not found.' });
   }
 
-  db.prepare('DELETE FROM hero_slides WHERE id = ?').run(slideId);
+  await db.prepare('DELETE FROM hero_slides WHERE id = ?').run(slideId);
 
-  const usedByRoom = db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(slide.image_url).count > 0;
-  const usedByCover = db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(slide.image_url).count > 0;
-  const usedBySettings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get().hero_image === slide.image_url;
-  const usedByContentPage = db.prepare('SELECT COUNT(*) AS count FROM content_pages WHERE image_url = ?').get(slide.image_url).count > 0;
-  const usedByOtherSlides = db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(slide.image_url).count > 0;
+  const usedByRoom = (await db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(slide.image_url)).count > 0;
+  const usedByCover = (await db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(slide.image_url)).count > 0;
+  const usedBySettings = (await db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get()).hero_image === slide.image_url;
+  const usedByContentPage = (await db.prepare('SELECT COUNT(*) AS count FROM content_pages WHERE image_url = ?').get(slide.image_url)).count > 0;
+  const usedByOtherSlides = (await db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(slide.image_url)).count > 0;
 
   if (!usedByRoom && !usedByCover && !usedBySettings && !usedByContentPage && !usedByOtherSlides) {
-    removeUploadByUrl(slide.image_url);
+    await removeUploadByUrl(slide.image_url);
     removeRelatedOriginalByProcessedUrl(slide.image_url);
   }
 
   return res.json({ ok: true });
 });
 
-app.put('/api/admin/settings', requireAdmin, (req, res) => {
+app.put('/api/admin/settings', requireAdmin, async (req, res) => {
   const siteName = String(req.body.siteName || '').trim();
   const domain = String(req.body.domain || '').trim();
   const headline = String(req.body.headline || '').trim();
@@ -1165,7 +1193,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Please provide a valid contact email.' });
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE site_settings
      SET site_name = @site_name,
          domain = @domain,
@@ -1201,32 +1229,32 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-app.put('/api/admin/platform-links', requireAdmin, (req, res) => {
+app.put('/api/admin/platform-links', requireAdmin, async (req, res) => {
   const links = Array.isArray(req.body.links) ? req.body.links : [];
 
-  const trx = db.transaction(() => {
-    db.prepare('DELETE FROM platform_links').run();
+  const trx = db.transaction(async () => {
+    await db.prepare('DELETE FROM platform_links').run();
 
     const insert = db.prepare('INSERT INTO platform_links (platform_name, url, icon, sort_order) VALUES (?, ?, ?, ?)');
-    links.forEach((link, index) => {
+    for (const [index, link] of links.entries()) {
       const platformName = String(link.platformName || '').trim();
       const url = String(link.url || '').trim();
       const icon = String(link.icon || 'link').trim();
       if (platformName && /^https?:\/\//.test(url)) {
-        insert.run(platformName, url, icon, Number(link.sortOrder ?? index + 1));
+        await insert.run(platformName, url, icon, Number(link.sortOrder ?? index + 1));
       }
-    });
+    }
   });
 
-  trx();
+  await trx();
   return res.json({ ok: true });
 });
 
-app.put('/api/admin/page-content', requireAdmin, (req, res) => {
+app.put('/api/admin/page-content', requireAdmin, async (req, res) => {
   const pages = Array.isArray(req.body.pages) ? req.body.pages : [];
   const allowedSlugs = new Set(['eat-sip', 'property', 'about']);
 
-  const trx = db.transaction(() => {
+  const trx = db.transaction(async () => {
     const upsert = db.prepare(
       `INSERT INTO content_pages (
         slug, nav_label, title, subtitle, body, highlights_json, image_url, icon, sort_order, active, updated_at
@@ -1246,9 +1274,9 @@ app.put('/api/admin/page-content', requireAdmin, (req, res) => {
         updated_at = CURRENT_TIMESTAMP`
     );
 
-    pages.forEach((page, index) => {
+    for (const [index, page] of pages.entries()) {
       const slug = slugify(page.slug || '');
-      if (!allowedSlugs.has(slug)) return;
+      if (!allowedSlugs.has(slug)) continue;
 
       const navLabel = String(page.navLabel || '').trim();
       const title = String(page.title || '').trim();
@@ -1263,7 +1291,7 @@ app.put('/api/admin/page-content', requireAdmin, (req, res) => {
         throw new Error('Each page needs a nav label, title, and body.');
       }
 
-      upsert.run({
+      await upsert.run({
         slug,
         nav_label: navLabel,
         title,
@@ -1275,11 +1303,11 @@ app.put('/api/admin/page-content', requireAdmin, (req, res) => {
         sort_order: Number(page.sortOrder || index + 1),
         active: page.active === false ? 0 : 1
       });
-    });
+    }
   });
 
   try {
-    trx();
+    await trx();
     return res.json({ ok: true });
   } catch (error) {
     return res.status(400).json({ error: error.message || 'Failed to save page content.' });
@@ -1290,7 +1318,6 @@ app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('ima
   const slug = slugify(req.params.slug || '');
   const allowedSlugs = new Set(['eat-sip', 'property', 'about']);
   if (!allowedSlugs.has(slug)) {
-    removeFileIfExists(req.file?.path);
     return res.status(400).json({ error: 'Unsupported page.' });
   }
 
@@ -1298,52 +1325,45 @@ app.post('/api/admin/page-content/:slug/image', requireAdmin, upload.single('ima
     return res.status(400).json({ error: 'Image file is required.' });
   }
 
-  let originalCopyPath = '';
-  let outputPath = '';
+  let imageUrl = '';
 
   try {
-    const settings = getSettings();
-    const page = db.prepare('SELECT * FROM content_pages WHERE slug = ?').get(slug);
-    const baseName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-    const outputFilename = `${baseName}.jpg`;
-    const sourceExtension = (path.extname(req.file.originalname || '') || '.jpg').toLowerCase();
-    const safeExtension = /^[.][a-z0-9]{2,6}$/.test(sourceExtension) ? sourceExtension : '.jpg';
-    outputPath = path.join(siteUploadDir, outputFilename);
-    originalCopyPath = path.join(siteOriginalDir, `${baseName}-orig${safeExtension}`);
+    const settings = await getSettings();
+    const page = await db.prepare('SELECT * FROM content_pages WHERE slug = ?').get(slug);
+    imageUrl = await processAndSaveUpload({
+      buffer: req.file.buffer,
+      originalname: req.file.originalname,
+      relativeFolder: 'site',
+      originalsDir: siteOriginalDir,
+      logoText: settings.logo_text,
+      mode: 'slide'
+    });
 
-    await saveOriginalCopy(req.file.path, originalCopyPath);
-    await watermarkImage(req.file.path, outputPath, settings.logo_text, 'slide');
-
-    const imageUrl = `/uploads/site/${outputFilename}`;
-    db.prepare('UPDATE content_pages SET image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?').run(imageUrl, slug);
-
-    removeFileIfExists(req.file.path);
+    await db.prepare('UPDATE content_pages SET image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?').run(imageUrl, slug);
 
     if (page?.image_url && page.image_url !== imageUrl) {
-      const usedByRoom = db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(page.image_url).count > 0;
-      const usedByCover = db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(page.image_url).count > 0;
-      const usedBySettings = db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get().hero_image === page.image_url;
-      const usedBySlides = db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(page.image_url).count > 0;
-      const usedByOtherPages = db
+      const usedByRoom = (await db.prepare('SELECT COUNT(*) AS count FROM room_images WHERE image_url = ?').get(page.image_url)).count > 0;
+      const usedByCover = (await db.prepare('SELECT COUNT(*) AS count FROM rooms WHERE cover_image = ?').get(page.image_url)).count > 0;
+      const usedBySettings = (await db.prepare('SELECT hero_image FROM site_settings WHERE id = 1').get()).hero_image === page.image_url;
+      const usedBySlides = (await db.prepare('SELECT COUNT(*) AS count FROM hero_slides WHERE image_url = ?').get(page.image_url)).count > 0;
+      const usedByOtherPages = (await db
         .prepare('SELECT COUNT(*) AS count FROM content_pages WHERE image_url = ? AND slug != ?')
-        .get(page.image_url, slug).count > 0;
+        .get(page.image_url, slug)).count > 0;
 
       if (!usedByRoom && !usedByCover && !usedBySettings && !usedBySlides && !usedByOtherPages) {
-        removeUploadByUrl(page.image_url);
+        await removeUploadByUrl(page.image_url);
         removeRelatedOriginalByProcessedUrl(page.image_url);
       }
     }
 
     return res.status(201).json({ imageUrl });
   } catch (error) {
-    removeFileIfExists(req.file?.path);
-    removeFileIfExists(originalCopyPath);
-    removeFileIfExists(outputPath);
+    if (imageUrl) await removeUploadByUrl(imageUrl);
     return res.status(500).json({ error: 'Page image upload failed.' });
   }
 });
 
-app.put('/api/admin/chatbot-settings', requireAdmin, (req, res) => {
+app.put('/api/admin/chatbot-settings', requireAdmin, async (req, res) => {
   const title = String(req.body.title || '').trim();
   const greeting = String(req.body.greeting || '').trim();
   const whatsappNumber = String(req.body.whatsappNumber || '').replace(/[^\d]/g, '');
@@ -1358,7 +1378,7 @@ app.put('/api/admin/chatbot-settings', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'WhatsApp number is too short.' });
   }
 
-  db.prepare(
+  await db.prepare(
     `UPDATE chatbot_settings
      SET title = @title,
          greeting = @greeting,
@@ -1378,23 +1398,23 @@ app.put('/api/admin/chatbot-settings', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-app.put('/api/admin/chatbot-faqs', requireAdmin, (req, res) => {
+app.put('/api/admin/chatbot-faqs', requireAdmin, async (req, res) => {
   const faqs = Array.isArray(req.body.faqs) ? req.body.faqs : [];
 
-  const trx = db.transaction(() => {
-    db.prepare('DELETE FROM chatbot_faqs').run();
+  const trx = db.transaction(async () => {
+    await db.prepare('DELETE FROM chatbot_faqs').run();
 
     const insert = db.prepare('INSERT INTO chatbot_faqs (question, answer, sort_order) VALUES (?, ?, ?)');
-    faqs.forEach((faq, index) => {
+    for (const [index, faq] of faqs.entries()) {
       const question = String(faq.question || '').trim();
       const answer = String(faq.answer || '').trim();
-      if (!question || !answer) return;
+      if (!question || !answer) continue;
 
-      insert.run(question, answer, Number(faq.sortOrder ?? index + 1));
-    });
+      await insert.run(question, answer, Number(faq.sortOrder ?? index + 1));
+    }
   });
 
-  trx();
+  await trx();
   return res.json({ ok: true });
 });
 
@@ -1415,10 +1435,6 @@ app.get('/', (req, res) => {
 });
 
 app.use((error, req, res, next) => {
-  if (req.file?.path) {
-    removeFileIfExists(req.file.path);
-  }
-
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({ error: `Image is too large. Max allowed size is ${maxUploadSizeMb}MB.` });
@@ -1435,6 +1451,14 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ error: 'Unexpected server error.' });
 });
 
-app.listen(port, () => {
-  console.log(`Bomagawani app running on http://localhost:${port}`);
-});
+// Vercel imports this file as a serverless function handler and never calls
+// listen() itself - it just invokes the exported app per request. Everywhere
+// else (local dev, Docker, Render) keeps running the familiar long-lived
+// server via app.listen().
+if (!isVercel) {
+  app.listen(port, () => {
+    console.log(`Bomagawani app running on http://localhost:${port}`);
+  });
+}
+
+module.exports = app;

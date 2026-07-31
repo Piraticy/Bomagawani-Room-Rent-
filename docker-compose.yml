@@ -10,6 +10,10 @@ services:
       - PORT=3000
       - TRUST_PROXY=1
       - CONTENT_SNAPSHOT_FILE=/app/content.snapshot.json
+      # No TURSO_DATABASE_URL/BLOB_READ_WRITE_TOKEN here on purpose: leaving
+      # them unset makes the app fall back to the local SQLite file and local
+      # disk uploads on the volumes below, exactly like before this file was
+      # added for Vercel support. Only a Vercel deployment needs those set.
     volumes:
       - bomagawani_data:/app/data
       - bomagawani_room_uploads:/app/public/uploads/rooms

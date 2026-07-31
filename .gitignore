@@ -7,3 +7,4 @@ public/uploads/originals/*
 tmp-uploads
 .DS_Store
 .tunnel
+.vercel
