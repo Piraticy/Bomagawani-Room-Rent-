@@ -330,7 +330,8 @@ async function applyContentSnapshot(snapshot) {
 
         let roomId = existingRoom?.id || null;
         if (roomId) {
-          await updateRoom.run({ ...roomPayload, id: roomId });
+          const { slug: _slug, ...updatePayload } = roomPayload;
+          await updateRoom.run({ ...updatePayload, id: roomId });
         } else {
           const inserted = await insertRoom.run(roomPayload);
           roomId = Number(inserted.lastInsertRowid);
@@ -430,9 +431,10 @@ async function seedContentPages() {
   ];
 
   for (const page of pages) {
+    const { highlights, ...rest } = page;
     await insertPage.run({
-      ...page,
-      highlights_json: JSON.stringify(page.highlights),
+      ...rest,
+      highlights_json: JSON.stringify(highlights),
       active: 1
     });
   }
