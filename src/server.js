@@ -38,8 +38,10 @@ const siteOriginalDir = path.join(uploadRootDir, 'originals', 'site');
 
 // Local disk directories are only needed when Blob storage isn't configured -
 // Vercel's filesystem outside /tmp isn't writable/persistent anyway, so this
-// only matters for local dev, Docker, and Render.
-if (!blobStorage.isEnabled) {
+// only matters for local dev, Docker, and Render. Skip unconditionally on
+// Vercel even if BLOB_READ_WRITE_TOKEN isn't set yet, since mkdirSync would
+// otherwise crash the whole function before it can serve any request.
+if (!blobStorage.isEnabled && !isVercel) {
   fs.mkdirSync(roomUploadDir, { recursive: true });
   fs.mkdirSync(siteUploadDir, { recursive: true });
   fs.mkdirSync(roomOriginalDir, { recursive: true });
