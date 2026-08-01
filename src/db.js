@@ -934,7 +934,7 @@ CREATE TABLE IF NOT EXISTS sessions (
       price_per_night_usd: 75,
       max_guests: 2,
       size_label: '24 m2',
-      bed_size: '1 Double Bed + 2 Double Bed',
+      bed_size: '1 Single Bed + 1 Double Bed',
       featured: 0,
       cover_image: '/uploads/rooms/guest-room-main.jpg',
       amenities_json: JSON.stringify([
@@ -958,7 +958,14 @@ CREATE TABLE IF NOT EXISTS sessions (
 
   const guestRoomBedSize = await db.prepare("SELECT bed_size FROM rooms WHERE slug = 'guest-room'").get();
   if (guestRoomBedSize && guestRoomBedSize.bed_size === null) {
-    await db.prepare("UPDATE rooms SET bed_size = '1 Double Bed + 2 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
+    await db.prepare("UPDATE rooms SET bed_size = '1 Single Bed + 1 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
+  }
+
+  // Follow-up correction: the bed_size above briefly shipped as "1 Double Bed
+  // + 2 Double Bed" - fix it to the correct wording, but only if it still
+  // holds that exact old value, so a later admin edit is never clobbered.
+  if (guestRoomBedSize && guestRoomBedSize.bed_size === '1 Double Bed + 2 Double Bed') {
+    await db.prepare("UPDATE rooms SET bed_size = '1 Single Bed + 1 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
   }
 
   const linksCount = (await db.prepare('SELECT COUNT(*) AS count FROM platform_links').get()).count;

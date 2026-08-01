@@ -71,6 +71,15 @@ const translations = {
     'form.note': 'Note (optional)',
     'form.notePlaceholder': 'Late arrival, special request',
     'form.submit': 'Send Booking Request',
+    'offers.title': 'Exclusive Offers',
+    'offers.swahiliRetreat.tabLabel': 'Swahili Retreat',
+    'offers.swahiliRetreat.title': 'Swahili Retreat',
+    'offers.swahiliRetreat.duration': '21 Days Offer',
+    'offers.swahiliRetreat.terms': 'Pay 30% booking and the rest once leaving.',
+    'offers.camping.tabLabel': 'Camping Offer',
+    'offers.camping.title': 'Camping Offer',
+    'offers.camping.duration': '21 Days Offer',
+    'offers.camping.terms': 'Pay 30% booking and the rest once leaving.',
     'tracking.title': 'Check your booking status',
     'tracking.code': 'Booking reference',
     'tracking.button': 'Check booking',
@@ -188,6 +197,15 @@ const translations = {
     'amenities.subtitle': 'Alles, was Sie für einen angenehmen Aufenthalt brauchen.',
     'booking.title': 'Direkt auf Bomagawani.com buchen',
     'booking.subtitle': 'Wählen Sie Zimmer, Reisedaten und Währung. Ihre Buchungsreferenz wird sofort vorbereitet.',
+    'offers.title': 'Exklusive Angebote',
+    'offers.swahiliRetreat.tabLabel': 'Swahili Retreat',
+    'offers.swahiliRetreat.title': 'Swahili Retreat',
+    'offers.swahiliRetreat.duration': '21-Tage-Angebot',
+    'offers.swahiliRetreat.terms': 'Zahlen Sie 30% bei Buchung und den Rest bei Abreise.',
+    'offers.camping.tabLabel': 'Camping-Angebot',
+    'offers.camping.title': 'Camping-Angebot',
+    'offers.camping.duration': '21-Tage-Angebot',
+    'offers.camping.terms': 'Zahlen Sie 30% bei Buchung und den Rest bei Abreise.',
     'tracking.title': 'Buchungsstatus prüfen',
     'tracking.code': 'Buchungsreferenz',
     'tracking.button': 'Buchung prüfen',
@@ -606,9 +624,8 @@ const dom = {
   bookingStatus: document.getElementById('booking-status'),
   phoneCountry: document.getElementById('phone-country'),
   guestPhoneLocal: document.getElementById('guest-phone-local'),
-  trackingForm: document.getElementById('tracking-form'),
-  trackingCode: document.getElementById('tracking-code'),
-  trackingResult: document.getElementById('tracking-result'),
+  offersTabs: document.querySelectorAll('[data-offer-tab]'),
+  offerPanels: document.querySelectorAll('[data-offer-panel]'),
   statRooms: document.getElementById('stat-rooms'),
   statLocation: document.getElementById('stat-location'),
   useLocation: document.getElementById('use-location'),
@@ -798,10 +815,6 @@ function refreshIcons() {
 
 function languageLabel(code) {
   return languageConfig[code]?.label || 'English';
-}
-
-function paymentLabel(code) {
-  return t(`payment.${code || 'pay_on_arrival'}`);
 }
 
 function countryFlagFromIso2(iso2) {
@@ -2117,33 +2130,24 @@ async function submitBooking(event) {
   }
 }
 
-async function trackBooking(event) {
-  event.preventDefault();
-  const code = dom.trackingCode.value.trim().toUpperCase();
-  if (!code) return;
+function configureOffersTabs() {
+  dom.offersTabs.forEach((tabButton) => {
+    tabButton.addEventListener('click', () => {
+      const key = tabButton.dataset.offerTab;
 
-  dom.trackingResult.textContent = t('tracking.checking');
+      dom.offersTabs.forEach((button) => {
+        const isActive = button.dataset.offerTab === key;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
 
-  try {
-    const response = await fetch(`/api/public/bookings/${encodeURIComponent(code)}`);
-    const result = await response.json();
-
-    if (!response.ok) {
-      dom.trackingResult.textContent = result.error || t('tracking.notFound');
-      return;
-    }
-
-    dom.trackingResult.innerHTML = `
-      <strong>${t('tracking.status')}:</strong> ${result.booking_status}<br/>
-      <strong>${t('tracking.room')}:</strong> ${escapeHtml(result.room_name)}<br/>
-      <strong>${t('tracking.dates')}:</strong> ${result.check_in} to ${result.check_out}<br/>
-      <strong>${t('tracking.payment')}:</strong> ${result.payment_status}<br/>
-      <strong>${t('tracking.paymentOption')}:</strong> ${paymentLabel(result.payment_option)}<br/>
-      <a href="/receipt/${result.booking_code}" target="_blank" rel="noreferrer">${t('status.openReceipt')}</a>
-    `;
-  } catch (error) {
-    dom.trackingResult.textContent = t('tracking.serviceDown');
-  }
+      dom.offerPanels.forEach((panel) => {
+        const isActive = panel.dataset.offerPanel === key;
+        panel.classList.toggle('is-active', isActive);
+        panel.hidden = !isActive;
+      });
+    });
+  });
 }
 
 function configureDateInputs() {
@@ -2569,7 +2573,7 @@ configurePropertyGallery();
 configureClientRouting();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
-dom.trackingForm.addEventListener('submit', trackBooking);
+configureOffersTabs();
 
 window.addEventListener('load', refreshIcons);
 

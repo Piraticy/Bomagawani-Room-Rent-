@@ -276,9 +276,9 @@ h4 {
 
 .bank-transfer-panel {
   display: grid;
-  gap: 10px;
+  gap: 14px;
   margin-top: -6px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   border-radius: 14px;
   background: #edf7f5;
   border: 1px solid #cde8df;
@@ -291,23 +291,30 @@ h4 {
   line-height: 1.5;
 }
 
-.bank-transfer-panel .ghost-btn {
+.bank-transfer-panel .primary-btn {
   justify-self: start;
 }
 
 .bank-details-box {
   display: grid;
-  gap: 4px;
-  padding: 12px 14px;
+  gap: 6px;
+  padding: 16px 18px;
   border-radius: 12px;
   background: #fff;
   border: 1px solid #cde8df;
+  box-shadow: 0 10px 28px rgba(13, 34, 64, 0.1);
 }
 
 .bank-details-box p {
   margin: 0;
   font-size: 0.92rem;
   color: var(--dark, #1d2a3a);
+}
+
+.bank-details-name {
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--primary);
 }
 
 .hero {
@@ -2332,6 +2339,71 @@ body.lightbox-open {
   margin-top: 10px;
 }
 
+.offers-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.offers-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.offers-tab:hover {
+  border-color: rgba(18, 91, 102, 0.4);
+}
+
+.offers-tab.is-active {
+  background: linear-gradient(120deg, #125b66, #0f7f71);
+  border-color: transparent;
+  color: #fff;
+}
+
+.offer-panel {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #edf7f5;
+  border: 1px solid #cde8df;
+}
+
+.offer-panel h4 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.offer-duration {
+  display: inline-flex;
+  margin: 0 0 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(227, 163, 78, 0.16);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.offer-panel > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -2580,16 +2652,19 @@ textarea {
 .footer-contact {
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   gap: 10px;
 }
 
-.footer-contact a {
+.footer-map-link {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
   color: var(--primary);
   background: #edf7f5;
   border: 1px solid #cde8df;
-  border-radius: 999px;
-  padding: 8px 12px;
+  border-radius: 14px;
+  padding: 8px 14px;
   font-weight: 900;
   font-size: 0.9rem;
 }
@@ -2598,16 +2673,27 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
+  background: #edf7f5;
+  border: 1px solid #cde8df;
+  border-radius: 14px;
+  padding: 7px 14px 9px;
+}
+
+.footer-contact-item a {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 0.9rem;
 }
 
 .footer-contact-note {
   color: var(--accent);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding-left: 4px;
 }
 
 .floating-prompt {
