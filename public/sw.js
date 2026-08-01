@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bomagawani-v25';
+const CACHE_NAME = 'bomagawani-v26';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -46,21 +46,20 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/receipt/')) return;
 
   if (isAppShellRequest(url.pathname)) {
+    // Network-first: always try to fetch the latest app shell so a new
+    // deploy shows up the very next time someone opens or reloads the site,
+    // not one visit late. The cache is only a fallback for when the network
+    // request fails (offline), not the default source of truth.
     event.respondWith(
-      caches.open(CACHE_NAME).then((cache) =>
-        cache.match(event.request).then((cached) => {
-          const networkFetch = fetch(event.request)
-            .then((response) => {
-              cache.put(event.request, response.clone()).catch(() => {
-                // Some requests cannot be cached (opaque/cors), ignore safely
-              });
-              return response;
-            })
-            .catch(() => cached);
-
-          return cached || networkFetch;
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {
+            // Some requests cannot be cached (opaque/cors), ignore safely
+          });
+          return response;
         })
-      )
+        .catch(() => caches.match(event.request))
     );
     return;
   }
