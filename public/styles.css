@@ -1600,7 +1600,7 @@ h4 {
 .eat-gallery-wall {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: 210px;
+  grid-auto-rows: 270px;
   gap: 14px;
 }
 
@@ -1608,14 +1608,14 @@ h4 {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  min-height: 210px;
+  min-height: 270px;
   background: #e9f2f4;
   margin: 0;
   box-shadow: 0 18px 46px rgba(13, 34, 64, 0.08);
 }
 
 .eat-gallery-main {
-  grid-column: span 2;
+  grid-row: span 2;
 }
 
 .eat-gallery-main figcaption {
@@ -2902,6 +2902,11 @@ textarea {
 
   .eat-gallery-wall {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .eat-gallery-main {
+    grid-row: auto;
+    grid-column: span 2;
   }
 
   .property-fact-grid,
