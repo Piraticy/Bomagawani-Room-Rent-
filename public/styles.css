@@ -1471,7 +1471,7 @@ h4 {
 
 .eat-feature-image {
   position: relative;
-  min-height: 440px;
+  height: 440px;
   overflow: hidden;
   border-radius: 26px;
   background: #173947;
@@ -3048,7 +3048,7 @@ textarea {
   }
 
   .eat-feature-image {
-    min-height: 340px;
+    height: 340px;
   }
 
   .eat-gallery-main {
