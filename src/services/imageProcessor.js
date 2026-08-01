@@ -22,9 +22,11 @@ function safeLogoText(value) {
 }
 
 function normalizeTarget(mode) {
-  if (mode === 'hero') return { width: 1920, height: 1080, quality: 95 };
-  if (mode === 'slide') return { width: 1920, height: 1080, quality: 95 };
-  return { width: 1600, height: 1100, quality: 94 };
+  if (mode === 'hero') return { width: 1920, height: 1080, quality: 95, chromaSubsampling: '4:4:4' };
+  if (mode === 'slide') return { width: 1920, height: 1080, quality: 95, chromaSubsampling: '4:4:4' };
+  // Room photos are shown small (card thumbnails/sliders), so a heavier target
+  // just slows page loads for no visible benefit - keep quality good but lighter.
+  return { width: 1400, height: 960, quality: 78, chromaSubsampling: '4:2:0' };
 }
 
 // `input` is either a Buffer (from multer memory storage) or a file path -
@@ -85,7 +87,7 @@ async function watermarkImage(input, logoText, mode = 'room') {
         left: 0
       }
     ])
-    .jpeg({ quality: target.quality, mozjpeg: true, progressive: true, chromaSubsampling: '4:4:4' })
+    .jpeg({ quality: target.quality, mozjpeg: true, progressive: true, chromaSubsampling: target.chromaSubsampling })
     .toBuffer();
 
   return {

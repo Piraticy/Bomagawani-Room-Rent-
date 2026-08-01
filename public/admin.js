@@ -47,6 +47,7 @@ const dom = {
   roomPrice: document.getElementById('room-price'),
   roomMax: document.getElementById('room-max'),
   roomSize: document.getElementById('room-size'),
+  roomBedSize: document.getElementById('room-bed-size'),
   roomAmenities: document.getElementById('room-amenities'),
   roomFeatured: document.getElementById('room-featured'),
   roomActive: document.getElementById('room-active'),
@@ -209,6 +210,7 @@ function amenitiesToText(amenities) {
 
 function paymentOptionLabel(option) {
   if (option === 'pay_online') return 'Pay Online';
+  if (option === 'bank_transfer') return 'Bank Transfer (30% deposit)';
   return 'Pay On Arrival';
 }
 
@@ -265,7 +267,7 @@ function renderRooms() {
     item.innerHTML = `
       <div>
         <p><strong>${escapeHtml(room.name)}</strong> ${room.active ? '' : '(Inactive)'}</p>
-        <p>${escapeHtml(room.price_per_night_usd)} USD/night • Max ${escapeHtml(room.max_guests)}</p>
+        <p>${escapeHtml(room.price_per_night_usd)} USD/night • Max ${escapeHtml(room.max_guests)}${room.bed_size ? ` • ${escapeHtml(room.bed_size)}` : ''}</p>
       </div>
       <div class="action-row">
         <button class="small-btn" data-edit-room="${room.id}">Edit</button>
@@ -633,6 +635,7 @@ function startRoomEdit(roomId) {
   dom.roomPrice.value = room.price_per_night_usd;
   dom.roomMax.value = room.max_guests;
   dom.roomSize.value = room.size_label;
+  dom.roomBedSize.value = room.bed_size || '';
   dom.roomAmenities.value = amenitiesToText(room.amenities || []);
   dom.roomFeatured.checked = Boolean(room.featured);
   dom.roomActive.checked = Boolean(room.active);
@@ -903,6 +906,7 @@ dom.roomForm.addEventListener('submit', async (event) => {
     pricePerNightUsd: Number(dom.roomPrice.value),
     maxGuests: Number(dom.roomMax.value),
     sizeLabel: dom.roomSize.value.trim(),
+    bedSize: dom.roomBedSize.value.trim(),
     featured: dom.roomFeatured.checked,
     active: dom.roomActive.checked,
     amenities: parseAmenitiesText(dom.roomAmenities.value)

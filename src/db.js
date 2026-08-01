@@ -535,6 +535,7 @@ CREATE TABLE IF NOT EXISTS rooms (
   price_per_night_usd REAL NOT NULL,
   max_guests INTEGER NOT NULL,
   size_label TEXT NOT NULL,
+  bed_size TEXT,
   featured INTEGER NOT NULL DEFAULT 0,
   amenities_json TEXT NOT NULL,
   cover_image TEXT,
@@ -631,6 +632,10 @@ CREATE TABLE IF NOT EXISTS sessions (
 
   if (!(await hasColumn('content_pages', 'image_url'))) {
     await db.exec('ALTER TABLE content_pages ADD COLUMN image_url TEXT');
+  }
+
+  if (!(await hasColumn('rooms', 'bed_size'))) {
+    await db.exec('ALTER TABLE rooms ADD COLUMN bed_size TEXT');
   }
 
   await seedContentPages();
@@ -895,8 +900,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   if (!roomsCount) {
     const insertRoom = db.prepare(`
       INSERT INTO rooms (
-        name, slug, short_description, long_description, price_per_night_usd, max_guests, size_label, featured, amenities_json, cover_image
-      ) VALUES (@name, @slug, @short_description, @long_description, @price_per_night_usd, @max_guests, @size_label, @featured, @amenities_json, @cover_image)
+        name, slug, short_description, long_description, price_per_night_usd, max_guests, size_label, bed_size, featured, amenities_json, cover_image
+      ) VALUES (@name, @slug, @short_description, @long_description, @price_per_night_usd, @max_guests, @size_label, @bed_size, @featured, @amenities_json, @cover_image)
     `);
 
     await insertRoom.run({
@@ -905,8 +910,9 @@ CREATE TABLE IF NOT EXISTS sessions (
       short_description: 'Premium private suite with balcony and ocean breeze.',
       long_description: 'The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.',
       price_per_night_usd: 120,
-      max_guests: 2,
+      max_guests: 4,
       size_label: '38 m2',
+      bed_size: '2 Double Bed',
       featured: 1,
       cover_image: '',
       amenities_json: JSON.stringify([
@@ -928,6 +934,7 @@ CREATE TABLE IF NOT EXISTS sessions (
       price_per_night_usd: 75,
       max_guests: 2,
       size_label: '24 m2',
+      bed_size: '1 Double Bed + 2 Double Bed',
       featured: 0,
       cover_image: '/uploads/rooms/guest-room-main.jpg',
       amenities_json: JSON.stringify([
@@ -939,6 +946,19 @@ CREATE TABLE IF NOT EXISTS sessions (
         { icon: 'glass-water', label: 'Drinks' }
       ])
     });
+  }
+
+  // Bed size is a brand-new column (always NULL on existing rows until an
+  // admin sets it), so this only ever fires once per room and never
+  // overwrites a value an admin has already edited.
+  const masterBedroomBedSize = await db.prepare("SELECT max_guests, bed_size FROM rooms WHERE slug = 'master-bedroom'").get();
+  if (masterBedroomBedSize && masterBedroomBedSize.bed_size === null) {
+    await db.prepare("UPDATE rooms SET max_guests = 4, bed_size = '2 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'master-bedroom'").run();
+  }
+
+  const guestRoomBedSize = await db.prepare("SELECT bed_size FROM rooms WHERE slug = 'guest-room'").get();
+  if (guestRoomBedSize && guestRoomBedSize.bed_size === null) {
+    await db.prepare("UPDATE rooms SET bed_size = '1 Double Bed + 2 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
   }
 
   const linksCount = (await db.prepare('SELECT COUNT(*) AS count FROM platform_links').get()).count;

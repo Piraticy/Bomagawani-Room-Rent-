@@ -16,7 +16,7 @@ const { db, ready } = require('./db');
 const { requireAdmin } = require('./middleware/auth');
 const { convertFromUSD, fetchRates } = require('./services/currency');
 const { watermarkImage, saveOriginalCopy } = require('./services/imageProcessor');
-const { sendBookingStatusEmail } = require('./services/email');
+const { sendBookingStatusEmail, sendNewBookingNotification } = require('./services/email');
 const TursoSessionStore = require('./middleware/tursoSessionStore');
 const blobStorage = require('./services/blobStorage');
 
@@ -230,7 +230,14 @@ function normalizeCurrency(code) {
 function normalizePaymentOption(value) {
   const option = String(value || 'pay_on_arrival').trim().toLowerCase();
   if (option === 'pay_online') return 'pay_online';
+  if (option === 'bank_transfer') return 'bank_transfer';
   return 'pay_on_arrival';
+}
+
+function paymentOptionLabel(option) {
+  if (option === 'pay_online') return 'Pay Online';
+  if (option === 'bank_transfer') return 'Bank Transfer (30% deposit)';
+  return 'Pay On Arrival';
 }
 
 function parseDateOnly(dateString) {
@@ -623,6 +630,24 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     }
   }
 
+  sendNewBookingNotification({
+    booking_code: code,
+    room_name: room.name,
+    check_in: checkIn,
+    check_out: checkOut,
+    nights: dateCheck.nights,
+    guests_count: parsedGuests,
+    total_in_currency: converted.total,
+    currency_code: converted.currency,
+    payment_option: paymentOption,
+    guest_name: guestName,
+    guest_email: guestEmail,
+    guest_phone: guestPhone,
+    note
+  }).catch((error) => {
+    console.error('[email] Unexpected error sending new-booking notification:', error.message);
+  });
+
   return res.status(201).json({
     message: 'Booking request created successfully. Waiting for admin confirmation.',
     bookingCode: code,
@@ -711,7 +736,7 @@ app.get('/receipt/:code', apiLimiter, async (req, res) => {
             <div><div class="label">Nights</div><div class="value">${escapeHtml(booking.nights)}</div></div>
             <div><div class="label">Guests</div><div class="value">${escapeHtml(booking.guests_count)}</div></div>
             <div><div class="label">Contact</div><div class="value">${escapeHtml(booking.guest_email)}<br/>${escapeHtml(booking.guest_phone)}</div></div>
-            <div><div class="label">Payment Option</div><div class="value">${booking.payment_option === 'pay_online' ? 'Pay Online' : 'Pay On Arrival'}</div></div>
+            <div><div class="label">Payment Option</div><div class="value">${escapeHtml(paymentOptionLabel(booking.payment_option))}</div></div>
             <div><div class="label">Payment Status</div><div class="value">${escapeHtml(booking.payment_status)}</div></div>
           </div>
 
@@ -870,6 +895,7 @@ app.post('/api/admin/rooms', requireAdmin, async (req, res) => {
   const pricePerNightUsd = Number(req.body.pricePerNightUsd);
   const maxGuests = Number(req.body.maxGuests);
   const sizeLabel = String(req.body.sizeLabel || '').trim();
+  const bedSize = String(req.body.bedSize || '').trim();
   const featured = req.body.featured === true;
   const active = req.body.active !== false;
   const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : [];
@@ -895,10 +921,10 @@ app.post('/api/admin/rooms', requireAdmin, async (req, res) => {
     .prepare(
       `INSERT INTO rooms (
         name, slug, short_description, long_description, price_per_night_usd,
-        max_guests, size_label, featured, active, amenities_json
+        max_guests, size_label, bed_size, featured, active, amenities_json
       ) VALUES (
         @name, @slug, @short_description, @long_description, @price_per_night_usd,
-        @max_guests, @size_label, @featured, @active, @amenities_json
+        @max_guests, @size_label, @bed_size, @featured, @active, @amenities_json
       )`
     )
     .run({
@@ -909,6 +935,7 @@ app.post('/api/admin/rooms', requireAdmin, async (req, res) => {
       price_per_night_usd: pricePerNightUsd,
       max_guests: maxGuests,
       size_label: sizeLabel,
+      bed_size: bedSize,
       featured: featured ? 1 : 0,
       active: active ? 1 : 0,
       amenities_json: JSON.stringify(amenities)
@@ -930,6 +957,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, async (req, res) => {
   const parsedPrice = req.body.pricePerNightUsd !== undefined ? Number(req.body.pricePerNightUsd) : Number(room.price_per_night_usd);
   const parsedMaxGuests = req.body.maxGuests !== undefined ? Number(req.body.maxGuests) : Number(room.max_guests);
   const sizeLabel = String(req.body.sizeLabel || room.size_label).trim();
+  const bedSize = req.body.bedSize === undefined ? room.bed_size || '' : String(req.body.bedSize || '').trim();
   const featured = typeof req.body.featured === 'boolean' ? (req.body.featured ? 1 : 0) : room.featured;
   const active = typeof req.body.active === 'boolean' ? (req.body.active ? 1 : 0) : room.active;
   const amenities = Array.isArray(req.body.amenities) ? req.body.amenities : JSON.parse(room.amenities_json || '[]');
@@ -947,6 +975,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, async (req, res) => {
          price_per_night_usd = @price_per_night_usd,
          max_guests = @max_guests,
          size_label = @size_label,
+         bed_size = @bed_size,
          featured = @featured,
          active = @active,
          amenities_json = @amenities_json,
@@ -961,6 +990,7 @@ app.put('/api/admin/rooms/:id', requireAdmin, async (req, res) => {
     price_per_night_usd: parsedPrice,
     max_guests: parsedMaxGuests,
     size_label: sizeLabel,
+    bed_size: bedSize,
     featured,
     active,
     amenities_json: JSON.stringify(amenities),

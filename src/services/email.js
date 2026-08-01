@@ -64,7 +64,56 @@ async function sendBookingStatusEmail(booking, statusKey) {
   }
 }
 
+function formatPaymentOption(option) {
+  return String(option || 'pay_on_arrival')
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+async function sendNewBookingNotification(booking) {
+  const recipient = process.env.BOOKING_NOTIFICATION_EMAIL || 'hermann.h.chausiku@gmail.com';
+
+  if (!isConfigured()) {
+    console.log(`[email] SMTP not configured, skipping new-booking notification for ${booking.booking_code}.`);
+    return { sent: false, reason: 'smtp_not_configured' };
+  }
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+      to: recipient,
+      subject: `New booking request: ${booking.booking_code}`,
+      text: [
+        `A new booking request was submitted on Bomagawani.com.`,
+        '',
+        `Booking code: ${booking.booking_code}`,
+        `Room: ${booking.room_name}`,
+        `Dates: ${booking.check_in} to ${booking.check_out} (${booking.nights} night(s))`,
+        `Guests: ${booking.guests_count}`,
+        `Total: ${booking.total_in_currency} ${booking.currency_code}`,
+        `Payment option: ${formatPaymentOption(booking.payment_option)}`,
+        '',
+        `Guest name: ${booking.guest_name}`,
+        `Guest email: ${booking.guest_email}`,
+        `Guest phone: ${booking.guest_phone}`,
+        booking.note ? `Note: ${booking.note}` : null,
+        '',
+        `Confirm or manage this booking in the admin panel: ${process.env.PUBLIC_BASE_URL || ''}/admin`
+      ]
+        .filter((line) => line !== null)
+        .join('\n')
+    });
+    return { sent: true };
+  } catch (error) {
+    console.error('[email] Failed to send new-booking notification:', error.message);
+    return { sent: false, reason: 'send_failed' };
+  }
+}
+
 module.exports = {
   isConfigured,
-  sendBookingStatusEmail
+  sendBookingStatusEmail,
+  sendNewBookingNotification
 };

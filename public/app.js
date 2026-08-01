@@ -60,6 +60,11 @@ const translations = {
     'form.currency': 'Currency',
     'form.paymentOption': 'Payment option',
     'form.payOnArrival': 'Pay on arrival',
+    'form.bankTransfer': 'Bank transfer (30% deposit)',
+    'form.bankTransferNote': 'Pay a 30% deposit of your total stay cost by bank transfer to secure this booking. The remaining balance is paid on arrival.',
+    'form.showBankDetails': 'Show bank details',
+    'form.iban': 'IBAN',
+    'form.bic': 'BIC',
     'form.fullName': 'Full name',
     'form.email': 'Email',
     'form.phone': 'Phone',
@@ -76,14 +81,14 @@ const translations = {
     'chatbot.answerPlaceholder': 'Tap a question to get a quick answer.',
     'chatbot.toggle': 'Chat',
     'chatbot.whatsapp': 'Chat on WhatsApp',
-    'quote.empty': 'Enter dates to check availability.',
-    'quote.loading': 'Checking availability...',
+    'quote.empty': 'Enter dates to see your price estimate.',
+    'quote.loading': 'Calculating quote...',
     'quote.conflict': 'Those dates are already confirmed for this room. Please pick another date.',
     'quote.conflictNextAvailable': 'This room is booked for those dates. It is next available from {date}.',
-    'quote.unavailable': 'Could not check availability.',
-    'quote.serviceDown': 'Availability service unavailable. Try again.',
-    'quote.nights': '{nights} night(s) selected',
-    'quote.priceOnRequest': "We'll confirm your total price directly.",
+    'quote.unavailable': 'Could not get quote.',
+    'quote.serviceDown': 'Quote service unavailable. Try again.',
+    'quote.nights': '{nights} night(s) x {price}',
+    'quote.total': 'Total: {total}',
     'status.checkQuoteFirst': 'Please check dates and quote first.',
     'status.submittingBooking': 'Submitting booking request...',
     'status.bookingFailed': 'Booking failed.',
@@ -94,6 +99,8 @@ const translations = {
     'form.loadingCountryCodes': 'Loading dialing codes...',
     'footer.map': 'Map',
     'footer.email': 'Email',
+    'footer.forBooking': 'For Booking',
+    'footer.forInquiries': 'For Inquiries',
     'contact.call': 'Call',
     'eatSip.galleryCaption': 'Fresh coastal plates, prepared to order.',
     'status.openReceipt': 'Open receipt',
@@ -107,6 +114,7 @@ const translations = {
     'tracking.paymentOption': 'Payment option',
     'payment.pay_on_arrival': 'Pay on arrival',
     'payment.pay_online': 'Pay online',
+    'payment.bank_transfer': 'Bank transfer (30% deposit)',
     'location.noSupport': 'Geolocation is not supported on this device.',
     'location.reading': 'Reading your location...',
     'location.ready': 'Route link is ready. Tap Open Map.',
@@ -147,6 +155,11 @@ const translations = {
     'form.currency': 'Währung',
     'form.paymentOption': 'Zahlungsart',
     'form.payOnArrival': 'Bei Ankunft bezahlen',
+    'form.bankTransfer': 'Banküberweisung (30% Anzahlung)',
+    'form.bankTransferNote': 'Zahlen Sie 30% Anzahlung der Gesamtkosten per Banküberweisung, um diese Buchung zu sichern. Der Restbetrag wird bei Ankunft bezahlt.',
+    'form.showBankDetails': 'Bankdaten anzeigen',
+    'form.iban': 'IBAN',
+    'form.bic': 'BIC',
     'form.fullName': 'Vollständiger Name',
     'form.email': 'E-Mail',
     'form.phone': 'Telefon',
@@ -185,14 +198,14 @@ const translations = {
     'chatbot.answerPlaceholder': 'Tippen Sie auf eine Frage für eine schnelle Antwort.',
     'chatbot.toggle': 'Chat',
     'chatbot.whatsapp': 'Auf WhatsApp schreiben',
-    'quote.empty': 'Reisedaten eingeben, um die Verfügbarkeit zu prüfen.',
-    'quote.loading': 'Verfügbarkeit wird geprüft...',
+    'quote.empty': 'Reisedaten eingeben, um den Preis zu sehen.',
+    'quote.loading': 'Preis wird berechnet...',
     'quote.conflict': 'Diese Daten sind für dieses Zimmer bereits bestätigt. Bitte wählen Sie andere Daten.',
     'quote.conflictNextAvailable': 'Dieses Zimmer ist für diese Daten gebucht. Nächste Verfügbarkeit ab {date}.',
-    'quote.unavailable': 'Verfügbarkeit konnte nicht geprüft werden.',
-    'quote.serviceDown': 'Verfügbarkeitsservice nicht erreichbar. Bitte erneut versuchen.',
-    'quote.nights': '{nights} Nacht/Nächte ausgewählt',
-    'quote.priceOnRequest': 'Wir bestätigen Ihnen den Gesamtpreis direkt.',
+    'quote.unavailable': 'Preis konnte nicht geladen werden.',
+    'quote.serviceDown': 'Preisservice nicht erreichbar. Bitte erneut versuchen.',
+    'quote.nights': '{nights} Nacht/Nächte x {price}',
+    'quote.total': 'Gesamt: {total}',
     'status.checkQuoteFirst': 'Bitte zuerst Daten und Preis prüfen.',
     'status.submittingBooking': 'Buchungsanfrage wird gesendet...',
     'status.bookingFailed': 'Buchung fehlgeschlagen.',
@@ -203,6 +216,8 @@ const translations = {
     'form.loadingCountryCodes': 'Ländervorwahlen werden geladen...',
     'footer.map': 'Karte',
     'footer.email': 'E-Mail',
+    'footer.forBooking': 'Für Buchungen',
+    'footer.forInquiries': 'Für Anfragen',
     'contact.call': 'Anrufen',
     'eatSip.galleryCaption': 'Frische Küstengerichte, auf Bestellung zubereitet.',
     'status.openReceipt': 'Beleg öffnen',
@@ -216,6 +231,7 @@ const translations = {
     'tracking.paymentOption': 'Zahlungsart',
     'payment.pay_on_arrival': 'Bei Ankunft bezahlen',
     'payment.pay_online': 'Online bezahlen',
+    'payment.bank_transfer': 'Banküberweisung (30% Anzahlung)',
     'location.noSupport': 'Standortbestimmung wird auf diesem Gerät nicht unterstützt.',
     'location.reading': 'Standort wird gelesen...',
     'location.ready': 'Routenlink ist bereit. Tippen Sie auf Karte öffnen.',
@@ -548,6 +564,7 @@ const dom = {
   contactWhatsappLink: document.getElementById('contact-whatsapp-link'),
   contactMapLink: document.getElementById('contact-map-link'),
   footerPhoneLink: document.getElementById('footer-phone-link'),
+  footerInquiryPhoneLink: document.getElementById('footer-inquiry-phone-link'),
   footerEmailLink: document.getElementById('footer-email-link'),
   footerMapLink: document.getElementById('footer-map-link'),
   heroBookingForm: document.getElementById('hero-booking-form'),
@@ -581,6 +598,9 @@ const dom = {
   currencySelect: document.getElementById('currency-select'),
   paymentOption: document.getElementById('payment-option'),
   paymentOptionGroup: document.getElementById('payment-option-group'),
+  bankTransferPanel: document.getElementById('bank-transfer-panel'),
+  showBankDetailsBtn: document.getElementById('show-bank-details-btn'),
+  bankDetailsBox: document.getElementById('bank-details-box'),
   quoteBox: document.getElementById('quote-box'),
   bookingForm: document.getElementById('booking-form'),
   bookingStatus: document.getElementById('booking-status'),
@@ -747,6 +767,11 @@ function applyCopyTranslations() {
     const core = original.trim();
     node.nodeValue = `${leading}${translateCopy(core)}${trailing}`;
   }
+}
+
+function displayPriceFromUsd(value, currency = currentCurrency()) {
+  const rate = state.exchangeRates[currency] || fallbackExchangeRates[currency] || 1;
+  return Number(value || 0) * rate;
 }
 
 async function loadExchangeRate(currency = currentCurrency()) {
@@ -1192,6 +1217,18 @@ function selectBookingRangeDate(dateString) {
   setTimeout(hideBookingDateRangePicker, 120);
 }
 
+function formatAmount(value, currency) {
+  try {
+    return new Intl.NumberFormat(currentLocale(), {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 2
+    }).format(value);
+  } catch (error) {
+    return `${Number(value).toFixed(2)} ${currency}`;
+  }
+}
+
 function isDateRangeAvailable(roomId, checkIn, checkOut) {
   const room = state.rooms.find((item) => item.id === Number(roomId));
   if (!room || !checkIn || !checkOut) return true;
@@ -1443,6 +1480,7 @@ function renderRooms() {
   const previouslySelectedRoomId = dom.roomSelect.value;
   dom.roomsGrid.innerHTML = '';
   dom.roomSelect.innerHTML = '';
+  const preferredCurrency = selectedCurrency();
 
   state.rooms.forEach((room) => {
     const gallery = [room.cover_image, ...(room.images || []).map((image) => image.image_url)].filter(Boolean);
@@ -1451,6 +1489,10 @@ function renderRooms() {
     const imageSources = uniqueGallery.length ? uniqueGallery : [fallback];
 
     const badges = [`<span class="badge"><i data-lucide="users"></i> ${state.language === 'de' ? 'Bis zu' : 'Up to'} ${room.max_guests} ${state.language === 'de' ? 'Gäste' : 'guests'}</span>`];
+
+    if (room.bed_size) {
+      badges.push(`<span class="badge"><i data-lucide="bed-double"></i> ${escapeHtml(translateCopy(room.bed_size))}</span>`);
+    }
 
     if (room.featured) {
       badges.unshift(`<span class="badge badge-featured"><i data-lucide="sparkles"></i> ${translateCopy('Featured stay')}</span>`);
@@ -1506,6 +1548,7 @@ function renderRooms() {
         <p class="room-kicker">${translateCopy('Private coastal room')}</p>
         <div class="room-top">
           <h3>${escapeHtml(translateCopy(room.name))}</h3>
+          <strong><span>${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}</span><small>${state.language === 'de' ? '/ Nacht' : '/ night'}</small></strong>
         </div>
         <p>${escapeHtml(translateCopy(room.short_description))}</p>
         <div class="room-badges">${badges.join('')}</div>
@@ -1521,7 +1564,7 @@ function renderRooms() {
 
     const option = document.createElement('option');
     option.value = String(room.id);
-    option.textContent = translateCopy(room.name);
+    option.textContent = `${translateCopy(room.name)} - ${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}${state.language === 'de' ? '/Nacht' : '/night'}`;
     dom.roomSelect.appendChild(option);
   });
 
@@ -1804,8 +1847,12 @@ function applySettings() {
   dom.eatSipRequestLink.href = '/contact';
   dom.footerPhoneLink.href = dom.contactPhoneLink.href;
   dom.footerPhoneLink.textContent = state.settings.contact_phone || 'Call';
-  dom.footerEmailLink.href = dom.contactEmailLink.href;
-  dom.footerEmailLink.textContent = state.settings.contact_email || 'Email';
+  dom.footerEmailLink.href = 'mailto:hermann.h.chausiku@gmail.com';
+  dom.footerEmailLink.textContent = 'hermann.h.chausiku@gmail.com';
+  if (dom.footerInquiryPhoneLink) {
+    dom.footerInquiryPhoneLink.href = 'tel:+4366499425267';
+    dom.footerInquiryPhoneLink.textContent = '+43 664 994 252 67';
+  }
   dom.footerMapLink.href = state.settings.map_link;
 
   if (dom.mapEmbed) dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&output=embed`;
@@ -1899,7 +1946,9 @@ function updateStructuredData() {
         '@type': 'Room',
         name: room.name,
         description: room.short_description
-      }
+      },
+      priceCurrency: 'USD',
+      price: room.price_per_night_usd
     }))
   };
 
@@ -1914,8 +1963,8 @@ function renderQuote(quote) {
 
   dom.quoteBox.innerHTML = `
     <strong>${escapeHtml(quote.roomName)}</strong><br/>
-    ${t('quote.nights', { nights: quote.nights })}<br/>
-    <em>${t('quote.priceOnRequest')}</em>
+    ${t('quote.nights', { nights: quote.nights, price: formatAmount(quote.pricePerNightUsd, 'USD') })}<br/>
+    <strong>${t('quote.total', { total: formatAmount(quote.totalInCurrency, quote.currency) })}</strong>
   `;
 }
 
@@ -2232,6 +2281,13 @@ function setPaymentOption(value) {
   dom.paymentOptionGroup?.querySelectorAll('[data-payment-option]').forEach((item) => {
     item.classList.toggle('is-selected', item.dataset.paymentOption === value);
   });
+
+  if (dom.bankTransferPanel) {
+    dom.bankTransferPanel.hidden = value !== 'bank_transfer';
+  }
+  if (dom.bankDetailsBox) {
+    dom.bankDetailsBox.hidden = true;
+  }
 }
 
 function configurePaymentOptionButtons() {
@@ -2239,6 +2295,10 @@ function configurePaymentOptionButtons() {
 
   dom.paymentOptionGroup.querySelectorAll('[data-payment-option]').forEach((button) => {
     button.addEventListener('click', () => setPaymentOption(button.dataset.paymentOption));
+  });
+
+  dom.showBankDetailsBtn?.addEventListener('click', () => {
+    if (dom.bankDetailsBox) dom.bankDetailsBox.hidden = !dom.bankDetailsBox.hidden;
   });
 }
 

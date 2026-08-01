@@ -511,7 +511,30 @@
               </label>
             </div>
 
-            <input type="hidden" id="payment-option" value="pay_on_arrival" required />
+            <label>
+              <span data-i18n="form.paymentOption">Payment option</span>
+              <div class="payment-option-group" id="payment-option-group" role="group" aria-label="Payment option">
+                <button type="button" class="payment-option-btn is-selected" data-payment-option="pay_on_arrival">
+                  <i data-lucide="wallet"></i>
+                  <span data-i18n="form.payOnArrival">Pay on arrival</span>
+                </button>
+                <button type="button" class="payment-option-btn" data-payment-option="bank_transfer">
+                  <i data-lucide="landmark"></i>
+                  <span data-i18n="form.bankTransfer">Bank transfer (30% deposit)</span>
+                </button>
+              </div>
+              <input type="hidden" id="payment-option" value="pay_on_arrival" required />
+            </label>
+
+            <div class="bank-transfer-panel" id="bank-transfer-panel" hidden>
+              <p data-i18n="form.bankTransferNote">Pay a 30% deposit of your total stay cost by bank transfer to secure this booking. The remaining balance is paid on arrival.</p>
+              <button type="button" class="ghost-btn compact-btn" id="show-bank-details-btn" data-i18n="form.showBankDetails">Show bank details</button>
+              <div class="bank-details-box" id="bank-details-box" hidden>
+                <p><strong>Hermann Buergler</strong></p>
+                <p><span data-i18n="form.iban">IBAN</span>: AT344073010310008512</p>
+                <p><span data-i18n="form.bic">BIC</span>: OVLIAT21XXX</p>
+              </div>
+            </div>
 
             <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to check availability.</div>
 
@@ -599,7 +622,14 @@
         </div>
         <div class="footer-contact">
           <a id="footer-phone-link" href="#">Call</a>
-          <a id="footer-email-link" href="#">Email</a>
+          <div class="footer-contact-item">
+            <a id="footer-email-link" href="#">Email</a>
+            <span class="footer-contact-note" data-i18n="footer.forBooking">For Booking</span>
+          </div>
+          <div class="footer-contact-item">
+            <a id="footer-inquiry-phone-link" href="#">Inquiries</a>
+            <span class="footer-contact-note" data-i18n="footer.forInquiries">For Inquiries</span>
+          </div>
           <a id="footer-map-link" href="#" target="_blank" rel="noreferrer" data-i18n="footer.map">Map</a>
         </div>
       </div>
