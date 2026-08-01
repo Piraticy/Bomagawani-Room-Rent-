@@ -673,7 +673,7 @@ CREATE TABLE IF NOT EXISTS sessions (
       address: 'Kigombe, Tanga, Tanzania',
       map_link: 'https://maps.app.goo.gl/vpY5krcPsqJaYbLR6',
       contact_phone: '+255 756 906 006',
-      contact_email: 'stay@bomagawani.com',
+      contact_email: 'hermann.h.chausiku@gmail.com',
       check_in_time: '14:00',
       check_out_time: '11:00',
       logo_text: 'Bomagawani.com',
@@ -685,6 +685,12 @@ CREATE TABLE IF NOT EXISTS sessions (
     UPDATE site_settings
     SET contact_phone = '+255 756 906 006'
     WHERE contact_phone = '+255 700 000 000'
+  `).run();
+
+  await db.prepare(`
+    UPDATE site_settings
+    SET contact_email = 'hermann.h.chausiku@gmail.com'
+    WHERE contact_email = 'stay@bomagawani.com'
   `).run();
 
   const eatSipPage = await db.prepare("SELECT title, body FROM content_pages WHERE slug = 'eat-sip'").get();
