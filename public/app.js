@@ -570,6 +570,9 @@ const dom = {
   propertyLightboxCaption: document.getElementById('property-lightbox-caption'),
   propertyLightboxCount: document.getElementById('property-lightbox-count'),
   propertyLightboxClose: document.getElementById('property-lightbox-close'),
+  navToggle: document.getElementById('nav-toggle'),
+  mainMenu: document.getElementById('main-menu'),
+  navBackdrop: document.getElementById('nav-backdrop'),
   propertyLightboxPrev: document.getElementById('property-lightbox-prev'),
   propertyLightboxNext: document.getElementById('property-lightbox-next'),
   propertySalePrice: document.getElementById('property-sale-price'),
@@ -2209,6 +2212,41 @@ function configureDateInputs() {
   });
 }
 
+function configureMobileNav() {
+  if (!dom.navToggle || !dom.mainMenu || !dom.navBackdrop) return;
+
+  const closeNav = () => {
+    dom.mainMenu.classList.remove('is-open');
+    dom.navToggle.setAttribute('aria-expanded', 'false');
+    dom.navBackdrop.hidden = true;
+  };
+
+  const openNav = () => {
+    dom.mainMenu.classList.add('is-open');
+    dom.navToggle.setAttribute('aria-expanded', 'true');
+    dom.navBackdrop.hidden = false;
+  };
+
+  dom.navToggle.addEventListener('click', () => {
+    if (dom.mainMenu.classList.contains('is-open')) {
+      closeNav();
+    } else {
+      openNav();
+    }
+  });
+
+  dom.navBackdrop.addEventListener('click', closeNav);
+  dom.mainMenu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeNav));
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeNav();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1080) closeNav();
+  });
+}
+
 function configureHeroBookingShortcut() {
   let bookingType = 'rooms';
 
@@ -2565,6 +2603,7 @@ configureHeroControls();
 configureLanguagePreference();
 configureDateInputs();
 configureHeroBookingShortcut();
+configureMobileNav();
 configurePhoneInput();
 configurePaymentOptionButtons();
 configureLocationRoute();

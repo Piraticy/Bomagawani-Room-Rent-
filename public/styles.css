@@ -147,6 +147,42 @@ h4 {
   gap: 10px;
 }
 
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  border: 1px solid #d7e4ef;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: #183a62;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle[aria-expanded='true'] span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded='true'] span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded='true'] span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 .language-switch {
   display: inline-flex;
   align-items: center;
@@ -475,7 +511,7 @@ h4 {
 
 .home-booking-panel {
   display: grid;
-  grid-template-columns: 1.05fr minmax(260px, 1.8fr) repeat(3, minmax(90px, 0.8fr)) 1.05fr 118px;
+  grid-template-columns: minmax(150px, 1.05fr) minmax(260px, 1.8fr) repeat(3, minmax(90px, 0.8fr)) minmax(220px, 1.3fr) 118px;
   gap: 12px;
   align-items: end;
   background: rgba(255, 255, 255, 0.96);
@@ -502,7 +538,8 @@ h4 {
 
 .booking-panel-intro strong {
   font-family: 'Fraunces', serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  line-height: 1.2;
 }
 
 .home-booking-panel label {
@@ -707,6 +744,9 @@ h4 {
 .home-booking-type button {
   background: transparent;
   color: #536985;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  padding: 10px 8px;
 }
 
 .home-booking-type button.is-selected {
@@ -2745,6 +2785,18 @@ textarea {
   font-size: 0.9rem;
 }
 
+.footer-contact-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.footer-contact-sep {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .footer-contact-note {
   color: var(--accent);
   font-size: 0.66rem;
@@ -2891,16 +2943,54 @@ textarea {
 
 @media (max-width: 1080px) {
   .topbar {
-    align-items: flex-start;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
-  .top-links {
-    order: 3;
-    width: 100%;
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .top-links.main-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: min(78vw, 320px);
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 2px;
+    flex-wrap: nowrap;
+    gap: 2px;
+    background: #fbfdff;
+    padding: 88px 26px 26px;
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    z-index: 60;
+    overflow-y: auto;
+    box-shadow: -14px 0 44px rgba(15, 26, 41, 0.22);
+  }
+
+  .top-links.main-menu.is-open {
+    transform: translateX(0);
+  }
+
+  .top-links.main-menu a {
+    width: 100%;
+    padding: 13px 0;
+    font-size: 1.05rem;
+    white-space: normal;
+    border-bottom: 1px solid rgba(15, 38, 63, 0.08);
+  }
+
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(15, 26, 41, 0.42);
+  }
+
+  .nav-backdrop[hidden] {
+    display: none;
   }
 }
 
@@ -2975,6 +3065,10 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .property-media-grid {
+    grid-template-rows: auto;
+  }
+
   .property-media-main,
   .property-video-card {
     grid-row: auto;
@@ -2988,45 +3082,37 @@ textarea {
 
 @media (max-width: 720px) {
   .topbar {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 10px 12px;
     gap: 8px;
   }
 
   .brand {
     min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
   }
 
   .brand-logo {
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
   }
 
   .brand-text {
     font-size: 0.88rem;
-  }
-
-  .top-links {
-    grid-column: 1 / -1;
-    order: 3;
-    width: 100%;
-    flex-wrap: nowrap;
-    gap: 12px;
-    overflow-x: auto;
-    justify-content: flex-start;
-    scrollbar-width: none;
-  }
-
-  .top-links::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .top-actions {
     width: auto;
     justify-content: flex-end;
-    gap: 6px;
+    flex-shrink: 0;
+    gap: 4px;
   }
 
   .language-switch {
@@ -3043,9 +3129,9 @@ textarea {
 
   .top-actions .ghost-btn,
   .top-actions .primary-btn {
-    padding: 8px 10px;
+    padding: 8px 9px;
     border-radius: 10px;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
   }
 
   .hero {
@@ -3082,9 +3168,16 @@ textarea {
   }
 
   .date-range-popover {
-    left: 12px;
-    right: 12px;
-    width: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: min(360px, calc(100vw - 32px));
+    max-height: min(80vh, 560px);
+    overflow-y: auto;
+    z-index: 90;
+    box-shadow: 0 20px 60px rgba(12, 34, 52, 0.35), 0 0 0 100vmax rgba(15, 26, 41, 0.45);
   }
 
   .home-story-card {
@@ -3119,6 +3212,7 @@ textarea {
 
   .eat-gallery-main {
     grid-row: auto;
+    grid-column: auto;
   }
 
   .property-media-grid {
@@ -3217,12 +3311,6 @@ textarea {
     height: 48px;
   }
 
-  .booking-date-popover {
-    left: 0;
-    right: 0;
-    width: auto;
-  }
-
   .section,
   .footer {
     padding-left: 12px;
@@ -3279,13 +3367,12 @@ textarea {
 }
 
 @media (max-width: 460px) {
-  .topbar {
-    grid-template-columns: 1fr;
+  .brand-text {
+    max-width: 96px;
   }
 
-  .top-actions {
-    width: 100%;
-    justify-content: space-between;
+  .top-actions .primary-btn {
+    padding: 8px 8px;
   }
 
   .hero-copy h1 {

@@ -27,7 +27,7 @@
         <span class="brand-text">Bomagawani.com</span>
       </a>
 
-      <nav class="top-links main-menu" aria-label="Primary navigation">
+      <nav class="top-links main-menu" id="main-menu" aria-label="Primary navigation">
         <a href="/" data-page-link="home" data-i18n="nav.home">Home</a>
         <a href="/rooms" data-page-link="rooms" data-i18n="nav.rooms">Rooms</a>
         <a href="/eat-sip" data-page-link="eat-sip" data-i18n="nav.eatSip">Eat & Sip</a>
@@ -47,8 +47,14 @@
           </button>
         </div>
         <a class="primary-btn" href="/rooms#booking" data-i18n="nav.bookNow">Book Now</a>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </header>
+    <div class="nav-backdrop" id="nav-backdrop" hidden></div>
 
     <main id="home">
       <section class="hero" id="hero" data-page="home">
@@ -637,15 +643,15 @@
         <div class="footer-contact">
           <div class="footer-contact-item">
             <span class="footer-contact-note" data-i18n="footer.forInquiries">For Inquiries</span>
-            <a id="footer-phone-link" href="#">Call</a>
+            <span class="footer-contact-links">
+              <a id="footer-phone-link" href="#">Call</a>
+              <span class="footer-contact-sep" aria-hidden="true">/</span>
+              <a id="footer-inquiry-phone-link" href="#">Inquiries</a>
+            </span>
           </div>
           <div class="footer-contact-item">
             <span class="footer-contact-note" data-i18n="footer.forBooking">For Booking</span>
             <a id="footer-email-link" href="#">Email</a>
-          </div>
-          <div class="footer-contact-item">
-            <span class="footer-contact-note" data-i18n="footer.forInquiries">For Inquiries</span>
-            <a id="footer-inquiry-phone-link" href="#">Inquiries</a>
           </div>
           <a id="footer-map-link" class="footer-map-link" href="#" target="_blank" rel="noreferrer" data-i18n="footer.map">Map</a>
         </div>
