@@ -2985,7 +2985,7 @@ textarea {
   .nav-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 55;
+    z-index: 35;
     background: rgba(15, 26, 41, 0.42);
   }
 
