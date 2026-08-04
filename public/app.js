@@ -107,6 +107,8 @@ const translations = {
     'quote.serviceDown': 'Quote service unavailable. Try again.',
     'quote.nights': '{nights} night(s) x {price}',
     'quote.total': 'Total: {total}',
+    'quote.offerFlat': '{guests} guest(s) x {price} (fixed package price)',
+    'quote.offerPerNight': '{nights} night(s) x {guests} guest(s) x {price}',
     'status.checkQuoteFirst': 'Please check dates and quote first.',
     'status.submittingBooking': 'Submitting booking request...',
     'status.bookingFailed': 'Booking failed.',
@@ -242,6 +244,8 @@ const translations = {
     'quote.serviceDown': 'Preisservice nicht erreichbar. Bitte erneut versuchen.',
     'quote.nights': '{nights} Nacht/Nächte x {price}',
     'quote.total': 'Gesamt: {total}',
+    'quote.offerFlat': '{guests} Gast/Gäste x {price} (Pauschalpreis)',
+    'quote.offerPerNight': '{nights} Nacht/Nächte x {guests} Gast/Gäste x {price}',
     'status.checkQuoteFirst': 'Bitte zuerst Daten und Preis prüfen.',
     'status.submittingBooking': 'Buchungsanfrage wird gesendet...',
     'status.bookingFailed': 'Buchung fehlgeschlagen.',
@@ -297,6 +301,12 @@ const fallbackExchangeRates = {
   TZS: 2600,
   AED: 3.67,
   KES: 129
+};
+
+const OFFER_PRICING = {
+  retreat: { labelKey: 'offersPage.retreat.title', model: 'flat_per_person', amountEur: 840 },
+  'short-stay': { labelKey: 'offersPage.shortStay.title', model: 'per_person_per_night', amountEur: 39 },
+  camping: { labelKey: 'offersPage.camping.title', model: 'per_person_per_night', amountEur: 8 }
 };
 
 const PROPERTY_GALLERY_IMAGES = [
@@ -523,6 +533,7 @@ const state = {
   currencies: ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'],
   exchangeRates: { USD: 1 },
   currentQuote: null,
+  selectedOffer: null,
   deferredInstallPrompt: null,
   language: localStorage.getItem('preferred_language') || 'en',
   roomSlideIntervals: {},
@@ -813,6 +824,11 @@ function applyCopyTranslations() {
 function displayPriceFromUsd(value, currency = currentCurrency()) {
   const rate = state.exchangeRates[currency] || fallbackExchangeRates[currency] || 1;
   return Number(value || 0) * rate;
+}
+
+function displayPriceFromEur(value, currency = currentCurrency()) {
+  const eurRate = state.exchangeRates.EUR || fallbackExchangeRates.EUR;
+  return displayPriceFromUsd(Number(value || 0) / eurRate, currency);
 }
 
 async function loadExchangeRate(currency = currentCurrency()) {
@@ -1644,6 +1660,7 @@ function configureOfferSelectButtons() {
   dom.offerSelectButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const offerName = button.dataset.offerName || button.dataset.offerSelect;
+      state.selectedOffer = button.dataset.offerSelect;
 
       if (dom.offerSelectedChip && dom.offerSelectedName) {
         dom.offerSelectedName.textContent = offerName;
@@ -1658,6 +1675,7 @@ function configureOfferSelectButtons() {
 
       navigateToPath('/offers-prices#booking');
       requestAnimationFrame(() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' }));
+      requestQuote();
     });
   });
 }
@@ -2036,6 +2054,25 @@ function updateStructuredData() {
 function renderQuote(quote) {
   if (!quote) {
     dom.quoteBox.textContent = t('quote.empty');
+    return;
+  }
+
+  const offer = state.selectedOffer ? OFFER_PRICING[state.selectedOffer] : null;
+  if (offer) {
+    const guests = Math.max(1, Number(dom.guestsCount.value || 1));
+    const currency = quote.currency;
+    const perPersonDisplay = formatAmount(displayPriceFromEur(offer.amountEur, currency), currency);
+    const totalEur = offer.model === 'flat_per_person' ? offer.amountEur * guests : offer.amountEur * guests * quote.nights;
+    const totalDisplay = formatAmount(displayPriceFromEur(totalEur, currency), currency);
+    const detailLine = offer.model === 'flat_per_person'
+      ? t('quote.offerFlat', { guests, price: perPersonDisplay })
+      : t('quote.offerPerNight', { nights: quote.nights, guests, price: perPersonDisplay });
+
+    dom.quoteBox.innerHTML = `
+      <strong>${escapeHtml(t(offer.labelKey))}</strong><br/>
+      ${detailLine}<br/>
+      <strong>${t('quote.total', { total: totalDisplay })}</strong>
+    `;
     return;
   }
 
