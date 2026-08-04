@@ -977,10 +977,9 @@ CREATE TABLE IF NOT EXISTS sessions (
   const linksCount = (await db.prepare('SELECT COUNT(*) AS count FROM platform_links').get()).count;
   if (!linksCount) {
     const insertLink = db.prepare('INSERT INTO platform_links (platform_name, url, icon, sort_order) VALUES (?, ?, ?, ?)');
-    await insertLink.run('Book Direct', 'https://bomagawani.com', 'calendar-check', 1);
-    await insertLink.run('Booking.com', 'https://www.booking.com', 'hotel', 2);
-    await insertLink.run('Tripadvisor', 'https://www.tripadvisor.com', 'map-pin', 3);
-    await insertLink.run('Google Travel', 'https://www.google.com/travel/', 'plane', 4);
+    await insertLink.run('Booking.com', 'https://www.booking.com', 'hotel', 1);
+    await insertLink.run('Tripadvisor', 'https://www.tripadvisor.com', 'map-pin', 2);
+    await insertLink.run('Google Travel', 'https://maps.app.goo.gl/tazyJt9jBEg8734J7', 'plane', 3);
   }
 
   const adminCount = (await db.prepare('SELECT COUNT(*) AS count FROM admins').get()).count;

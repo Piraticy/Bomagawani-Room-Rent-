@@ -165,28 +165,22 @@
   ],
   "platformLinks": [
     {
-      "platformName": "Book Direct",
-      "url": "https://bomagawani.com",
-      "icon": "calendar-check",
-      "sortOrder": 1
-    },
-    {
       "platformName": "Booking.com",
       "url": "https://www.booking.com",
       "icon": "hotel",
-      "sortOrder": 2
+      "sortOrder": 1
     },
     {
       "platformName": "Tripadvisor",
       "url": "https://www.tripadvisor.com",
       "icon": "map-pin",
-      "sortOrder": 3
+      "sortOrder": 2
     },
     {
       "platformName": "Google Travel",
-      "url": "https://www.google.com/travel/",
+      "url": "https://maps.app.goo.gl/tazyJt9jBEg8734J7",
       "icon": "plane",
-      "sortOrder": 4
+      "sortOrder": 3
     }
   ],
   "contentPages": [
