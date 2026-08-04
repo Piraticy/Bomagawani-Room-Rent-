@@ -913,7 +913,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     await insertRoom.run({
       name: 'Master Bedroom',
       slug: 'master-bedroom',
-      short_description: 'Premium private suite with balcony and ocean breeze.',
+      short_description: 'Comfortable Group Room with ocean breeze.',
       long_description: 'The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.',
       price_per_night_usd: 120,
       max_guests: 4,
@@ -938,7 +938,7 @@ CREATE TABLE IF NOT EXISTS sessions (
       short_description: 'Comfortable and affordable room for short or long stays.',
       long_description: 'The Guest Room offers a calm, clean, and budget-friendly option while still giving access to the full property experience.',
       price_per_night_usd: 75,
-      max_guests: 2,
+      max_guests: 3,
       size_label: '24 m2',
       bed_size: '1 Single Bed + 1 Double Bed',
       featured: 0,

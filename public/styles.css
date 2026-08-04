@@ -2375,7 +2375,7 @@ body.lightbox-open {
 
 .offers-page-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 480px);
   gap: 24px;
   align-items: start;
 }
