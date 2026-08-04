@@ -8,6 +8,7 @@ const translations = {
     'nav.rooms': 'Rooms',
     'nav.eatSip': 'Eat & Sip',
     'nav.bomagawani': 'Bomagawani',
+    'nav.offersPrices': 'Offers & Prices',
     'nav.contact': 'Contact',
     'home.heroKicker': 'Welcome to Bomagawani – Holiday & Adventure at the Swahili Coast.',
     'home.viewRooms': 'View Rooms',
@@ -72,15 +73,20 @@ const translations = {
     'form.note': 'Note (optional)',
     'form.notePlaceholder': 'Late arrival, special request',
     'form.submit': 'Send Booking Request',
-    'offers.title': 'Exclusive Offers',
-    'offers.swahiliRetreat.tabLabel': 'Swahili Retreat',
-    'offers.swahiliRetreat.title': 'Swahili Retreat',
-    'offers.swahiliRetreat.duration': '21 Days Offer',
-    'offers.swahiliRetreat.terms': 'Pay 30% booking and the rest once leaving.',
-    'offers.camping.tabLabel': 'Camping Offer',
-    'offers.camping.title': 'Camping Offer',
-    'offers.camping.duration': '21 Days Offer',
-    'offers.camping.terms': 'Pay 30% booking and the rest once leaving.',
+    'offersPage.kicker': 'Offers & Prices',
+    'offersPage.title': 'Offers & Prices at Bomagawani',
+    'offersPage.subtitle': 'Choose the stay that suits you — a long, immersive Swahili retreat, a simple overnight, or camping right on the Indian Ocean.',
+    'offersPage.retreat.title': 'Swahili Retreat — Long-Term Stay',
+    'offersPage.retreat.body': 'Three weeks of swimming in the Indian Ocean, excursions and experiences, plus traditional Swahili cuisine and attentive, personal service. Half-board included — you discuss your wishes with us every morning.',
+    'offersPage.retreat.price': '21 days — €840 per person',
+    'offersPage.shortStay.title': 'Short Stays',
+    'offersPage.shortStay.body': 'An overnight stay including breakfast, prepared entirely according to your wishes.',
+    'offersPage.shortStay.price': '€39 per person',
+    'offersPage.camping.title': 'Camping on the Indian Ocean',
+    'offersPage.camping.body': 'Bring your own camping equipment — we provide a pitch directly on the Indian Ocean with showers and toilets. Overlanders are very welcome. Local cuisine (breakfast, dinner, and often BBQ) can be booked separately.',
+    'offersPage.camping.price': '€8 per person, per night',
+    'offersPage.paymentTitle': 'Payment for long-term stays:',
+    'offersPage.paymentBody': '1/3 deposit before arrival, 2/3 upon departure. Bank transfer details are shown in the booking form below.',
     'tracking.title': 'Check your booking status',
     'tracking.code': 'Booking reference',
     'tracking.button': 'Check booking',
@@ -145,6 +151,7 @@ const translations = {
     'nav.rooms': 'Zimmer',
     'nav.eatSip': 'Essen & Trinken',
     'nav.bomagawani': 'Bomagawani',
+    'nav.offersPrices': 'Angebote & Preise',
     'nav.contact': 'Kontakt',
     'home.heroKicker': 'Willkommen bei Bomagawani – Urlaub & Abenteuer an der Swahili-Küste.',
     'home.viewRooms': 'Zimmer ansehen',
@@ -199,15 +206,20 @@ const translations = {
     'amenities.subtitle': 'Alles, was Sie für einen angenehmen Aufenthalt brauchen.',
     'booking.title': 'Direkt auf Bomagawani.com buchen',
     'booking.subtitle': 'Wählen Sie Zimmer, Reisedaten und Währung. Ihre Buchungsreferenz wird sofort vorbereitet.',
-    'offers.title': 'Exklusive Angebote',
-    'offers.swahiliRetreat.tabLabel': 'Swahili Retreat',
-    'offers.swahiliRetreat.title': 'Swahili Retreat',
-    'offers.swahiliRetreat.duration': '21-Tage-Angebot',
-    'offers.swahiliRetreat.terms': 'Zahlen Sie 30% bei Buchung und den Rest bei Abreise.',
-    'offers.camping.tabLabel': 'Camping-Angebot',
-    'offers.camping.title': 'Camping-Angebot',
-    'offers.camping.duration': '21-Tage-Angebot',
-    'offers.camping.terms': 'Zahlen Sie 30% bei Buchung und den Rest bei Abreise.',
+    'offersPage.kicker': 'Angebote & Preise',
+    'offersPage.title': 'Angebote & Preise bei Bomagawani',
+    'offersPage.subtitle': 'Wählen Sie den passenden Aufenthalt — ein langes, intensives Swahili Retreat, einen einfachen Übernachtungsaufenthalt oder Camping direkt am Indischen Ozean.',
+    'offersPage.retreat.title': 'Swahili Retreat — Langzeitaufenthalt',
+    'offersPage.retreat.body': 'Drei Wochen Baden im Indischen Ozean, Ausflüge und Erlebnisse sowie traditionelle Swahili-Küche und aufmerksamer, persönlicher Service. Halbpension inklusive — Ihre Wünsche besprechen wir jeden Morgen mit Ihnen.',
+    'offersPage.retreat.price': '21 Tage — 840 € pro Person',
+    'offersPage.shortStay.title': 'Kurzaufenthalte',
+    'offersPage.shortStay.body': 'Eine Übernachtung inklusive Frühstück, ganz nach Ihren Wünschen zubereitet.',
+    'offersPage.shortStay.price': '39 € pro Person',
+    'offersPage.camping.title': 'Camping am Indischen Ozean',
+    'offersPage.camping.body': 'Bringen Sie Ihre eigene Campingausrüstung mit — wir stellen Ihnen einen Stellplatz direkt am Indischen Ozean mit Duschen und Toiletten zur Verfügung. Overlander sind ebenfalls sehr willkommen. Lokale Küche (Frühstück, Abendessen, oft auch BBQ) kann separat gebucht werden.',
+    'offersPage.camping.price': '8 € pro Person und Nacht',
+    'offersPage.paymentTitle': 'Zahlung für Langzeitaufenthalte:',
+    'offersPage.paymentBody': '1/3 Anzahlung vor Anreise, 2/3 bei Abreise. Die Bankdaten finden Sie im Buchungsformular unten.',
     'tracking.title': 'Buchungsstatus prüfen',
     'tracking.code': 'Buchungsreferenz',
     'tracking.button': 'Buchung prüfen',
@@ -629,8 +641,6 @@ const dom = {
   bookingStatus: document.getElementById('booking-status'),
   phoneCountry: document.getElementById('phone-country'),
   guestPhoneLocal: document.getElementById('guest-phone-local'),
-  offersTabs: document.querySelectorAll('[data-offer-tab]'),
-  offerPanels: document.querySelectorAll('[data-offer-panel]'),
   statRooms: document.getElementById('stat-rooms'),
   statLocation: document.getElementById('stat-location'),
   useLocation: document.getElementById('use-location'),
@@ -660,6 +670,7 @@ const pageRoutes = {
   '/rooms': 'rooms',
   '/eat-sip': 'eat-sip',
   '/bomagawani': 'bomagawani',
+  '/offers-prices': 'offers-prices',
   '/contact': 'contact',
   '/about-us': 'contact'
 };
@@ -1467,6 +1478,7 @@ function pageTitleForCurrentPage() {
   if (state.currentPage === 'rooms') return t('nav.rooms');
   if (state.currentPage === 'eat-sip') return translateCopy(pageBySlug('eat-sip')?.nav_label || 'Eat & Sip');
   if (state.currentPage === 'bomagawani') return translateCopy(pageBySlug('property')?.nav_label || 'Bomagawani');
+  if (state.currentPage === 'offers-prices') return t('nav.offersPrices');
   if (state.currentPage === 'contact') return t('nav.contact');
   return state.language === 'de' ? 'Küstenzimmer buchen' : 'Coastal Room Booking';
 }
@@ -1566,14 +1578,13 @@ function renderRooms() {
         <p class="room-kicker">${translateCopy('Private coastal room')}</p>
         <div class="room-top">
           <h3>${escapeHtml(translateCopy(room.name))}</h3>
-          <strong><span>${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}</span><small>${state.language === 'de' ? '/ Nacht' : '/ night'}</small></strong>
         </div>
         <p>${escapeHtml(translateCopy(room.short_description))}</p>
         <div class="room-badges">${badges.join('')}</div>
         <div class="room-amenity-strip">${amenityHighlights}</div>
         <div class="room-actions">
           <button class="primary-btn" data-book-room="${room.id}">${t('nav.bookNow')}</button>
-          <a class="hero-text-link" href="#booking" data-book-room="${room.id}">${translateCopy('Check dates')}</a>
+          <a class="hero-text-link" href="/offers-prices#booking" data-book-room="${room.id}">${translateCopy('Check dates')}</a>
         </div>
       </div>
     `;
@@ -1594,8 +1605,9 @@ function renderRooms() {
     button.addEventListener('click', (event) => {
       event.preventDefault();
       dom.roomSelect.value = button.dataset.bookRoom;
-      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+      navigateToPath('/offers-prices#booking');
       requestQuote();
+      requestAnimationFrame(() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' }));
     });
   });
 
@@ -2135,26 +2147,6 @@ async function submitBooking(event) {
   }
 }
 
-function configureOffersTabs() {
-  dom.offersTabs.forEach((tabButton) => {
-    tabButton.addEventListener('click', () => {
-      const key = tabButton.dataset.offerTab;
-
-      dom.offersTabs.forEach((button) => {
-        const isActive = button.dataset.offerTab === key;
-        button.classList.toggle('is-active', isActive);
-        button.setAttribute('aria-selected', String(isActive));
-      });
-
-      dom.offerPanels.forEach((panel) => {
-        const isActive = panel.dataset.offerPanel === key;
-        panel.classList.toggle('is-active', isActive);
-        panel.hidden = !isActive;
-      });
-    });
-  });
-}
-
 function configureDateInputs() {
   const today = new Date().toISOString().slice(0, 10);
   dom.checkIn.min = today;
@@ -2316,7 +2308,7 @@ function configureHeroBookingShortcut() {
     params.set('rooms', String(roomCount));
     params.set('guests', String(adults + children));
 
-    window.location.href = `/rooms?${params.toString()}#booking`;
+    window.location.href = `/offers-prices?${params.toString()}#booking`;
   });
 }
 
@@ -2614,7 +2606,6 @@ configurePropertyGallery();
 configureClientRouting();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
-configureOffersTabs();
 
 window.addEventListener('load', refreshIcons);
 

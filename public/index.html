@@ -33,6 +33,7 @@
         <a href="/rooms" data-page-link="rooms" data-i18n="nav.rooms">Rooms</a>
         <a href="/eat-sip" data-page-link="eat-sip" data-i18n="nav.eatSip">Eat & Sip</a>
         <a href="/bomagawani" data-page-link="bomagawani" data-i18n="nav.bomagawani">Bomagawani</a>
+        <a href="/offers-prices" data-page-link="offers-prices" data-i18n="nav.offersPrices">Offers & Prices</a>
         <a href="/contact" data-page-link="contact" data-i18n="nav.contact">Contact</a>
       </nav>
 
@@ -47,7 +48,7 @@
             <strong>DE</strong>
           </button>
         </div>
-        <a class="primary-btn" href="/rooms#booking" data-i18n="nav.bookNow">Book Now</a>
+        <a class="primary-btn" href="/offers-prices#booking" data-i18n="nav.bookNow">Book Now</a>
         <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-menu">
           <span></span>
           <span></span>
@@ -464,174 +465,186 @@
         <div class="about-highlights contact-note-list" id="about-highlights"></div>
       </section>
 
-      <section class="section booking-layout" id="booking" data-page="rooms">
-        <div class="booking-card">
-          <h2 data-i18n="booking.title">Book Direct on Bomagawani.com</h2>
-          <p data-i18n="booking.subtitle">Select room, date, and currency. Your booking code is created instantly.</p>
-
-          <form id="booking-form">
-            <label>
-              <span data-i18n="form.room">Room</span>
-              <select id="room-select" required></select>
-            </label>
-
-            <div class="booking-date-range-wrap">
-              <label class="booking-range-field">
-                <span data-i18n="form.stayDates">Stay dates</span>
-                <button type="button" class="date-range-trigger booking-date-trigger" id="booking-date-range-trigger" aria-expanded="false" aria-controls="booking-date-range-picker">
-                  <span id="booking-date-range-text" data-i18n="date.selectRange">Select check-in and check-out</span>
-                  <i data-lucide="calendar-days"></i>
-                </button>
-                <input type="hidden" id="check-in" />
-                <input type="hidden" id="check-out" />
-              </label>
-              <div class="date-range-popover booking-date-popover" id="booking-date-range-picker" hidden>
-                <div class="date-range-head">
-                  <button type="button" id="booking-date-range-prev" aria-label="Previous month">‹</button>
-                  <strong id="booking-date-range-month">Month Year</strong>
-                  <button type="button" id="booking-date-range-next" aria-label="Next month">›</button>
-                </div>
-                <div class="date-range-weekdays" aria-hidden="true">
-                  <span>Mon</span>
-                  <span>Tue</span>
-                  <span>Wed</span>
-                  <span>Thu</span>
-                  <span>Fri</span>
-                  <span>Sat</span>
-                  <span>Sun</span>
-                </div>
-                <div class="date-range-grid" id="booking-date-range-grid"></div>
-                <div class="date-range-foot">
-                  <span id="booking-date-range-status" data-i18n="date.selectArrival">Select your arrival date.</span>
-                  <button type="button" id="booking-date-range-clear">Clear</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="date-grid">
-              <label>
-                <span data-i18n="form.guests">Guests</span>
-                <input type="number" id="guests-count" min="1" value="1" required />
-              </label>
-              <label>
-                <span data-i18n="form.currency">Currency</span>
-                <select id="currency-select"></select>
-              </label>
-            </div>
-
-            <label>
-              <span data-i18n="form.paymentOption">Payment option</span>
-              <div class="payment-option-group" id="payment-option-group" role="group" aria-label="Payment option">
-                <button type="button" class="payment-option-btn is-selected" data-payment-option="pay_on_arrival">
-                  <i data-lucide="wallet"></i>
-                  <span data-i18n="form.payOnArrival">Pay on arrival</span>
-                </button>
-                <button type="button" class="payment-option-btn" data-payment-option="bank_transfer">
-                  <i data-lucide="landmark"></i>
-                  <span data-i18n="form.bankTransfer">Bank transfer (30% deposit)</span>
-                </button>
-              </div>
-              <input type="hidden" id="payment-option" value="pay_on_arrival" required />
-            </label>
-
-            <div class="bank-transfer-panel" id="bank-transfer-panel" hidden>
-              <p data-i18n="form.bankTransferNote">Pay a 30% deposit of your total stay cost by bank transfer to secure this booking. The remaining balance is paid on arrival.</p>
-              <button type="button" class="primary-btn compact-btn" id="show-bank-details-btn">
-                <i data-lucide="landmark"></i>
-                <span data-i18n="form.showBankDetails">Show bank details</span>
-              </button>
-              <div class="bank-details-box" id="bank-details-box" hidden>
-                <p class="bank-details-name">Hermann Buergler</p>
-                <p><span data-i18n="form.iban">IBAN</span>: <strong>AT344073010310008512</strong></p>
-                <p><span data-i18n="form.bic">BIC</span>: <strong>OVLIAT21XXX</strong></p>
-              </div>
-            </div>
-
-            <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to check availability.</div>
-
-            <label>
-              <span data-i18n="form.fullName">Full name</span>
-              <input type="text" id="guest-name" required />
-            </label>
-            <div class="date-grid contact-grid">
-              <label class="contact-email">
-                <span data-i18n="form.email">Email</span>
-                <input type="email" id="guest-email" required />
-              </label>
-              <label class="contact-phone">
-                <span data-i18n="form.phone">Phone</span>
-                <div class="phone-input-wrap">
-                  <select id="phone-country" aria-label="Country code" required>
-                    <option value="+255" data-i18n="form.loadingCountryCodes">Loading dialing codes...</option>
-                  </select>
-                  <input
-                    type="tel"
-                    id="guest-phone-local"
-                    inputmode="numeric"
-                    pattern="[0-9]+"
-                    maxlength="12"
-                    minlength="6"
-                    placeholder="00 000 0000"
-                    required
-                  />
-                </div>
-              </label>
-            </div>
-            <label>
-              <span data-i18n="form.note">Note (optional)</span>
-              <textarea id="guest-note" rows="3" data-i18n-placeholder="form.notePlaceholder" placeholder="Late arrival, special request"></textarea>
-            </label>
-
-            <button type="submit" class="primary-btn wide" data-i18n="form.submit">Send Booking Request</button>
-            <p class="form-status" id="booking-status"></p>
-          </form>
+      <section class="section" data-page="offers-prices">
+        <div class="section-head">
+          <p class="section-kicker" data-i18n="offersPage.kicker">Offers &amp; Prices</p>
+          <h2 data-i18n="offersPage.title">Offers &amp; Prices at Bomagawani</h2>
+          <p data-i18n="offersPage.subtitle">Choose the stay that suits you — a long, immersive Swahili retreat, a simple overnight, or camping right on the Indian Ocean.</p>
         </div>
-
-        <aside class="side-cards">
-          <article class="quick-card offers-card">
-            <h3 data-i18n="offers.title">Exclusive Offers</h3>
-            <div class="offers-tabs" role="tablist" aria-label="Exclusive offers">
-              <button type="button" class="offers-tab is-active" data-offer-tab="swahili-retreat" role="tab" aria-selected="true">
-                <span data-i18n="offers.swahiliRetreat.tabLabel">Swahili Retreat</span>
-              </button>
-              <button type="button" class="offers-tab" data-offer-tab="camping" role="tab" aria-selected="false">
-                <span data-i18n="offers.camping.tabLabel">Camping Offer</span>
-              </button>
-            </div>
-            <div class="offer-panel is-active" data-offer-panel="swahili-retreat">
-              <h4 data-i18n="offers.swahiliRetreat.title">Swahili Retreat</h4>
-              <p class="offer-duration" data-i18n="offers.swahiliRetreat.duration">21 Days Offer</p>
-              <p data-i18n="offers.swahiliRetreat.terms">Pay 30% booking and the rest once leaving.</p>
-            </div>
-            <div class="offer-panel" data-offer-panel="camping" hidden>
-              <h4 data-i18n="offers.camping.title">Camping Offer</h4>
-              <p class="offer-duration" data-i18n="offers.camping.duration">21 Days Offer</p>
-              <p data-i18n="offers.camping.terms">Pay 30% booking and the rest once leaving.</p>
-            </div>
+        <div class="property-fact-grid offer-plans-grid">
+          <article>
+            <span>01</span>
+            <h3 data-i18n="offersPage.retreat.title">Swahili Retreat — Long-Term Stay</h3>
+            <p data-i18n="offersPage.retreat.body">Three weeks of swimming in the Indian Ocean, excursions and experiences, plus traditional Swahili cuisine and attentive, personal service. Half-board included — you discuss your wishes with us every morning.</p>
+            <p class="offer-duration" data-i18n="offersPage.retreat.price">21 days — €840 per person</p>
           </article>
-
-          <article class="quick-card">
-            <h3 data-i18n="location.title">Location &amp; direction</h3>
-            <p id="location-line">Kigombe, Tanga, Tanzania</p>
-            <div class="map-wrap">
-              <iframe
-                id="map-embed"
-                loading="lazy"
-                allowfullscreen
-                referrerpolicy="no-referrer-when-downgrade"
-                title="Bomagawani location map"
-              ></iframe>
-            </div>
-            <a id="map-link" class="ghost-btn wide" target="_blank" rel="noreferrer" data-i18n="location.openMap">Open Map</a>
-            <button id="use-location" class="ghost-btn wide" type="button" data-i18n="location.route">Use my location for route</button>
-            <small id="location-status"></small>
+          <article>
+            <span>02</span>
+            <h3 data-i18n="offersPage.shortStay.title">Short Stays</h3>
+            <p data-i18n="offersPage.shortStay.body">An overnight stay including breakfast, prepared entirely according to your wishes.</p>
+            <p class="offer-duration" data-i18n="offersPage.shortStay.price">€39 per person</p>
           </article>
-
-          <article class="quick-card channels-card">
-            <h3 data-i18n="channels.title">Also listed on travel channels</h3>
-            <div id="channel-list"></div>
+          <article>
+            <span>03</span>
+            <h3 data-i18n="offersPage.camping.title">Camping on the Indian Ocean</h3>
+            <p data-i18n="offersPage.camping.body">Bring your own camping equipment — we provide a pitch directly on the Indian Ocean with showers and toilets. Overlanders are very welcome. Local cuisine (breakfast, dinner, and often BBQ) can be booked separately.</p>
+            <p class="offer-duration" data-i18n="offersPage.camping.price">€8 per person, per night</p>
           </article>
-        </aside>
+        </div>
+        <div class="quote-box offers-payment-note">
+          <strong data-i18n="offersPage.paymentTitle">Payment for long-term stays:</strong>
+          <span data-i18n="offersPage.paymentBody">1/3 deposit before arrival, 2/3 upon departure. Bank transfer details are shown in the booking form below.</span>
+        </div>
+      </section>
+
+      <section class="section" id="booking" data-page="offers-prices">
+        <div class="offers-booking-wrap">
+          <div class="booking-card">
+            <h2 data-i18n="booking.title">Book Direct on Bomagawani.com</h2>
+            <p data-i18n="booking.subtitle">Select room, date, and currency. Your booking code is created instantly.</p>
+
+            <form id="booking-form">
+              <label>
+                <span data-i18n="form.room">Room</span>
+                <select id="room-select" required></select>
+              </label>
+
+              <div class="booking-date-range-wrap">
+                <label class="booking-range-field">
+                  <span data-i18n="form.stayDates">Stay dates</span>
+                  <button type="button" class="date-range-trigger booking-date-trigger" id="booking-date-range-trigger" aria-expanded="false" aria-controls="booking-date-range-picker">
+                    <span id="booking-date-range-text" data-i18n="date.selectRange">Select check-in and check-out</span>
+                    <i data-lucide="calendar-days"></i>
+                  </button>
+                  <input type="hidden" id="check-in" />
+                  <input type="hidden" id="check-out" />
+                </label>
+                <div class="date-range-popover booking-date-popover" id="booking-date-range-picker" hidden>
+                  <div class="date-range-head">
+                    <button type="button" id="booking-date-range-prev" aria-label="Previous month">‹</button>
+                    <strong id="booking-date-range-month">Month Year</strong>
+                    <button type="button" id="booking-date-range-next" aria-label="Next month">›</button>
+                  </div>
+                  <div class="date-range-weekdays" aria-hidden="true">
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                    <span>Sun</span>
+                  </div>
+                  <div class="date-range-grid" id="booking-date-range-grid"></div>
+                  <div class="date-range-foot">
+                    <span id="booking-date-range-status" data-i18n="date.selectArrival">Select your arrival date.</span>
+                    <button type="button" id="booking-date-range-clear">Clear</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="date-grid">
+                <label>
+                  <span data-i18n="form.guests">Guests</span>
+                  <input type="number" id="guests-count" min="1" value="1" required />
+                </label>
+                <label>
+                  <span data-i18n="form.currency">Currency</span>
+                  <select id="currency-select"></select>
+                </label>
+              </div>
+
+              <label>
+                <span data-i18n="form.paymentOption">Payment option</span>
+                <div class="payment-option-group" id="payment-option-group" role="group" aria-label="Payment option">
+                  <button type="button" class="payment-option-btn is-selected" data-payment-option="pay_on_arrival">
+                    <i data-lucide="wallet"></i>
+                    <span data-i18n="form.payOnArrival">Pay on arrival</span>
+                  </button>
+                  <button type="button" class="payment-option-btn" data-payment-option="bank_transfer">
+                    <i data-lucide="landmark"></i>
+                    <span data-i18n="form.bankTransfer">Bank transfer (30% deposit)</span>
+                  </button>
+                </div>
+                <input type="hidden" id="payment-option" value="pay_on_arrival" required />
+              </label>
+
+              <div class="bank-transfer-panel" id="bank-transfer-panel" hidden>
+                <p data-i18n="form.bankTransferNote">Pay a 30% deposit of your total stay cost by bank transfer to secure this booking. The remaining balance is paid on arrival.</p>
+                <button type="button" class="primary-btn compact-btn" id="show-bank-details-btn">
+                  <i data-lucide="landmark"></i>
+                  <span data-i18n="form.showBankDetails">Show bank details</span>
+                </button>
+                <div class="bank-details-box" id="bank-details-box" hidden>
+                  <p class="bank-details-name">Hermann Buergler</p>
+                  <p><span data-i18n="form.iban">IBAN</span>: <strong>AT344073010310008512</strong></p>
+                  <p><span data-i18n="form.bic">BIC</span>: <strong>OVLIAT21XXX</strong></p>
+                </div>
+              </div>
+
+              <div class="quote-box" id="quote-box" data-i18n="quote.empty">Enter dates to check availability.</div>
+
+              <label>
+                <span data-i18n="form.fullName">Full name</span>
+                <input type="text" id="guest-name" required />
+              </label>
+              <div class="date-grid contact-grid">
+                <label class="contact-email">
+                  <span data-i18n="form.email">Email</span>
+                  <input type="email" id="guest-email" required />
+                </label>
+                <label class="contact-phone">
+                  <span data-i18n="form.phone">Phone</span>
+                  <div class="phone-input-wrap">
+                    <select id="phone-country" aria-label="Country code" required>
+                      <option value="+255" data-i18n="form.loadingCountryCodes">Loading dialing codes...</option>
+                    </select>
+                    <input
+                      type="tel"
+                      id="guest-phone-local"
+                      inputmode="numeric"
+                      pattern="[0-9]+"
+                      maxlength="12"
+                      minlength="6"
+                      placeholder="00 000 0000"
+                      required
+                    />
+                  </div>
+                </label>
+              </div>
+              <label>
+                <span data-i18n="form.note">Note (optional)</span>
+                <textarea id="guest-note" rows="3" data-i18n-placeholder="form.notePlaceholder" placeholder="Late arrival, special request"></textarea>
+              </label>
+
+              <button type="submit" class="primary-btn wide" data-i18n="form.submit">Send Booking Request</button>
+              <p class="form-status" id="booking-status"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section rooms-info-grid" data-page="rooms">
+        <article class="quick-card">
+          <h3 data-i18n="location.title">Location &amp; direction</h3>
+          <p id="location-line">Kigombe, Tanga, Tanzania</p>
+          <div class="map-wrap">
+            <iframe
+              id="map-embed"
+              loading="lazy"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Bomagawani location map"
+            ></iframe>
+          </div>
+          <a id="map-link" class="ghost-btn wide" target="_blank" rel="noreferrer" data-i18n="location.openMap">Open Map</a>
+          <button id="use-location" class="ghost-btn wide" type="button" data-i18n="location.route">Use my location for route</button>
+          <small id="location-status"></small>
+        </article>
+
+        <article class="quick-card channels-card">
+          <h3 data-i18n="channels.title">Also listed on travel channels</h3>
+          <div id="channel-list"></div>
+        </article>
       </section>
     </main>
 

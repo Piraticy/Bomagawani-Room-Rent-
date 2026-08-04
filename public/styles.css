@@ -1032,28 +1032,6 @@ h4 {
   margin: 0;
 }
 
-.room-top strong {
-  min-width: 112px;
-  border-radius: 18px;
-  background: #edf8f6;
-  color: var(--primary);
-  padding: 10px 12px;
-  text-align: right;
-}
-
-.room-top strong span,
-.room-top strong small {
-  display: block;
-}
-
-.room-top strong small {
-  color: #67758b;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
 .room-content > p:not(.room-kicker) {
   color: var(--muted);
   font-size: 1rem;
@@ -2395,12 +2373,23 @@ body.lightbox-open {
     #ffffff;
 }
 
-.booking-layout {
-  margin-top: 14px;
+.offers-booking-wrap {
+  max-width: 640px;
+}
+
+.offers-payment-note {
+  margin-top: 20px;
+  max-width: 640px;
+}
+
+.offer-plans-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rooms-info-grid {
   display: grid;
-  grid-template-columns: minmax(0, 560px) 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  align-items: start;
 }
 
 .booking-card {
@@ -2436,51 +2425,6 @@ body.lightbox-open {
   margin-top: 10px;
 }
 
-.offers-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.offers-tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--muted);
-  font-weight: 800;
-  font-size: 0.86rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.offers-tab:hover {
-  border-color: rgba(18, 91, 102, 0.4);
-}
-
-.offers-tab.is-active {
-  background: linear-gradient(120deg, #125b66, #0f7f71);
-  border-color: transparent;
-  color: #fff;
-}
-
-.offer-panel {
-  margin-top: 12px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #edf7f5;
-  border: 1px solid #cde8df;
-}
-
-.offer-panel h4 {
-  margin: 0 0 4px;
-  font-size: 1.1rem;
-}
-
 .offer-duration {
   display: inline-flex;
   margin: 0 0 8px;
@@ -2492,13 +2436,6 @@ body.lightbox-open {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-.offer-panel > p:last-child {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
 }
 
 label {
@@ -3001,7 +2938,6 @@ textarea {
   .property-sale-hero,
   .property-media-grid,
   .contact-hero-card,
-  .booking-layout,
   .story-card,
   .property-layout,
   .about-card {
@@ -3202,7 +3138,8 @@ textarea {
   .eat-gallery-wall,
   .property-fact-grid,
   .contact-intent-grid,
-  .property-features {
+  .property-features,
+  .rooms-info-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3298,10 +3235,6 @@ textarea {
 
   .room-top {
     flex-direction: column;
-  }
-
-  .room-top strong {
-    text-align: left;
   }
 
   .room-thumbs {
