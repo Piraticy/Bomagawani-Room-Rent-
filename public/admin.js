@@ -562,7 +562,7 @@ function renderBookings() {
       (booking) => `
       <tr>
         <td>${escapeHtml(booking.booking_code)}</td>
-        <td>${escapeHtml(booking.room_name)}</td>
+        <td>${escapeHtml(booking.room_name)}${booking.offer_name ? `<br/><small>Offer: ${escapeHtml(booking.offer_name)}</small>` : ''}</td>
         <td>${escapeHtml(booking.guest_name)}<br/><small>${escapeHtml(booking.guest_email)}</small></td>
         <td>${escapeHtml(booking.check_in)}<br/>to<br/>${escapeHtml(booking.check_out)}</td>
         <td>${Number(booking.total_in_currency).toFixed(2)} ${escapeHtml(booking.currency_code)}</td>

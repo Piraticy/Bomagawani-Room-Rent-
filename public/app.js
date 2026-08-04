@@ -304,9 +304,9 @@ const fallbackExchangeRates = {
 };
 
 const OFFER_PRICING = {
-  retreat: { labelKey: 'offersPage.retreat.title', model: 'flat_per_person', amountEur: 840 },
-  'short-stay': { labelKey: 'offersPage.shortStay.title', model: 'per_person_per_night', amountEur: 39 },
-  camping: { labelKey: 'offersPage.camping.title', model: 'per_person_per_night', amountEur: 8 }
+  retreat: { labelKey: 'offersPage.retreat.title', model: 'flat_per_person' },
+  'short-stay': { labelKey: 'offersPage.shortStay.title', model: 'per_person_per_night' },
+  camping: { labelKey: 'offersPage.camping.title', model: 'per_person_per_night' }
 };
 
 const PROPERTY_GALLERY_IMAGES = [
@@ -824,11 +824,6 @@ function applyCopyTranslations() {
 function displayPriceFromUsd(value, currency = currentCurrency()) {
   const rate = state.exchangeRates[currency] || fallbackExchangeRates[currency] || 1;
   return Number(value || 0) * rate;
-}
-
-function displayPriceFromEur(value, currency = currentCurrency()) {
-  const eurRate = state.exchangeRates.EUR || fallbackExchangeRates.EUR;
-  return displayPriceFromUsd(Number(value || 0) / eurRate, currency);
 }
 
 async function loadExchangeRate(currency = currentCurrency()) {
@@ -2057,21 +2052,17 @@ function renderQuote(quote) {
     return;
   }
 
-  const offer = state.selectedOffer ? OFFER_PRICING[state.selectedOffer] : null;
+  const offer = quote.offerKey ? OFFER_PRICING[quote.offerKey] : null;
   if (offer) {
-    const guests = Math.max(1, Number(dom.guestsCount.value || 1));
-    const currency = quote.currency;
-    const perPersonDisplay = formatAmount(displayPriceFromEur(offer.amountEur, currency), currency);
-    const totalEur = offer.model === 'flat_per_person' ? offer.amountEur * guests : offer.amountEur * guests * quote.nights;
-    const totalDisplay = formatAmount(displayPriceFromEur(totalEur, currency), currency);
+    const perPersonDisplay = formatAmount(quote.pricePerPersonInCurrency, quote.currency);
     const detailLine = offer.model === 'flat_per_person'
-      ? t('quote.offerFlat', { guests, price: perPersonDisplay })
-      : t('quote.offerPerNight', { nights: quote.nights, guests, price: perPersonDisplay });
+      ? t('quote.offerFlat', { guests: quote.guests, price: perPersonDisplay })
+      : t('quote.offerPerNight', { nights: quote.nights, guests: quote.guests, price: perPersonDisplay });
 
     dom.quoteBox.innerHTML = `
       <strong>${escapeHtml(t(offer.labelKey))}</strong><br/>
       ${detailLine}<br/>
-      <strong>${t('quote.total', { total: totalDisplay })}</strong>
+      <strong>${t('quote.total', { total: formatAmount(quote.totalInCurrency, quote.currency) })}</strong>
     `;
     return;
   }
@@ -2119,6 +2110,7 @@ async function requestQuote() {
   const checkIn = dom.checkIn.value;
   const checkOut = dom.checkOut.value;
   const currency = dom.currencySelect.value;
+  const guests = Math.max(1, Number(dom.guestsCount.value || 1));
 
   if (!roomId || !checkIn || !checkOut) {
     if (requestId === latestQuoteRequestId) renderQuote(null);
@@ -2138,8 +2130,11 @@ async function requestQuote() {
 
   try {
     if (requestId === latestQuoteRequestId) dom.quoteBox.textContent = t('quote.loading');
+    const offerParam = state.selectedOffer
+      ? `&offerKey=${encodeURIComponent(state.selectedOffer)}&guests=${encodeURIComponent(guests)}`
+      : '';
     const response = await fetch(
-      `/api/public/quote?roomId=${encodeURIComponent(roomId)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&currency=${encodeURIComponent(currency)}`
+      `/api/public/quote?roomId=${encodeURIComponent(roomId)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&currency=${encodeURIComponent(currency)}${offerParam}`
     );
 
     if (requestId !== latestQuoteRequestId) return;
@@ -2198,7 +2193,8 @@ async function submitBooking(event) {
       guestsCount: Number(dom.guestsCount.value),
       note: document.getElementById('guest-note').value.trim(),
       currencyCode: dom.currencySelect.value,
-      paymentOption: dom.paymentOption.value
+      paymentOption: dom.paymentOption.value,
+      offerKey: state.selectedOffer || undefined
     };
 
     dom.bookingStatus.textContent = t('status.submittingBooking');
@@ -2280,6 +2276,9 @@ function configureDateInputs() {
     renderBookingDateRangePicker();
     requestQuote();
     updateRoomSelectDetails();
+  });
+  dom.guestsCount.addEventListener('input', () => {
+    requestQuote();
   });
   dom.currencySelect.addEventListener('change', async () => {
     state.currencyManuallySet = true;

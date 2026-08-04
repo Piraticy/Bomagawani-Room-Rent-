@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bomagawani-v27';
+const CACHE_NAME = 'bomagawani-v28';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -50,8 +50,12 @@ self.addEventListener('fetch', (event) => {
     // deploy shows up the very next time someone opens or reloads the site,
     // not one visit late. The cache is only a fallback for when the network
     // request fails (offline), not the default source of truth.
+    // `cache: 'reload'` is required here - these files are served with a
+    // 10-minute Cache-Control max-age, so a plain fetch() can be silently
+    // satisfied from the browser's HTTP cache instead of hitting the
+    // network, defeating this whole network-first strategy.
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'reload' })
         .then((response) => {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {

@@ -14,7 +14,7 @@ const rateLimit = require('express-rate-limit');
 
 const { db, ready } = require('./db');
 const { requireAdmin } = require('./middleware/auth');
-const { convertFromUSD, fetchRates } = require('./services/currency');
+const { convertFromUSD, convertFromEUR, fetchRates } = require('./services/currency');
 const { watermarkImage, saveOriginalCopy } = require('./services/imageProcessor');
 const { sendBookingStatusEmail, sendNewBookingNotification } = require('./services/email');
 const TursoSessionStore = require('./middleware/tursoSessionStore');
@@ -225,6 +225,23 @@ const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'TZS', 'KES'];
 function normalizeCurrency(code) {
   const value = String(code || 'USD').trim().toUpperCase();
   return SUPPORTED_CURRENCIES.includes(value) ? value : 'USD';
+}
+
+const OFFER_PRICING = {
+  retreat: { name: 'Swahili Retreat — Long-Term Stay', model: 'flat_per_person', amountEur: 840 },
+  'short-stay': { name: 'Short Stays', model: 'per_person_per_night', amountEur: 39 },
+  camping: { name: 'Camping on the Indian Ocean', model: 'per_person_per_night', amountEur: 8 }
+};
+
+function normalizeOfferKey(value) {
+  const key = String(value || '').trim();
+  return Object.prototype.hasOwnProperty.call(OFFER_PRICING, key) ? key : null;
+}
+
+function offerTotalEur(offerKey, guests, nights) {
+  const offer = OFFER_PRICING[offerKey];
+  if (!offer) return null;
+  return offer.model === 'flat_per_person' ? offer.amountEur * guests : offer.amountEur * guests * nights;
 }
 
 function normalizePaymentOption(value) {
@@ -509,6 +526,8 @@ app.get('/api/public/quote', async (req, res) => {
   const checkIn = String(req.query.checkIn || '').trim();
   const checkOut = String(req.query.checkOut || '').trim();
   const currency = normalizeCurrency(req.query.currency);
+  const offerKey = normalizeOfferKey(req.query.offerKey);
+  const guests = Math.max(1, Number(req.query.guests) || 1);
 
   if (!roomId || !checkIn || !checkOut) {
     return res.status(400).json({ error: 'roomId, checkIn, and checkOut are required.' });
@@ -526,6 +545,27 @@ app.get('/api/public/quote', async (req, res) => {
 
   if (!(await isRoomAvailable(roomId, checkIn, checkOut))) {
     return res.status(409).json({ error: 'Selected dates are not available.' });
+  }
+
+  if (offerKey) {
+    const offer = OFFER_PRICING[offerKey];
+    const eurTotal = offerTotalEur(offerKey, guests, dateCheck.nights);
+    const converted = await convertFromEUR(eurTotal, currency);
+    const perPersonConverted = await convertFromEUR(offer.amountEur, currency);
+
+    return res.json({
+      nights: dateCheck.nights,
+      roomName: room.name,
+      offerKey,
+      offerName: offer.name,
+      offerModel: offer.model,
+      guests,
+      pricePerPersonInCurrency: perPersonConverted.total,
+      totalUsd: Number((eurTotal / ((await fetchRates('USD')).EUR || 0.92)).toFixed(2)),
+      currency: converted.currency,
+      exchangeRate: converted.rate,
+      totalInCurrency: converted.total
+    });
   }
 
   const totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
@@ -555,6 +595,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   const note = String(req.body.note || '').trim();
   const currencyCode = normalizeCurrency(req.body.currencyCode || 'USD');
   const paymentOption = normalizePaymentOption(req.body.paymentOption || 'pay_on_arrival');
+  const offerKey = normalizeOfferKey(req.body.offerKey);
 
   if (!roomId || !guestName || !guestEmail || !guestPhone || !checkIn || !checkOut || !parsedGuests) {
     return res.status(400).json({ error: 'Please complete all required fields.' });
@@ -586,17 +627,28 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
     return res.status(409).json({ error: 'These dates are already booked. Please choose different dates.' });
   }
 
-  const totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
-  const converted = await convertFromUSD(totalUsd, currencyCode);
+  const offer = offerKey ? OFFER_PRICING[offerKey] : null;
+  let totalUsd;
+  let converted;
+
+  if (offer) {
+    const eurTotal = offerTotalEur(offerKey, parsedGuests, dateCheck.nights);
+    const eurRate = (await fetchRates('USD')).EUR || 0.92;
+    totalUsd = Number((eurTotal / eurRate).toFixed(2));
+    converted = await convertFromEUR(eurTotal, currencyCode);
+  } else {
+    totalUsd = Number((dateCheck.nights * room.price_per_night_usd).toFixed(2));
+    converted = await convertFromUSD(totalUsd, currencyCode);
+  }
 
   const insertBooking = db.prepare(
     `INSERT INTO bookings (
       booking_code, room_id, guest_name, guest_email, guest_phone, check_in, check_out,
-      nights, guests_count, note, price_per_night_usd, total_usd, currency_code,
+      nights, guests_count, note, offer_key, offer_name, price_per_night_usd, total_usd, currency_code,
       exchange_rate, total_in_currency, payment_option, payment_status, booking_status
     ) VALUES (
       @booking_code, @room_id, @guest_name, @guest_email, @guest_phone, @check_in, @check_out,
-      @nights, @guests_count, @note, @price_per_night_usd, @total_usd, @currency_code,
+      @nights, @guests_count, @note, @offer_key, @offer_name, @price_per_night_usd, @total_usd, @currency_code,
       @exchange_rate, @total_in_currency, @payment_option, 'pending', 'pending'
     )`
   );
@@ -617,6 +669,8 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
         nights: dateCheck.nights,
         guests_count: parsedGuests,
         note,
+        offer_key: offerKey,
+        offer_name: offer ? offer.name : null,
         price_per_night_usd: room.price_per_night_usd,
         total_usd: totalUsd,
         currency_code: converted.currency,
@@ -634,6 +688,7 @@ app.post('/api/public/bookings', bookingLimiter, async (req, res) => {
   sendNewBookingNotification({
     booking_code: code,
     room_name: room.name,
+    offer_name: offer ? offer.name : null,
     check_in: checkIn,
     check_out: checkOut,
     nights: dateCheck.nights,
@@ -733,6 +788,7 @@ app.get('/receipt/:code', apiLimiter, async (req, res) => {
             <div><div class="label">Booking Code</div><div class="value">${escapeHtml(booking.booking_code)}</div></div>
             <div><div class="label">Guest</div><div class="value">${escapeHtml(booking.guest_name)}</div></div>
             <div><div class="label">Room</div><div class="value">${escapeHtml(booking.room_name)}</div></div>
+            ${booking.offer_name ? `<div><div class="label">Offer</div><div class="value">${escapeHtml(booking.offer_name)}</div></div>` : ''}
             <div><div class="label">Dates</div><div class="value">${escapeHtml(booking.check_in)} to ${escapeHtml(booking.check_out)}</div></div>
             <div><div class="label">Nights</div><div class="value">${escapeHtml(booking.nights)}</div></div>
             <div><div class="label">Guests</div><div class="value">${escapeHtml(booking.guests_count)}</div></div>

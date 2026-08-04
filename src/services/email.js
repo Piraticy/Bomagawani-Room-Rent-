@@ -90,6 +90,7 @@ async function sendNewBookingNotification(booking) {
         '',
         `Booking code: ${booking.booking_code}`,
         `Room: ${booking.room_name}`,
+        booking.offer_name ? `Offer: ${booking.offer_name} (priced per this offer, not the room's nightly rate)` : null,
         `Dates: ${booking.check_in} to ${booking.check_out} (${booking.nights} night(s))`,
         `Guests: ${booking.guests_count}`,
         `Total: ${booking.total_in_currency} ${booking.currency_code}`,

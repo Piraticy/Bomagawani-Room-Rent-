@@ -70,7 +70,14 @@ async function convertFromUSD(usdAmount, targetCurrency) {
   };
 }
 
+async function convertFromEUR(eurAmount, targetCurrency) {
+  const rates = await fetchRates('USD');
+  const eurRate = rates.EUR || 0.92;
+  return convertFromUSD(eurAmount / eurRate, targetCurrency);
+}
+
 module.exports = {
   fetchRates,
-  convertFromUSD
+  convertFromUSD,
+  convertFromEUR
 };

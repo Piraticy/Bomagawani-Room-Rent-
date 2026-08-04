@@ -566,6 +566,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   nights INTEGER NOT NULL,
   guests_count INTEGER NOT NULL,
   note TEXT,
+  offer_key TEXT,
+  offer_name TEXT,
   price_per_night_usd REAL NOT NULL,
   total_usd REAL NOT NULL,
   currency_code TEXT NOT NULL,
@@ -636,6 +638,14 @@ CREATE TABLE IF NOT EXISTS sessions (
 
   if (!(await hasColumn('rooms', 'bed_size'))) {
     await db.exec('ALTER TABLE rooms ADD COLUMN bed_size TEXT');
+  }
+
+  if (!(await hasColumn('bookings', 'offer_key'))) {
+    await db.exec('ALTER TABLE bookings ADD COLUMN offer_key TEXT');
+  }
+
+  if (!(await hasColumn('bookings', 'offer_name'))) {
+    await db.exec('ALTER TABLE bookings ADD COLUMN offer_name TEXT');
   }
 
   await seedContentPages();
