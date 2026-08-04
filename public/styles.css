@@ -2604,38 +2604,15 @@ textarea {
   min-width: 0;
 }
 
-.phone-input-wrap {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid #cbd9ea;
-  border-radius: 12px;
-  background: #fbfdff;
-  overflow: hidden;
-}
-
-.phone-input-wrap select,
-.phone-input-wrap input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.phone-input-wrap select {
-  flex: 0 0 auto;
-  width: 108px;
-  border-right: 1px solid #cbd9ea;
-}
-
-.phone-input-wrap input {
-  flex: 1;
-}
-
-#phone-country {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
+.room-capacity-alert {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(227, 163, 78, 0.14);
+  border: 1px solid rgba(227, 163, 78, 0.4);
+  color: #8a5a1e;
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 .quote-box {
@@ -3360,10 +3337,6 @@ textarea {
 
   .date-grid {
     grid-template-columns: 1fr;
-  }
-
-  .phone-input-wrap select {
-    width: 92px;
   }
 
   .floating-prompt {

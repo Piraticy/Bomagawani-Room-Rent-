@@ -522,6 +522,7 @@
                 <select id="room-select" required></select>
               </label>
               <p class="room-select-details" id="room-select-details"></p>
+              <p class="room-capacity-alert" id="room-capacity-alert" hidden></p>
 
               <div class="booking-date-range-wrap">
                 <label class="booking-range-field">
@@ -608,21 +609,7 @@
                 </label>
                 <label class="contact-phone">
                   <span data-i18n="form.phone">Phone</span>
-                  <div class="phone-input-wrap">
-                    <select id="phone-country" aria-label="Country code" required>
-                      <option value="+255" data-i18n="form.loadingCountryCodes">Loading dialing codes...</option>
-                    </select>
-                    <input
-                      type="tel"
-                      id="guest-phone-local"
-                      inputmode="numeric"
-                      pattern="[0-9]+"
-                      maxlength="12"
-                      minlength="6"
-                      placeholder="00 000 0000"
-                      required
-                    />
-                  </div>
+                  <input type="tel" id="guest-phone" inputmode="tel" placeholder="+255 712 345 678" required />
                 </label>
               </div>
               <label>

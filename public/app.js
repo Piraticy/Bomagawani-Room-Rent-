@@ -73,6 +73,8 @@ const translations = {
     'form.note': 'Note (optional)',
     'form.notePlaceholder': 'Late arrival, special request',
     'form.submit': 'Send Booking Request',
+    'form.roomCapacitySwitched': '{guests} guests exceeds {oldRoom}\'s capacity ({oldMax}). Switched you to {newRoom} (up to {newMax} guests).',
+    'form.roomCapacityNoFit': 'We don\'t have a single room for {guests} guests. Please contact us directly to arrange this.',
     'offersPage.kicker': 'Offers & Prices',
     'offersPage.title': 'Offers & Prices at Bomagawani',
     'offersPage.subtitle': 'Choose the stay that suits you — a long, immersive Swahili retreat, a simple overnight, or camping right on the Indian Ocean.',
@@ -113,10 +115,8 @@ const translations = {
     'status.submittingBooking': 'Submitting booking request...',
     'status.bookingFailed': 'Booking failed.',
     'status.bookingServiceDown': 'Booking service is currently unavailable.',
-    'status.phoneInvalid': 'Please enter a valid phone number for selected country code.',
-    'status.phoneLengthRange': 'Phone number must be between {min} and {max} digits.',
+    'status.phoneInvalid': 'Please enter a valid phone number, including the country code (e.g. +255712345678).',
     'status.bookingSuccessPrefix': 'Booking sent. Your reference is',
-    'form.loadingCountryCodes': 'Loading dialing codes...',
     'footer.map': 'Map',
     'footer.email': 'Email',
     'footer.forBooking': 'For Booking',
@@ -187,6 +187,8 @@ const translations = {
     'form.note': 'Notiz (optional)',
     'form.notePlaceholder': 'Späte Ankunft, besonderer Wunsch',
     'form.submit': 'Buchungsanfrage senden',
+    'form.roomCapacitySwitched': '{guests} Gäste übersteigen die Kapazität von {oldRoom} ({oldMax}). Wir haben auf {newRoom} umgestellt (bis zu {newMax} Gäste).',
+    'form.roomCapacityNoFit': 'Wir haben kein einzelnes Zimmer für {guests} Gäste. Bitte kontaktieren Sie uns direkt, um dies zu arrangieren.',
     'date.selectRange': 'Anreise und Abreise auswählen',
     'date.selectArrival': 'Wählen Sie Ihr Anreisedatum.',
     'date.selectDeparture': 'Wählen Sie jetzt Ihr Abreisedatum.',
@@ -250,10 +252,8 @@ const translations = {
     'status.submittingBooking': 'Buchungsanfrage wird gesendet...',
     'status.bookingFailed': 'Buchung fehlgeschlagen.',
     'status.bookingServiceDown': 'Der Buchungsservice ist derzeit nicht erreichbar.',
-    'status.phoneInvalid': 'Bitte eine gültige Telefonnummer für die gewählte Ländervorwahl eingeben.',
-    'status.phoneLengthRange': 'Telefonnummer muss zwischen {min} und {max} Ziffern haben.',
+    'status.phoneInvalid': 'Bitte eine gültige Telefonnummer inklusive Landesvorwahl eingeben (z. B. +255712345678).',
     'status.bookingSuccessPrefix': 'Buchung gesendet. Ihre Referenz ist',
-    'form.loadingCountryCodes': 'Ländervorwahlen werden geladen...',
     'footer.map': 'Karte',
     'footer.email': 'E-Mail',
     'footer.forBooking': 'Für Buchungen',
@@ -658,8 +658,8 @@ const dom = {
   quoteBox: document.getElementById('quote-box'),
   bookingForm: document.getElementById('booking-form'),
   bookingStatus: document.getElementById('booking-status'),
-  phoneCountry: document.getElementById('phone-country'),
-  guestPhoneLocal: document.getElementById('guest-phone-local'),
+  guestPhone: document.getElementById('guest-phone'),
+  roomCapacityAlert: document.getElementById('room-capacity-alert'),
   statRooms: document.getElementById('stat-rooms'),
   statLocation: document.getElementById('stat-location'),
   useLocation: document.getElementById('use-location'),
@@ -714,15 +714,6 @@ const contentPageToRoute = {
     section: () => dom.aboutSection
   }
 };
-
-const FALLBACK_PHONE_COUNTRIES = [
-  { name: 'Tanzania', iso2: 'TZ', dial: '+255' },
-  { name: 'Kenya', iso2: 'KE', dial: '+254' },
-  { name: 'Uganda', iso2: 'UG', dial: '+256' },
-  { name: 'United States', iso2: 'US', dial: '+1' },
-  { name: 'United Kingdom', iso2: 'GB', dial: '+44' },
-  { name: 'United Arab Emirates', iso2: 'AE', dial: '+971' }
-];
 
 const amenityIconMap = {
   wifi: 'wifi',
@@ -850,63 +841,6 @@ function refreshIcons() {
 
 function languageLabel(code) {
   return languageConfig[code]?.label || 'English';
-}
-
-function countryFlagFromIso2(iso2) {
-  return String(iso2 || '')
-    .toUpperCase()
-    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
-}
-
-function populatePhoneCountries(countries) {
-  const currentIso = String(dom.phoneCountry.value || '').toUpperCase();
-  const currentDial = dom.phoneCountry.selectedOptions[0]?.dataset.dial || '+255';
-  const fragment = document.createDocumentFragment();
-
-  countries.forEach((country) => {
-    const option = document.createElement('option');
-    option.value = country.iso2;
-    option.dataset.iso2 = country.iso2;
-    option.dataset.dial = country.dial;
-    option.title = `${country.name} (${country.dial})`;
-    option.textContent = `${countryFlagFromIso2(country.iso2)} ${country.dial} ${country.iso2}`;
-    fragment.appendChild(option);
-  });
-
-  dom.phoneCountry.innerHTML = '';
-  dom.phoneCountry.appendChild(fragment);
-  if (countries.some((country) => country.iso2 === currentIso)) {
-    dom.phoneCountry.value = currentIso;
-    return;
-  }
-
-  const preferredIso = countries.find((country) => country.dial === currentDial)?.iso2;
-  dom.phoneCountry.value = preferredIso || (countries.some((country) => country.iso2 === 'TZ') ? 'TZ' : countries[0]?.iso2 || '');
-}
-
-async function loadPhoneCountries() {
-  try {
-    const response = await fetch('/country-codes.json', { cache: 'force-cache' });
-    if (!response.ok) throw new Error('Country list unavailable');
-    const countries = await response.json();
-
-    const normalized = Array.isArray(countries)
-      ? countries
-          .map((country) => ({
-            name: String(country.name || '').trim(),
-            iso2: String(country.iso2 || '').trim().toUpperCase(),
-            dial: String(country.dial || '').trim()
-          }))
-          .filter((country) => /^[A-Z]{2}$/.test(country.iso2) && /^\+\d+$/.test(country.dial) && country.name)
-      : [];
-
-    if (!normalized.length) throw new Error('No country data');
-    populatePhoneCountries(normalized);
-  } catch (error) {
-    populatePhoneCountries(FALLBACK_PHONE_COUNTRIES);
-  }
-
-  updatePhoneInputRules();
 }
 
 function setFooterYear() {
@@ -1649,6 +1583,38 @@ function updateRoomSelectDetails() {
   dom.roomSelectDetails.textContent = `${translateCopy(room.short_description)} (${facts.join(' · ')})`;
 }
 
+function enforceRoomCapacity() {
+  if (!dom.roomCapacityAlert) return;
+
+  const guests = Math.max(1, Number(dom.guestsCount.value || 1));
+  const currentRoom = state.rooms.find((item) => String(item.id) === String(dom.roomSelect.value));
+  if (!currentRoom || guests <= currentRoom.max_guests) {
+    dom.roomCapacityAlert.hidden = true;
+    dom.roomCapacityAlert.textContent = '';
+    return;
+  }
+
+  const fittingRoom = state.rooms
+    .filter((room) => room.id !== currentRoom.id && room.max_guests >= guests)
+    .sort((a, b) => a.max_guests - b.max_guests)[0];
+
+  dom.roomCapacityAlert.hidden = false;
+
+  if (fittingRoom) {
+    dom.roomCapacityAlert.textContent = t('form.roomCapacitySwitched', {
+      guests,
+      oldRoom: translateCopy(currentRoom.name),
+      oldMax: currentRoom.max_guests,
+      newRoom: translateCopy(fittingRoom.name),
+      newMax: fittingRoom.max_guests
+    });
+    dom.roomSelect.value = String(fittingRoom.id);
+    updateRoomSelectDetails();
+  } else {
+    dom.roomCapacityAlert.textContent = t('form.roomCapacityNoFit', { guests });
+  }
+}
+
 function configureOfferSelectButtons() {
   const notePrefixPattern = /^(Interested in|Interesse an): .*?\.\s*/;
 
@@ -1972,44 +1938,27 @@ function applySettings() {
   setupHeroSlider(heroImages.filter(Boolean));
 }
 
-function updatePhoneInputRules() {
-  const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
-  const maxLocalLength = Math.max(6, 15 - dialDigits.length);
-  const minLocalLength = Math.min(6, maxLocalLength);
-
-  dom.guestPhoneLocal.minLength = minLocalLength;
-  dom.guestPhoneLocal.maxLength = maxLocalLength;
-  dom.guestPhoneLocal.placeholder = '00 000 0000';
-  dom.guestPhoneLocal.title = t('status.phoneLengthRange', { min: minLocalLength, max: maxLocalLength });
-  dom.guestPhoneLocal.setCustomValidity('');
+function isLikelyPhone(value) {
+  return /^\+[1-9]\d{7,14}$/.test(String(value || ''));
 }
 
-function normalizeLocalPhoneInput() {
-  const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
-  const maxLocalLength = Math.max(6, 15 - dialDigits.length);
-  const digitsOnly = dom.guestPhoneLocal.value.replace(/\D/g, '');
-  dom.guestPhoneLocal.value = digitsOnly.slice(0, maxLocalLength);
-  dom.guestPhoneLocal.setCustomValidity('');
+function normalizeGuestPhoneInput(value) {
+  const cleaned = String(value || '').trim().replace(/[^+\d]/g, '').replace(/(?!^)\+/g, '');
+  if (!cleaned) return '';
+  return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
 }
 
 function getValidatedGuestPhone() {
-  const selected = dom.phoneCountry.selectedOptions[0];
-  const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
-  const maxLocalLength = Math.max(6, 15 - dialDigits.length);
-  const minLocalLength = Math.min(6, maxLocalLength);
-  const countryCode = String(selected?.dataset.dial || '').trim();
-  const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');
+  const normalized = normalizeGuestPhoneInput(dom.guestPhone.value);
 
-  if (localDigits.length < minLocalLength || localDigits.length > maxLocalLength) {
-    dom.guestPhoneLocal.setCustomValidity(t('status.phoneLengthRange', { min: minLocalLength, max: maxLocalLength }));
-    dom.guestPhoneLocal.reportValidity();
+  if (!isLikelyPhone(normalized)) {
+    dom.guestPhone.setCustomValidity(t('status.phoneInvalid'));
+    dom.guestPhone.reportValidity();
     return null;
   }
 
-  dom.guestPhoneLocal.setCustomValidity('');
-  return `${countryCode}${localDigits}`;
+  dom.guestPhone.setCustomValidity('');
+  return normalized;
 }
 
 function updateStructuredData() {
@@ -2095,6 +2044,7 @@ function applyBookingQueryParams() {
 
   if (guests > 0) {
     dom.guestsCount.value = String(guests);
+    enforceRoomCapacity();
   }
 
   if (checkIn && checkOut) {
@@ -2215,7 +2165,7 @@ async function submitBooking(event) {
     dom.bookingForm.reset();
     setBookingDateRange('', '');
     setPaymentOption('pay_on_arrival');
-    updatePhoneInputRules();
+    dom.guestPhone.setCustomValidity('');
     state.currentQuote = null;
     renderQuote(null);
 
@@ -2273,11 +2223,13 @@ function configureDateInputs() {
   });
 
   dom.roomSelect.addEventListener('change', () => {
+    enforceRoomCapacity();
     renderBookingDateRangePicker();
     requestQuote();
     updateRoomSelectDetails();
   });
   dom.guestsCount.addEventListener('input', () => {
+    enforceRoomCapacity();
     requestQuote();
   });
   dom.currencySelect.addEventListener('change', async () => {
@@ -2424,29 +2376,20 @@ function configurePaymentOptionButtons() {
 }
 
 function configurePhoneInput() {
-  dom.phoneCountry.addEventListener('change', () => {
-    updatePhoneInputRules();
-    normalizeLocalPhoneInput();
+  dom.guestPhone.addEventListener('input', () => {
+    dom.guestPhone.setCustomValidity('');
   });
 
-  dom.guestPhoneLocal.addEventListener('input', normalizeLocalPhoneInput);
-  dom.guestPhoneLocal.addEventListener('blur', () => {
-    const selected = dom.phoneCountry.selectedOptions[0];
-    const dialDigits = String(selected?.dataset.dial || '').replace(/\D/g, '');
-    const maxLocalLength = Math.max(6, 15 - dialDigits.length);
-    const minLocalLength = Math.min(6, maxLocalLength);
-    const localDigits = dom.guestPhoneLocal.value.replace(/\D/g, '');
-    if (localDigits.length && (localDigits.length < minLocalLength || localDigits.length > maxLocalLength)) {
-      dom.guestPhoneLocal.setCustomValidity(t('status.phoneLengthRange', { min: minLocalLength, max: maxLocalLength }));
-      dom.guestPhoneLocal.reportValidity();
+  dom.guestPhone.addEventListener('blur', () => {
+    const value = dom.guestPhone.value.trim();
+    if (value && !isLikelyPhone(normalizeGuestPhoneInput(value))) {
+      dom.guestPhone.setCustomValidity(t('status.phoneInvalid'));
+      dom.guestPhone.reportValidity();
       return;
     }
 
-    dom.guestPhoneLocal.setCustomValidity('');
+    dom.guestPhone.setCustomValidity('');
   });
-
-  updatePhoneInputRules();
-  loadPhoneCountries();
 }
 
 function configureLocationRoute() {
