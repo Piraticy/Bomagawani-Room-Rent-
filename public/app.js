@@ -272,7 +272,7 @@ const languageConfig = {
   de: { label: 'Deutsch', locale: 'de-DE', currency: 'EUR' }
 };
 
-const PROPERTY_COORDS = { lat: -5.271999, lng: 39.067505 };
+const PROPERTY_COORDS = { lat: -5.271996, lng: 39.067501 };
 
 const fallbackExchangeRates = {
   USD: 1,
@@ -1873,7 +1873,7 @@ function applySettings() {
   }
   dom.footerMapLink.href = state.settings.map_link;
 
-  if (dom.mapEmbed) dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&output=embed`;
+  if (dom.mapEmbed) dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&t=h&output=embed`;
 
   if (dom.statRooms) {
     dom.statRooms.textContent = `${state.rooms.length} ${t('nav.rooms')}`;
