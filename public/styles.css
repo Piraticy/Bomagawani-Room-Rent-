@@ -2375,7 +2375,7 @@ body.lightbox-open {
 
 .offers-page-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 480px);
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 520px);
   gap: 24px;
   align-items: start;
 }
@@ -2595,6 +2595,7 @@ textarea {
 }
 
 .contact-grid {
+  grid-template-columns: 1fr;
   align-items: start;
 }
 
