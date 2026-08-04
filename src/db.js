@@ -666,7 +666,7 @@ CREATE TABLE IF NOT EXISTS sessions (
       )
     `).run({
       site_name: 'Bomagawani House Rent',
-      domain: 'Bomagawani.com',
+      domain: 'www.bomagawani.com',
       headline: 'Bomagawani House Rent',
       subheadline: 'A calm Kigombe retreat with private rooms, fresh local meals, shaded veranda living, and simple direct booking.',
       about_text: 'Experience the unspoiled beauty of the Swahili Coast in northern Tanzania. Located directly on the Indian Ocean, a place of tranquility, warm hospitality, and unique natural beauty awaits you. Whether you\'re looking for a relaxing holiday, camping by the sea, or unforgettable discoveries – Bomagawani is your home away from home on the East African coast.',

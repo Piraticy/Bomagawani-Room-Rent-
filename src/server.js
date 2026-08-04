@@ -432,22 +432,21 @@ async function adminSummary() {
   };
 }
 
+function normalizeSitemapDomain(domain) {
+  const lower = domain.toLowerCase().replace(/^www\./, '');
+  return `www.${lower}`;
+}
+
 function buildSitemapXml(baseUrl, rooms) {
-  const urls = [
-    `${baseUrl}/`,
-    `${baseUrl}/rooms`,
-    `${baseUrl}/eat-sip`,
-    `${baseUrl}/bomagawani`,
-    `${baseUrl}/contact`,
-    `${baseUrl}/admin`
-  ];
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const urls = [`${baseUrl}/`, `${baseUrl}/rooms`, `${baseUrl}/eat-sip`, `${baseUrl}/bomagawani`, `${baseUrl}/contact`];
 
   rooms.forEach((room) => {
     urls.push(`${baseUrl}/#room-${room.slug}`);
   });
 
   const body = urls
-    .map((loc) => `<url><loc>${loc}</loc><changefreq>weekly</changefreq></url>`)
+    .map((loc) => `<url><loc>${loc}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq></url>`)
     .join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>`;
@@ -468,7 +467,9 @@ app.get('/robots.txt', (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   const settings = await getSettings();
-  const base = settings.domain.startsWith('http') ? settings.domain : `https://${settings.domain}`;
+  const base = settings.domain.startsWith('http')
+    ? settings.domain
+    : `https://${normalizeSitemapDomain(settings.domain)}`;
   const rooms = await db.prepare('SELECT slug FROM rooms WHERE active = 1').all();
 
   res.type('application/xml').send(buildSitemapXml(base, rooms));

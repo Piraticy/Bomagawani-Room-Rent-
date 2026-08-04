@@ -8,3 +8,4 @@ tmp-uploads
 .DS_Store
 .tunnel
 .vercel
+.env*
