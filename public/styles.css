@@ -2373,17 +2373,101 @@ body.lightbox-open {
     #ffffff;
 }
 
-.offers-booking-wrap {
-  max-width: 640px;
+.offers-page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
+  gap: 24px;
+  align-items: start;
+}
+
+.offers-column {
+  min-width: 0;
+}
+
+.offers-booking-column {
+  position: sticky;
+  top: 96px;
 }
 
 .offers-payment-note {
   margin-top: 20px;
-  max-width: 640px;
 }
 
 .offer-plans-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.offer-plans-grid article {
+  border: 1px solid rgba(216, 227, 238, 0.95);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 100%, rgba(255, 216, 160, 0.24), transparent 38%),
+    #ffffff;
+  box-shadow: 0 18px 50px rgba(13, 34, 64, 0.07);
+  padding: 22px 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.offer-plans-grid article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 60px rgba(13, 34, 64, 0.1);
+}
+
+.offer-plans-grid span {
+  display: inline-flex;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  margin-bottom: 12px;
+}
+
+.offer-plans-grid h3 {
+  font-size: 1.35rem;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.offer-plans-grid p {
+  color: var(--muted);
+  line-height: 1.62;
+  margin-bottom: 0;
+}
+
+.offer-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.offer-card-foot .offer-duration {
+  margin: 0;
+}
+
+.offer-selected-chip {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #edf7f5;
+  border: 1px solid #cde8df;
+  color: #1c5f5d;
+  font-size: 0.86rem;
+}
+
+.offer-selected-chip strong {
+  color: #125b66;
+}
+
+.room-select-details {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
 }
 
 .rooms-info-grid {
@@ -2940,8 +3024,13 @@ textarea {
   .contact-hero-card,
   .story-card,
   .property-layout,
-  .about-card {
+  .about-card,
+  .offers-page-layout {
     grid-template-columns: 1fr;
+  }
+
+  .offers-booking-column {
+    position: static;
   }
 
   .villa-sale-card {

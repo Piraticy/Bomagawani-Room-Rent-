@@ -87,6 +87,8 @@ const translations = {
     'offersPage.camping.price': '€8 per person, per night',
     'offersPage.paymentTitle': 'Payment for long-term stays:',
     'offersPage.paymentBody': '1/3 deposit before arrival, 2/3 upon departure. Bank transfer details are shown in the booking form below.',
+    'offersPage.selectOffer': 'Select this offer',
+    'offersPage.selectedLabel': 'Selected offer:',
     'tracking.title': 'Check your booking status',
     'tracking.code': 'Booking reference',
     'tracking.button': 'Check booking',
@@ -220,6 +222,8 @@ const translations = {
     'offersPage.camping.price': '8 € pro Person und Nacht',
     'offersPage.paymentTitle': 'Zahlung für Langzeitaufenthalte:',
     'offersPage.paymentBody': '1/3 Anzahlung vor Anreise, 2/3 bei Abreise. Die Bankdaten finden Sie im Buchungsformular unten.',
+    'offersPage.selectOffer': 'Dieses Angebot wählen',
+    'offersPage.selectedLabel': 'Ausgewähltes Angebot:',
     'tracking.title': 'Buchungsstatus prüfen',
     'tracking.code': 'Buchungsreferenz',
     'tracking.button': 'Buchung prüfen',
@@ -618,6 +622,10 @@ const dom = {
   heroChildren: document.getElementById('hero-children'),
   heroRoomCount: document.getElementById('hero-room-count'),
   roomSelect: document.getElementById('room-select'),
+  roomSelectDetails: document.getElementById('room-select-details'),
+  offerSelectButtons: document.querySelectorAll('[data-offer-select]'),
+  offerSelectedChip: document.getElementById('offer-selected-chip'),
+  offerSelectedName: document.getElementById('offer-selected-name'),
   bookingDateRangeTrigger: document.getElementById('booking-date-range-trigger'),
   bookingDateRangeText: document.getElementById('booking-date-range-text'),
   bookingDateRangePicker: document.getElementById('booking-date-range-picker'),
@@ -1593,13 +1601,15 @@ function renderRooms() {
 
     const option = document.createElement('option');
     option.value = String(room.id);
-    option.textContent = `${translateCopy(room.name)} - ${formatAmount(displayPriceFromUsd(room.price_per_night_usd, preferredCurrency), preferredCurrency)}${state.language === 'de' ? '/Nacht' : '/night'}`;
+    option.textContent = translateCopy(room.name);
     dom.roomSelect.appendChild(option);
   });
 
   if (previouslySelectedRoomId && state.rooms.some((room) => String(room.id) === previouslySelectedRoomId)) {
     dom.roomSelect.value = previouslySelectedRoomId;
   }
+
+  updateRoomSelectDetails();
 
   dom.roomsGrid.querySelectorAll('[data-book-room]').forEach((button) => {
     button.addEventListener('click', (event) => {
@@ -1612,6 +1622,44 @@ function renderRooms() {
   });
 
   initRoomSlides();
+}
+
+function updateRoomSelectDetails() {
+  if (!dom.roomSelectDetails) return;
+  const room = state.rooms.find((item) => String(item.id) === String(dom.roomSelect.value));
+  if (!room) {
+    dom.roomSelectDetails.textContent = '';
+    return;
+  }
+
+  const facts = [`${state.language === 'de' ? 'Bis zu' : 'Up to'} ${room.max_guests} ${state.language === 'de' ? 'Gäste' : 'guests'}`];
+  if (room.bed_size) facts.push(translateCopy(room.bed_size));
+
+  dom.roomSelectDetails.textContent = `${translateCopy(room.short_description)} (${facts.join(' · ')})`;
+}
+
+function configureOfferSelectButtons() {
+  const notePrefixPattern = /^(Interested in|Interesse an): .*?\.\s*/;
+
+  dom.offerSelectButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const offerName = button.dataset.offerName || button.dataset.offerSelect;
+
+      if (dom.offerSelectedChip && dom.offerSelectedName) {
+        dom.offerSelectedName.textContent = offerName;
+        dom.offerSelectedChip.hidden = false;
+      }
+
+      const guestNote = document.getElementById('guest-note');
+      if (guestNote) {
+        const notePrefix = state.language === 'de' ? `Interesse an: ${offerName}. ` : `Interested in: ${offerName}. `;
+        guestNote.value = `${notePrefix}${guestNote.value.replace(notePrefixPattern, '')}`;
+      }
+
+      navigateToPath('/offers-prices#booking');
+      requestAnimationFrame(() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' }));
+    });
+  });
 }
 
 function renderAmenities() {
@@ -2194,6 +2242,7 @@ function configureDateInputs() {
   dom.roomSelect.addEventListener('change', () => {
     renderBookingDateRangePicker();
     requestQuote();
+    updateRoomSelectDetails();
   });
   dom.currencySelect.addEventListener('change', async () => {
     state.currencyManuallySet = true;
@@ -2604,6 +2653,7 @@ registerServiceWorker();
 configureChatbot();
 configurePropertyGallery();
 configureClientRouting();
+configureOfferSelectButtons();
 
 dom.bookingForm.addEventListener('submit', submitBooking);
 
