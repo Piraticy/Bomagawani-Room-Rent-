@@ -418,14 +418,9 @@ const copyTranslations = {
     'Green garden path around the property': 'Grüner Gartenweg rund um das Grundstück',
     'Nearby coast sunset view': 'Sonnenuntergang an der nahen Küste',
     'House viewed across the front garden': 'Haus mit Blick über den Vorgarten',
-    'Palm-lined garden path with the roof in the distance': 'Von Palmen gesäumter Gartenweg mit Dach in der Ferne',
     'Side of the house with water storage tanks': 'Hausseite mit Wassertanks',
-    'Front steps and entrance door under shade trees': 'Vordertreppe und Eingangstür unter Schattenbäumen',
-    'Front of the house showing the rooftop solar panels': 'Hausfront mit Solarmodulen auf dem Dach',
-    'Garden path opening toward a glimpse of the sea': 'Gartenweg mit Blick auf das Meer',
     'Citrus orchard in the garden': 'Zitrusgarten auf dem Grundstück',
     'Covered veranda walkway to a side entrance': 'Überdachter Verandaweg zu einem Seiteneingang',
-    'Veranda lounge seating and dining table': 'Sitzbereich und Esstisch auf der Veranda',
     'Bomagawani – The Exclusive Villa on the Indian Ocean': 'Bomagawani – Die exklusive Villa am Indischen Ozean',
     'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.': 'Eine außergewöhnliche Villa in atemberaubender Lage erwartet Sie direkt an der Swahili-Küste. Umgeben von tropischer Natur und dem türkisfarbenen Wasser des Indischen Ozeans, verbindet sie traditionelle Architektur mit modernem Komfort – ein Ort der Ruhe, Entspannung und unvergesslicher Momente.',
     'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.': 'Bomagawani entstand aus einem gemeinsamen Traum von Eva und Hermann. Mit großer Leidenschaft, persönlichem Einsatz und echter Gastfreundschaft haben wir einen Ort geschaffen, an dem sich Gäste aus aller Welt willkommen und zu Hause fühlen.',
@@ -773,24 +768,8 @@ const ABOUT_US_GALLERY_IMAGES = [
     alt: 'House viewed across the front garden'
   },
   {
-    src: '/uploads/site/1783859236728-d0dc67f4.jpg',
-    alt: 'Palm-lined garden path with the roof in the distance'
-  },
-  {
     src: '/uploads/site/1783859244537-d0786d72.jpg',
     alt: 'Side of the house with water storage tanks'
-  },
-  {
-    src: '/uploads/site/1783859247951-9c98121b.jpg',
-    alt: 'Front steps and entrance door under shade trees'
-  },
-  {
-    src: '/uploads/site/1783859251255-5218c5df.jpg',
-    alt: 'Front of the house showing the rooftop solar panels'
-  },
-  {
-    src: '/uploads/site/1783859253089-192927ee.jpg',
-    alt: 'Garden path opening toward a glimpse of the sea'
   },
   {
     src: '/uploads/site/1783859256497-1402dc9d.jpg',
@@ -799,10 +778,6 @@ const ABOUT_US_GALLERY_IMAGES = [
   {
     src: '/uploads/site/1783859259643-6dd5d62f.jpg',
     alt: 'Covered veranda walkway to a side entrance'
-  },
-  {
-    src: '/uploads/site/1783859262543-89ffc529.jpg',
-    alt: 'Veranda lounge seating and dining table'
   }
 ];
 
