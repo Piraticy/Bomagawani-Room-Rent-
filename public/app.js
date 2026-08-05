@@ -9,6 +9,7 @@ const translations = {
     'nav.eatSip': 'Eat & Sip',
     'nav.bomagawani': 'Bomagawani',
     'nav.offersPrices': 'Offers & Prices',
+    'nav.aboutUs': 'About Us',
     'nav.contact': 'Contact',
     'home.heroKicker': 'Welcome to Bomagawani – Holiday & Adventure at the Swahili Coast.',
     'home.viewRooms': 'View Rooms',
@@ -92,6 +93,14 @@ const translations = {
     'offersPage.paymentBody': '1/3 deposit before arrival, 2/3 upon departure. Bank transfer details are shown in the booking form below.',
     'offersPage.selectOffer': 'Select this offer',
     'offersPage.selectedLabel': 'Selected offer:',
+    'aboutUsPage.kicker': 'About Us',
+    'aboutUsPage.title': 'Bomagawani For Sale',
+    'aboutUsPage.subtitle': 'A personal Swahili Coast retreat, built with care and now ready for its next owner.',
+    'aboutUsPage.storyKicker': 'Bomagawani For Sale',
+    'aboutUsPage.p1': 'After many years of passionately building and developing Bomagawani, Hermann has decided that it is time to enjoy more personal freedom and pursue new plans for the future. For this reason, this exceptional villa on Tanzania\'s beautiful Swahili Coast is now offered for sale.',
+    'aboutUsPage.p2': 'Built to a high standard of quality, the villa combines spacious living with the unique atmosphere of the Indian Ocean. It is the perfect home for those seeking peace, nature, and the relaxed lifestyle that makes the Swahili Coast such a special place to live.',
+    'aboutUsPage.p3': 'If you are interested in this unique property, Hermann or Eva will be delighted to provide you with further information and arrange a personal viewing. The asking price is negotiable.',
+    'aboutUsPage.galleryHint': 'Tap any photo to view it larger.',
     'tracking.title': 'Check your booking status',
     'tracking.code': 'Booking reference',
     'tracking.button': 'Check booking',
@@ -157,6 +166,7 @@ const translations = {
     'nav.eatSip': 'Essen & Trinken',
     'nav.bomagawani': 'Bomagawani',
     'nav.offersPrices': 'Angebote & Preise',
+    'nav.aboutUs': 'Über uns',
     'nav.contact': 'Kontakt',
     'home.heroKicker': 'Willkommen bei Bomagawani – Urlaub & Abenteuer an der Swahili-Küste.',
     'home.viewRooms': 'Zimmer ansehen',
@@ -230,6 +240,14 @@ const translations = {
     'offersPage.paymentBody': '1/3 Anzahlung vor Anreise, 2/3 bei Abreise. Die Bankdaten finden Sie im Buchungsformular unten.',
     'offersPage.selectOffer': 'Dieses Angebot wählen',
     'offersPage.selectedLabel': 'Ausgewähltes Angebot:',
+    'aboutUsPage.kicker': 'Über uns',
+    'aboutUsPage.title': 'Bomagawani zu verkaufen',
+    'aboutUsPage.subtitle': 'Ein persönliches Refugium an der Swahili-Küste, mit Sorgfalt gebaut und bereit für neue Besitzer.',
+    'aboutUsPage.storyKicker': 'Bomagawani zu verkaufen',
+    'aboutUsPage.p1': 'Nach vielen Jahren, in denen Hermann Bomagawani mit viel Leidenschaft aufgebaut und weiterentwickelt hat, ist es nun an der Zeit, mehr persönliche Freiheit zu genießen und neue Pläne für die Zukunft zu verfolgen. Aus diesem Grund wird diese außergewöhnliche Villa an Tansanias wunderschöner Swahili-Küste nun zum Verkauf angeboten.',
+    'aboutUsPage.p2': 'Die Villa wurde mit hohem Qualitätsanspruch gebaut und verbindet großzügiges Wohnen mit der einzigartigen Atmosphäre des Indischen Ozeans. Sie ist das perfekte Zuhause für alle, die Ruhe, Natur und den entspannten Lebensstil suchen, der die Swahili-Küste zu einem so besonderen Ort zum Leben macht.',
+    'aboutUsPage.p3': 'Wenn Sie an dieser einzigartigen Immobilie interessiert sind, geben Ihnen Hermann oder Eva gerne weitere Informationen und vereinbaren eine persönliche Besichtigung. Der Kaufpreis ist verhandelbar.',
+    'aboutUsPage.galleryHint': 'Tippen Sie auf ein Foto, um es größer anzuzeigen.',
     'tracking.title': 'Buchungsstatus prüfen',
     'tracking.code': 'Buchungsreferenz',
     'tracking.button': 'Buchung prüfen',
@@ -543,6 +561,8 @@ const state = {
   heroIndex: 0,
   propertyGalleryIndex: 0,
   propertyLightboxOpen: false,
+  aboutUsGalleryIndex: 0,
+  aboutUsLightboxOpen: false,
   currencyManuallySet: false,
   heroRangePickerMonth: null,
   bookingRangePickerMonth: null
@@ -605,6 +625,15 @@ const dom = {
   propertyLightboxPrev: document.getElementById('property-lightbox-prev'),
   propertyLightboxNext: document.getElementById('property-lightbox-next'),
   propertySalePrice: document.getElementById('property-sale-price'),
+  aboutUsMarqueeTrack: document.getElementById('about-us-marquee-track'),
+  aboutUsLightbox: document.getElementById('about-us-lightbox'),
+  aboutUsLightboxBackdrop: document.getElementById('about-us-lightbox-backdrop'),
+  aboutUsLightboxImage: document.getElementById('about-us-lightbox-image'),
+  aboutUsLightboxCaption: document.getElementById('about-us-lightbox-caption'),
+  aboutUsLightboxCount: document.getElementById('about-us-lightbox-count'),
+  aboutUsLightboxClose: document.getElementById('about-us-lightbox-close'),
+  aboutUsLightboxPrev: document.getElementById('about-us-lightbox-prev'),
+  aboutUsLightboxNext: document.getElementById('about-us-lightbox-next'),
   aboutSection: document.getElementById('about-section'),
   aboutNav: document.getElementById('about-nav'),
   aboutTitle: document.getElementById('about-title'),
@@ -692,9 +721,49 @@ const pageRoutes = {
   '/eat-sip': 'eat-sip',
   '/bomagawani': 'bomagawani',
   '/offers-prices': 'offers-prices',
+  '/about': 'about-us',
   '/contact': 'contact',
   '/about-us': 'contact'
 };
+
+const ABOUT_US_GALLERY_IMAGES = [
+  {
+    src: '/uploads/property/property-house-front.webp',
+    alt: 'Full front view of Bomagawani House'
+  },
+  {
+    src: '/uploads/property/property-entrance.webp',
+    alt: 'Front entrance and garden steps'
+  },
+  {
+    src: '/uploads/property/property-veranda-exterior.webp',
+    alt: 'Side veranda and garden flowers'
+  },
+  {
+    src: '/uploads/property/property-veranda-lounge.webp',
+    alt: 'Shaded veranda lounge and dining space'
+  },
+  {
+    src: '/uploads/property/property-veranda-dining.webp',
+    alt: 'Veranda dining with green garden view'
+  },
+  {
+    src: '/uploads/property/property-dining-hall.webp',
+    alt: 'Indoor dining hall and fridge'
+  },
+  {
+    src: '/uploads/property/property-garden-sea-view.webp',
+    alt: 'Garden with trees and coastal view'
+  },
+  {
+    src: '/uploads/property/property-garden-path.webp',
+    alt: 'Green garden path around the property'
+  },
+  {
+    src: '/uploads/property/property-coast-sunset.webp',
+    alt: 'Nearby coast sunset view'
+  }
+];
 
 const contentPageToRoute = {
   'eat-sip': {
@@ -886,6 +955,7 @@ function setLanguage(languageCode) {
     renderAmenities();
     renderPageContent();
     renderPropertyGallery();
+    renderAboutUsGallery();
     applySettings();
     requestQuote();
     updateStructuredData();
@@ -1434,6 +1504,7 @@ function pageTitleForCurrentPage() {
   if (state.currentPage === 'eat-sip') return translateCopy(pageBySlug('eat-sip')?.nav_label || 'Eat & Sip');
   if (state.currentPage === 'bomagawani') return translateCopy(pageBySlug('property')?.nav_label || 'Bomagawani');
   if (state.currentPage === 'offers-prices') return t('nav.offersPrices');
+  if (state.currentPage === 'about-us') return t('nav.aboutUs');
   if (state.currentPage === 'contact') return t('nav.contact');
   return state.language === 'de' ? 'Küstenzimmer buchen' : 'Coastal Room Booking';
 }
@@ -1785,6 +1856,69 @@ function renderPropertyGallery() {
   });
 
   showPropertyGalleryImage(state.propertyGalleryIndex);
+}
+
+function showAboutUsGalleryImage(index) {
+  if (!ABOUT_US_GALLERY_IMAGES.length) return;
+
+  state.aboutUsGalleryIndex = (index + ABOUT_US_GALLERY_IMAGES.length) % ABOUT_US_GALLERY_IMAGES.length;
+
+  if (state.aboutUsLightboxOpen) {
+    syncAboutUsLightbox();
+  }
+}
+
+function syncAboutUsLightbox() {
+  if (!dom.aboutUsLightboxImage || !ABOUT_US_GALLERY_IMAGES.length) return;
+
+  const image = ABOUT_US_GALLERY_IMAGES[state.aboutUsGalleryIndex];
+  const caption = translateCopy(image.alt);
+  dom.aboutUsLightboxImage.src = image.src;
+  dom.aboutUsLightboxImage.alt = caption;
+  dom.aboutUsLightboxCaption.textContent = caption;
+  dom.aboutUsLightboxCount.textContent = `${state.aboutUsGalleryIndex + 1} / ${ABOUT_US_GALLERY_IMAGES.length}`;
+}
+
+function openAboutUsLightbox(index = state.aboutUsGalleryIndex) {
+  if (!dom.aboutUsLightbox || !ABOUT_US_GALLERY_IMAGES.length) return;
+
+  showAboutUsGalleryImage(index);
+  state.aboutUsLightboxOpen = true;
+  dom.aboutUsLightbox.hidden = false;
+  dom.aboutUsLightbox.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('lightbox-open');
+  syncAboutUsLightbox();
+  dom.aboutUsLightboxClose?.focus();
+}
+
+function closeAboutUsLightbox() {
+  if (!dom.aboutUsLightbox) return;
+
+  state.aboutUsLightboxOpen = false;
+  dom.aboutUsLightbox.hidden = true;
+  dom.aboutUsLightbox.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('lightbox-open');
+}
+
+function renderAboutUsGallery() {
+  if (!dom.aboutUsMarqueeTrack) return;
+
+  const renderSet = (hiddenFromAssistiveTech) =>
+    ABOUT_US_GALLERY_IMAGES.map((image, index) => {
+      const caption = translateCopy(image.alt);
+      const a11yAttrs = hiddenFromAssistiveTech ? 'aria-hidden="true" tabindex="-1"' : `aria-label="${escapeHtml(caption)}"`;
+      return `
+        <button type="button" class="marquee-item" data-about-us-photo="${index}" ${a11yAttrs}>
+          <img src="${image.src}" alt="${hiddenFromAssistiveTech ? '' : escapeHtml(caption)}" loading="lazy" decoding="async" />
+        </button>
+      `;
+    }).join('');
+
+  dom.aboutUsMarqueeTrack.innerHTML = renderSet(false) + renderSet(true);
+
+  dom.aboutUsMarqueeTrack.querySelectorAll('[data-about-us-photo]').forEach((button) => {
+    button.addEventListener('click', () => openAboutUsLightbox(Number(button.dataset.aboutUsPhoto)));
+  });
 }
 
 function renderPageContent() {
@@ -2578,6 +2712,52 @@ function configurePropertyGallery() {
   });
 }
 
+function configureAboutUsGallery() {
+  dom.aboutUsLightboxClose?.addEventListener('click', closeAboutUsLightbox);
+  dom.aboutUsLightboxBackdrop?.addEventListener('click', closeAboutUsLightbox);
+  dom.aboutUsLightboxPrev?.addEventListener('click', () => {
+    showAboutUsGalleryImage(state.aboutUsGalleryIndex - 1);
+  });
+  dom.aboutUsLightboxNext?.addEventListener('click', () => {
+    showAboutUsGalleryImage(state.aboutUsGalleryIndex + 1);
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (!state.aboutUsLightboxOpen) return;
+
+    if (event.key === 'Escape') {
+      closeAboutUsLightbox();
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      showAboutUsGalleryImage(state.aboutUsGalleryIndex - 1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight') {
+      showAboutUsGalleryImage(state.aboutUsGalleryIndex + 1);
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      const focusable = [dom.aboutUsLightboxClose, dom.aboutUsLightboxPrev, dom.aboutUsLightboxNext].filter(Boolean);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+}
+
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -2608,6 +2788,7 @@ async function boot() {
     renderAmenities();
     renderPageContent();
     renderPropertyGallery();
+    renderAboutUsGallery();
     applyPageVisibility();
     renderChatbot();
     applyBookingQueryParams();
@@ -2633,6 +2814,7 @@ configureInstallPrompt();
 registerServiceWorker();
 configureChatbot();
 configurePropertyGallery();
+configureAboutUsGallery();
 configureClientRouting();
 configureOfferSelectButtons();
 
