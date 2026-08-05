@@ -2169,6 +2169,7 @@ body.lightbox-open {
 
 .about-us-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
 }
 
@@ -2189,7 +2190,7 @@ body.lightbox-open {
   display: flex;
   gap: 16px;
   width: max-content;
-  animation: about-us-marquee-scroll 38s linear infinite;
+  animation: about-us-marquee-scroll 85s linear infinite;
 }
 
 .marquee-viewport:hover .marquee-track,
