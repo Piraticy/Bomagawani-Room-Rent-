@@ -417,10 +417,20 @@ const copyTranslations = {
     'Garden with trees and coastal view': 'Garten mit Bäumen und Küstenblick',
     'Green garden path around the property': 'Grüner Gartenweg rund um das Grundstück',
     'Nearby coast sunset view': 'Sonnenuntergang an der nahen Küste',
-    'House viewed across the front garden': 'Haus mit Blick über den Vorgarten',
-    'Side of the house with water storage tanks': 'Hausseite mit Wassertanks',
-    'Citrus orchard in the garden': 'Zitrusgarten auf dem Grundstück',
-    'Covered veranda walkway to a side entrance': 'Überdachter Verandaweg zu einem Seiteneingang',
+    'Roof framing under construction': 'Dachkonstruktion im Bau',
+    'Roof framing seen from the garden side': 'Dachkonstruktion, Ansicht von der Gartenseite',
+    'Block walls going up around the shaded steps': 'Steinmauern wachsen rund um die schattige Treppe',
+    'The house nearing completion with its red roof on': 'Das Haus kurz vor Fertigstellung mit dem roten Dach',
+    'Finished house front with rooftop solar panels': 'Fertige Hausfront mit Solarmodulen auf dem Dach',
+    'Water storage tank beside the citrus orchard': 'Wassertank neben dem Zitrusgarten',
+    'Garden path leading toward the house': 'Gartenweg, der zum Haus führt',
+    'Grass driveway path up to the house': 'Grasweg zur Auffahrt des Hauses',
+    'Palm-lined path leading to the beach restaurant': 'Von Palmen gesäumter Weg zum Strandrestaurant',
+    'Bomagawani Bar-Restaurant hut': 'Bomagawani Bar-Restaurant-Hütte',
+    'Restaurant hut beside the beach and mangroves': 'Restaurant-Hütte am Strand bei den Mangroven',
+    'Lounge seating inside the restaurant hut': 'Sitzbereich in der Restaurant-Hütte',
+    'Beach view with wooden fence and flowers': 'Strandblick mit Holzzaun und Blumen',
+    'Sunset over the ocean near Bomagawani': 'Sonnenuntergang über dem Ozean bei Bomagawani',
     'Bomagawani – The Exclusive Villa on the Indian Ocean': 'Bomagawani – Die exklusive Villa am Indischen Ozean',
     'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.': 'Eine außergewöhnliche Villa in atemberaubender Lage erwartet Sie direkt an der Swahili-Küste. Umgeben von tropischer Natur und dem türkisfarbenen Wasser des Indischen Ozeans, verbindet sie traditionelle Architektur mit modernem Komfort – ein Ort der Ruhe, Entspannung und unvergesslicher Momente.',
     'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.': 'Bomagawani entstand aus einem gemeinsamen Traum von Eva und Hermann. Mit großer Leidenschaft, persönlichem Einsatz und echter Gastfreundschaft haben wir einen Ort geschaffen, an dem sich Gäste aus aller Welt willkommen und zu Hause fühlen.',
@@ -728,56 +738,60 @@ const pageRoutes = {
 
 const ABOUT_US_GALLERY_IMAGES = [
   {
-    src: '/uploads/property/property-house-front.webp',
-    alt: 'Full front view of Bomagawani House'
+    src: '/uploads/about-us/about-us-construction-frame-1.jpg',
+    alt: 'Roof framing under construction'
   },
   {
-    src: '/uploads/property/property-entrance.webp',
-    alt: 'Front entrance and garden steps'
+    src: '/uploads/about-us/about-us-construction-frame-2.jpg',
+    alt: 'Roof framing seen from the garden side'
   },
   {
-    src: '/uploads/property/property-veranda-exterior.webp',
-    alt: 'Side veranda and garden flowers'
+    src: '/uploads/about-us/about-us-construction-walls.jpg',
+    alt: 'Block walls going up around the shaded steps'
   },
   {
-    src: '/uploads/property/property-veranda-lounge.webp',
-    alt: 'Shaded veranda lounge and dining space'
+    src: '/uploads/about-us/about-us-construction-nearly-done.jpg',
+    alt: 'The house nearing completion with its red roof on'
   },
   {
-    src: '/uploads/property/property-veranda-dining.webp',
-    alt: 'Veranda dining with green garden view'
+    src: '/uploads/about-us/about-us-house-front-solar.jpg',
+    alt: 'Finished house front with rooftop solar panels'
   },
   {
-    src: '/uploads/property/property-dining-hall.webp',
-    alt: 'Indoor dining hall and fridge'
+    src: '/uploads/about-us/about-us-water-tank-orchard.jpg',
+    alt: 'Water storage tank beside the citrus orchard'
   },
   {
-    src: '/uploads/property/property-garden-sea-view.webp',
-    alt: 'Garden with trees and coastal view'
+    src: '/uploads/about-us/about-us-garden-path-house.jpg',
+    alt: 'Garden path leading toward the house'
   },
   {
-    src: '/uploads/property/property-garden-path.webp',
-    alt: 'Green garden path around the property'
+    src: '/uploads/about-us/about-us-driveway-path.jpg',
+    alt: 'Grass driveway path up to the house'
   },
   {
-    src: '/uploads/property/property-coast-sunset.webp',
-    alt: 'Nearby coast sunset view'
+    src: '/uploads/about-us/about-us-garden-path-hut.jpg',
+    alt: 'Palm-lined path leading to the beach restaurant'
   },
   {
-    src: '/uploads/site/1783858257487-5238f197.jpg',
-    alt: 'House viewed across the front garden'
+    src: '/uploads/about-us/about-us-restaurant-hut-front.jpg',
+    alt: 'Bomagawani Bar-Restaurant hut'
   },
   {
-    src: '/uploads/site/1783859244537-d0786d72.jpg',
-    alt: 'Side of the house with water storage tanks'
+    src: '/uploads/about-us/about-us-restaurant-hut-beach.jpg',
+    alt: 'Restaurant hut beside the beach and mangroves'
   },
   {
-    src: '/uploads/site/1783859256497-1402dc9d.jpg',
-    alt: 'Citrus orchard in the garden'
+    src: '/uploads/about-us/about-us-restaurant-hut-lounge.jpg',
+    alt: 'Lounge seating inside the restaurant hut'
   },
   {
-    src: '/uploads/site/1783859259643-6dd5d62f.jpg',
-    alt: 'Covered veranda walkway to a side entrance'
+    src: '/uploads/about-us/about-us-beach-view.jpg',
+    alt: 'Beach view with wooden fence and flowers'
+  },
+  {
+    src: '/uploads/about-us/about-us-beach-sunset.jpg',
+    alt: 'Sunset over the ocean near Bomagawani'
   }
 ];
 
