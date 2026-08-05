@@ -95,7 +95,6 @@ const translations = {
     'offersPage.selectedLabel': 'Selected offer:',
     'aboutUsPage.title': 'Bomagawani For Sale',
     'aboutUsPage.subtitle': 'A personal Swahili Coast retreat, built with care and now ready for its next owner.',
-    'aboutUsPage.storyKicker': 'Bomagawani For Sale',
     'aboutUsPage.p1': 'After many years of passionately building and developing Bomagawani, Hermann has decided that it is time to enjoy more personal freedom and pursue new plans for the future. For this reason, this exceptional villa on Tanzania\'s beautiful Swahili Coast is now offered for sale.',
     'aboutUsPage.p2': 'Built to a high standard of quality, the villa combines spacious living with the unique atmosphere of the Indian Ocean. It is the perfect home for those seeking peace, nature, and the relaxed lifestyle that makes the Swahili Coast such a special place to live.',
     'aboutUsPage.p3': 'If you are interested in this unique property, Hermann or Eva will be delighted to provide you with further information and arrange a personal viewing. The asking price is negotiable.',
@@ -241,7 +240,6 @@ const translations = {
     'offersPage.selectedLabel': 'Ausgewähltes Angebot:',
     'aboutUsPage.title': 'Bomagawani zu verkaufen',
     'aboutUsPage.subtitle': 'Ein persönliches Refugium an der Swahili-Küste, mit Sorgfalt gebaut und bereit für neue Besitzer.',
-    'aboutUsPage.storyKicker': 'Bomagawani zu verkaufen',
     'aboutUsPage.p1': 'Nach vielen Jahren, in denen Hermann Bomagawani mit viel Leidenschaft aufgebaut und weiterentwickelt hat, ist es nun an der Zeit, mehr persönliche Freiheit zu genießen und neue Pläne für die Zukunft zu verfolgen. Aus diesem Grund wird diese außergewöhnliche Villa an Tansanias wunderschöner Swahili-Küste nun zum Verkauf angeboten.',
     'aboutUsPage.p2': 'Die Villa wurde mit hohem Qualitätsanspruch gebaut und verbindet großzügiges Wohnen mit der einzigartigen Atmosphäre des Indischen Ozeans. Sie ist das perfekte Zuhause für alle, die Ruhe, Natur und den entspannten Lebensstil suchen, der die Swahili-Küste zu einem so besonderen Ort zum Leben macht.',
     'aboutUsPage.p3': 'Wenn Sie an dieser einzigartigen Immobilie interessiert sind, geben Ihnen Hermann oder Eva gerne weitere Informationen und vereinbaren eine persönliche Besichtigung. Der Kaufpreis ist verhandelbar.',
@@ -419,6 +417,15 @@ const copyTranslations = {
     'Garden with trees and coastal view': 'Garten mit Bäumen und Küstenblick',
     'Green garden path around the property': 'Grüner Gartenweg rund um das Grundstück',
     'Nearby coast sunset view': 'Sonnenuntergang an der nahen Küste',
+    'House viewed across the front garden': 'Haus mit Blick über den Vorgarten',
+    'Palm-lined garden path with the roof in the distance': 'Von Palmen gesäumter Gartenweg mit Dach in der Ferne',
+    'Side of the house with water storage tanks': 'Hausseite mit Wassertanks',
+    'Front steps and entrance door under shade trees': 'Vordertreppe und Eingangstür unter Schattenbäumen',
+    'Front of the house showing the rooftop solar panels': 'Hausfront mit Solarmodulen auf dem Dach',
+    'Garden path opening toward a glimpse of the sea': 'Gartenweg mit Blick auf das Meer',
+    'Citrus orchard in the garden': 'Zitrusgarten auf dem Grundstück',
+    'Covered veranda walkway to a side entrance': 'Überdachter Verandaweg zu einem Seiteneingang',
+    'Veranda lounge seating and dining table': 'Sitzbereich und Esstisch auf der Veranda',
     'Bomagawani – The Exclusive Villa on the Indian Ocean': 'Bomagawani – Die exklusive Villa am Indischen Ozean',
     'An exceptional villa in a stunning location awaits you directly on the Swahili Coast. Surrounded by tropical nature and the turquoise waters of the Indian Ocean, it combines traditional architecture with modern comfort – a place for peace, relaxation, and unforgettable moments.': 'Eine außergewöhnliche Villa in atemberaubender Lage erwartet Sie direkt an der Swahili-Küste. Umgeben von tropischer Natur und dem türkisfarbenen Wasser des Indischen Ozeans, verbindet sie traditionelle Architektur mit modernem Komfort – ein Ort der Ruhe, Entspannung und unvergesslicher Momente.',
     'Bomagawani was born from a shared dream of Eva and Hermann. With great passion, personal commitment, and genuine hospitality, we have created a place where guests from all over the world feel welcome and at home.': 'Bomagawani entstand aus einem gemeinsamen Traum von Eva und Hermann. Mit großer Leidenschaft, persönlichem Einsatz und echter Gastfreundschaft haben wir einen Ort geschaffen, an dem sich Gäste aus aller Welt willkommen und zu Hause fühlen.',
@@ -760,6 +767,42 @@ const ABOUT_US_GALLERY_IMAGES = [
   {
     src: '/uploads/property/property-coast-sunset.webp',
     alt: 'Nearby coast sunset view'
+  },
+  {
+    src: '/uploads/site/1783858257487-5238f197.jpg',
+    alt: 'House viewed across the front garden'
+  },
+  {
+    src: '/uploads/site/1783859236728-d0dc67f4.jpg',
+    alt: 'Palm-lined garden path with the roof in the distance'
+  },
+  {
+    src: '/uploads/site/1783859244537-d0786d72.jpg',
+    alt: 'Side of the house with water storage tanks'
+  },
+  {
+    src: '/uploads/site/1783859247951-9c98121b.jpg',
+    alt: 'Front steps and entrance door under shade trees'
+  },
+  {
+    src: '/uploads/site/1783859251255-5218c5df.jpg',
+    alt: 'Front of the house showing the rooftop solar panels'
+  },
+  {
+    src: '/uploads/site/1783859253089-192927ee.jpg',
+    alt: 'Garden path opening toward a glimpse of the sea'
+  },
+  {
+    src: '/uploads/site/1783859256497-1402dc9d.jpg',
+    alt: 'Citrus orchard in the garden'
+  },
+  {
+    src: '/uploads/site/1783859259643-6dd5d62f.jpg',
+    alt: 'Covered veranda walkway to a side entrance'
+  },
+  {
+    src: '/uploads/site/1783859262543-89ffc529.jpg',
+    alt: 'Veranda lounge seating and dining table'
   }
 ];
 
