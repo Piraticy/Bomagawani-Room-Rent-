@@ -1836,6 +1836,13 @@ function showPropertyGalleryImage(index) {
   }
 }
 
+function replayLightboxGrow(imageEl) {
+  if (!imageEl) return;
+  imageEl.style.animation = 'none';
+  void imageEl.offsetWidth;
+  imageEl.style.animation = '';
+}
+
 function syncPropertyLightbox() {
   if (!dom.propertyLightboxImage || !PROPERTY_GALLERY_IMAGES.length) return;
 
@@ -1845,6 +1852,7 @@ function syncPropertyLightbox() {
   dom.propertyLightboxImage.alt = caption;
   dom.propertyLightboxCaption.textContent = caption;
   dom.propertyLightboxCount.textContent = `${state.propertyGalleryIndex + 1} / ${PROPERTY_GALLERY_IMAGES.length}`;
+  replayLightboxGrow(dom.propertyLightboxImage);
 }
 
 function openPropertyLightbox(index = state.propertyGalleryIndex) {
@@ -1907,6 +1915,7 @@ function syncAboutUsLightbox() {
   dom.aboutUsLightboxImage.alt = caption;
   dom.aboutUsLightboxCaption.textContent = caption;
   dom.aboutUsLightboxCount.textContent = `${state.aboutUsGalleryIndex + 1} / ${ABOUT_US_GALLERY_IMAGES.length}`;
+  replayLightboxGrow(dom.aboutUsLightboxImage);
 }
 
 function openAboutUsLightbox(index = state.aboutUsGalleryIndex) {

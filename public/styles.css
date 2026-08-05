@@ -2106,9 +2106,28 @@ body.lightbox-open {
 .gallery-lightbox-figure img {
   display: block;
   width: 100%;
-  max-height: min(76vh, 980px);
-  object-fit: contain;
-  background: linear-gradient(180deg, #dfecef, #edf5f7 54%, #dfe8eb);
+  height: min(76vh, 980px);
+  object-fit: cover;
+  background: linear-gradient(180deg, #102435, #18374a);
+  animation: gallery-lightbox-grow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes gallery-lightbox-grow {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-lightbox-figure img {
+    animation: none;
+  }
 }
 
 .gallery-lightbox-caption {
@@ -3355,7 +3374,7 @@ textarea {
   }
 
   .gallery-lightbox-figure img {
-    max-height: 66vh;
+    height: 66vh;
   }
 
   .gallery-lightbox-caption {
