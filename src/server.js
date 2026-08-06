@@ -456,7 +456,7 @@ function normalizeSitemapDomain(domain) {
 
 function buildSitemapXml(baseUrl, rooms) {
   const lastmod = new Date().toISOString().slice(0, 10);
-  const urls = [`${baseUrl}/`, `${baseUrl}/rooms`, `${baseUrl}/eat-sip`, `${baseUrl}/bomagawani`, `${baseUrl}/offers-prices`, `${baseUrl}/about`, `${baseUrl}/contact`];
+  const urls = [`${baseUrl}/`, `${baseUrl}/rooms`, `${baseUrl}/eat-sip`, `${baseUrl}/bomagawani`, `${baseUrl}/offers-prices`, `${baseUrl}/about`, `${baseUrl}/our-story`, `${baseUrl}/contact`];
 
   rooms.forEach((room) => {
     urls.push(`${baseUrl}/#room-${room.slug}`);
@@ -1511,7 +1511,7 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicDir, 'admin.html'));
 });
 
-app.get(['/rooms', '/eat-sip', '/bomagawani', '/offers-prices', '/about', '/contact'], (req, res) => {
+app.get(['/rooms', '/eat-sip', '/bomagawani', '/offers-prices', '/about', '/our-story', '/contact'], (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
 });
 

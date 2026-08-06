@@ -99,6 +99,25 @@ const translations = {
     'aboutUsPage.p2': 'Built to a high standard of quality, the villa combines spacious living with the unique atmosphere of the Indian Ocean. It is the perfect home for those seeking peace, nature, and the relaxed lifestyle that makes the Swahili Coast such a special place to live.',
     'aboutUsPage.p3': 'If you are interested in this unique property, Hermann or Eva will be delighted to provide you with further information and arrange a personal viewing. The asking price is negotiable.',
     'aboutUsPage.galleryHint': 'Tap any photo to view it larger.',
+    'nav.ourStory': 'Our Story',
+    'ourStoryPage.kicker': 'Karibu',
+    'ourStoryPage.title': 'Together We Shared A Dream',
+    'ourStoryPage.subtitle': 'How a chance meeting in Oshongo became a home on the Swahili Coast, and a welcome for guests from all over the world.',
+    'ourStoryPage.quote1Kicker': '2013 · Oshongo',
+    'ourStoryPage.quote1': 'In 2013, I, Hermann Bürgler, met my wife Eva Robert Mwakisiala in Oshongo. Together we shared a dream: to create a peaceful place on the Indian Ocean that we could call home and open to guests from all over the world.',
+    'ourStoryPage.block2Kicker': 'Built With Passion',
+    'ourStoryPage.block2Title': 'Our Arabian-Inspired Retreat',
+    'ourStoryPage.block2Text': 'With great passion and attention to detail, we built our Arabian-inspired retreat, surrounded by nature and just minutes from the beach. Here, guests can enjoy the beauty of the Swahili Coast, fresh local cuisine, tropical fruits, and the relaxed rhythm of East African life.',
+    'ourStoryPage.block3Kicker': "Eva's Kitchen",
+    'ourStoryPage.block3Title': 'Shared Meals, Shared Stories',
+    'ourStoryPage.block3Text': 'Eva is a passionate cook and a wonderful hostess who prepares regional specialties with love. Our camp kitchen and beach bar are places where guests meet, share stories, and enjoy freshly prepared meals and refreshing drinks in a warm and friendly atmosphere.',
+    'ourStoryPage.block4Kicker': 'Karibu, Guests',
+    'ourStoryPage.block4Title': 'An Authentic Welcome',
+    'ourStoryPage.block4Text': 'For those who wish, we are also happy to introduce a little Swahili language and local culture, making your stay an even more authentic experience. We look forward to welcoming you and sharing the beauty of this special place with you.',
+    'ourStoryPage.ctaTitle': 'Come Share The Dream With Us',
+    'ourStoryPage.ctaText': "Book a room, taste Eva's cooking, and let Hermann show you the Swahili Coast we fell in love with.",
+    'ourStoryPage.ctaRooms': 'See Our Rooms',
+    'ourStoryPage.ctaContact': 'Get In Touch',
     'tracking.title': 'Check your booking status',
     'tracking.code': 'Booking reference',
     'tracking.button': 'Check booking',
@@ -244,6 +263,25 @@ const translations = {
     'aboutUsPage.p2': 'Die Villa wurde mit hohem Qualitätsanspruch gebaut und verbindet großzügiges Wohnen mit der einzigartigen Atmosphäre des Indischen Ozeans. Sie ist das perfekte Zuhause für alle, die Ruhe, Natur und den entspannten Lebensstil suchen, der die Swahili-Küste zu einem so besonderen Ort zum Leben macht.',
     'aboutUsPage.p3': 'Wenn Sie an dieser einzigartigen Immobilie interessiert sind, geben Ihnen Hermann oder Eva gerne weitere Informationen und vereinbaren eine persönliche Besichtigung. Der Kaufpreis ist verhandelbar.',
     'aboutUsPage.galleryHint': 'Tippen Sie auf ein Foto, um es größer anzuzeigen.',
+    'nav.ourStory': 'Unsere Geschichte',
+    'ourStoryPage.kicker': 'Karibu',
+    'ourStoryPage.title': 'Gemeinsam Träumten Wir',
+    'ourStoryPage.subtitle': 'Wie eine Begegnung in Oshongo zu einem Zuhause an der Swahili-Küste wurde, und zu einem Willkommen für Gäste aus aller Welt.',
+    'ourStoryPage.quote1Kicker': '2013 · Oshongo',
+    'ourStoryPage.quote1': '2013 lernte ich, Hermann Bürgler, meine Frau Eva Robert Mwakisiala in Oshongo kennen. Gemeinsam teilten wir einen Traum: einen friedlichen Ort am Indischen Ozean zu schaffen, den wir unser Zuhause nennen und Gästen aus aller Welt öffnen konnten.',
+    'ourStoryPage.block2Kicker': 'Mit Leidenschaft Gebaut',
+    'ourStoryPage.block2Title': 'Unser Arabisch Inspiriertes Refugium',
+    'ourStoryPage.block2Text': 'Mit großer Leidenschaft und Liebe zum Detail haben wir unser arabisch inspiriertes Refugium gebaut, umgeben von Natur und nur wenige Minuten vom Strand entfernt. Hier genießen unsere Gäste die Schönheit der Swahili-Küste, frische lokale Küche, tropische Früchte und den entspannten Rhythmus des ostafrikanischen Lebens.',
+    'ourStoryPage.block3Kicker': 'Evas Küche',
+    'ourStoryPage.block3Title': 'Geteilte Mahlzeiten, Geteilte Geschichten',
+    'ourStoryPage.block3Text': 'Eva ist eine leidenschaftliche Köchin und eine wunderbare Gastgeberin, die regionale Spezialitäten mit Liebe zubereitet. Unsere Camp-Küche und Strandbar sind Orte, an denen sich Gäste treffen, Geschichten teilen und frisch zubereitete Mahlzeiten und erfrischende Getränke in warmer, freundlicher Atmosphäre genießen.',
+    'ourStoryPage.block4Kicker': 'Karibu, Liebe Gäste',
+    'ourStoryPage.block4Title': 'Ein Authentisches Willkommen',
+    'ourStoryPage.block4Text': 'Wer möchte, dem vermitteln wir gerne ein wenig Swahili-Sprache und lokale Kultur, um Ihren Aufenthalt noch authentischer zu machen. Wir freuen uns darauf, Sie willkommen zu heißen und die Schönheit dieses besonderen Ortes mit Ihnen zu teilen.',
+    'ourStoryPage.ctaTitle': 'Teilen Sie Den Traum Mit Uns',
+    'ourStoryPage.ctaText': 'Buchen Sie ein Zimmer, probieren Sie Evas Küche und lassen Sie sich von Hermann die Swahili-Küste zeigen, in die wir uns verliebt haben.',
+    'ourStoryPage.ctaRooms': 'Unsere Zimmer',
+    'ourStoryPage.ctaContact': 'Kontaktieren Sie Uns',
     'tracking.title': 'Buchungsstatus prüfen',
     'tracking.code': 'Buchungsreferenz',
     'tracking.button': 'Buchung prüfen',
@@ -732,6 +770,7 @@ const pageRoutes = {
   '/bomagawani': 'bomagawani',
   '/offers-prices': 'offers-prices',
   '/about': 'about-us',
+  '/our-story': 'our-story',
   '/contact': 'contact',
   '/about-us': 'contact'
 };
@@ -1535,6 +1574,7 @@ function pageTitleForCurrentPage() {
   if (state.currentPage === 'bomagawani') return translateCopy(pageBySlug('property')?.nav_label || 'Bomagawani');
   if (state.currentPage === 'offers-prices') return t('nav.offersPrices');
   if (state.currentPage === 'about-us') return t('nav.aboutUs');
+  if (state.currentPage === 'our-story') return t('nav.ourStory');
   if (state.currentPage === 'contact') return t('nav.contact');
   return state.language === 'de' ? 'Küstenzimmer buchen' : 'Coastal Room Booking';
 }
@@ -2797,6 +2837,30 @@ function configureAboutUsGallery() {
   });
 }
 
+function configureStoryReveal() {
+  const targets = document.querySelectorAll('.story-reveal');
+  if (!targets.length) return;
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    targets.forEach((target) => target.classList.add('is-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.01, rootMargin: '0px 0px 120px 0px' }
+  );
+
+  targets.forEach((target) => observer.observe(target));
+}
+
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -2854,6 +2918,7 @@ registerServiceWorker();
 configureChatbot();
 configurePropertyGallery();
 configureAboutUsGallery();
+configureStoryReveal();
 configureClientRouting();
 configureOfferSelectButtons();
 
