@@ -2302,7 +2302,7 @@ body.lightbox-open {
 
 .story-reveal.is-visible .story-row-copy > *,
 .story-reveal.is-visible .story-intro-copy > *,
-.story-reveal.is-visible .story-cta > * {
+.story-cta.is-visible > * {
   opacity: 1;
   transform: none;
 }
