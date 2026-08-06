@@ -2282,12 +2282,11 @@ body.lightbox-open {
 .story-row-media,
 .story-intro-media {
   opacity: 0;
-  transform: scale(1.06) translateY(10px);
+  transform: scale(1.06);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.story-row-copy > *,
-.story-intro-copy > *,
+.story-copy-overlay > *,
 .story-cta > * {
   opacity: 0;
   transform: translateY(18px);
@@ -2300,76 +2299,77 @@ body.lightbox-open {
   transform: none;
 }
 
-.story-reveal.is-visible .story-row-copy > *,
-.story-reveal.is-visible .story-intro-copy > *,
+.story-reveal.is-visible .story-copy-overlay > *,
 .story-cta.is-visible > * {
   opacity: 1;
   transform: none;
 }
 
-.story-row-copy > *:nth-child(1),
-.story-intro-copy > *:nth-child(1),
+.story-copy-overlay > *:nth-child(1),
 .story-cta > *:nth-child(1) {
   transition-delay: 0.05s;
 }
 
-.story-row-copy > *:nth-child(2),
-.story-intro-copy > *:nth-child(2),
+.story-copy-overlay > *:nth-child(2),
 .story-cta > *:nth-child(2) {
   transition-delay: 0.16s;
 }
 
-.story-row-copy > *:nth-child(3),
-.story-intro-copy > *:nth-child(3),
+.story-copy-overlay > *:nth-child(3),
 .story-cta > *:nth-child(3) {
   transition-delay: 0.27s;
 }
 
-.story-intro-copy > *:nth-child(4) {
+.story-copy-overlay > *:nth-child(4) {
   transition-delay: 0.38s;
 }
 
-.story-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: stretch;
-  height: 400px;
+.story-intro,
+.story-row {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 480px;
   border-radius: 24px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 251, 0.94));
   box-shadow: 0 18px 46px rgba(13, 34, 64, 0.14);
 }
 
-.story-intro-media {
-  order: 2;
+.story-intro-media,
+.story-row-media {
+  position: absolute;
+  inset: 0;
   margin: 0;
-  height: 100%;
 }
 
-.story-intro-media img {
+.story-intro-media img,
+.story-row-media img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s ease;
 }
 
-.story-intro:hover .story-intro-media img {
+.story-intro:hover .story-intro-media img,
+.story-row:hover .story-row-media img {
   transform: scale(1.05);
 }
 
-.story-intro-copy {
-  order: 1;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(28px, 4vw, 44px);
+.story-copy-overlay {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: clamp(24px, 4vw, 48px);
+  background: linear-gradient(180deg, rgba(8, 16, 24, 0) 0%, rgba(8, 16, 24, 0.32) 32%, rgba(6, 12, 18, 0.9) 100%);
 }
 
 .story-intro-copy h2 {
-  font-size: clamp(2rem, 3.4vw, 2.8rem);
-  margin-bottom: 22px;
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+  margin-bottom: 14px;
 }
 
 .story-quote-kicker {
@@ -2386,70 +2386,18 @@ body.lightbox-open {
 
 .story-intro-quote {
   margin: 0;
-  color: var(--ink);
+  color: rgba(255, 255, 255, 0.92);
   font-family: 'Fraunces', serif;
   font-style: italic;
-  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
   max-width: 640px;
-}
-
-.section-head .section-kicker {
-  color: var(--accent);
-  margin: 0 0 6px;
-}
-
-.section-head .story-quote-kicker {
-  color: var(--accent);
-  margin: 0 0 10px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .story-timeline {
   display: grid;
   gap: 58px;
-}
-
-.story-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: stretch;
-  height: 400px;
-  border-radius: 24px;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(246, 251, 251, 0.94));
-  box-shadow: 0 18px 46px rgba(13, 34, 64, 0.14);
-}
-
-.story-row-reverse .story-row-media {
-  order: 2;
-}
-
-.story-row-reverse .story-row-copy {
-  order: 1;
-}
-
-.story-row-media {
-  margin: 0;
-  height: 100%;
-}
-
-.story-row-media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.story-row:hover .story-row-media img {
-  transform: scale(1.05);
-}
-
-.story-row-copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(28px, 4vw, 44px);
 }
 
 .story-row-kicker {
@@ -2470,16 +2418,20 @@ body.lightbox-open {
 }
 
 .story-row-copy h3 {
-  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
   line-height: 1.15;
   margin-bottom: 10px;
 }
 
 .story-row-copy p {
   margin: 0;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 1.02rem;
-  line-height: 1.7;
+  line-height: 1.65;
+  max-width: 680px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .story-cta {
@@ -2490,7 +2442,7 @@ body.lightbox-open {
   padding: clamp(30px, 4vw, 46px);
   border-radius: 28px;
   border: 1px solid rgba(216, 227, 238, 0.9);
-  background: linear-gradient(135deg, rgba(18, 91, 102, 0.08), rgba(227, 163, 78, 0.1));
+  background: linear-gradient(135deg, rgba(18, 91, 102, 0.16), rgba(227, 163, 78, 0.2));
 }
 
 .story-cta h3 {
@@ -2513,8 +2465,7 @@ body.lightbox-open {
 @media (prefers-reduced-motion: reduce) {
   .story-row-media,
   .story-intro-media,
-  .story-row-copy > *,
-  .story-intro-copy > *,
+  .story-copy-overlay > *,
   .story-cta > * {
     opacity: 1;
     transform: none;
@@ -2522,34 +2473,11 @@ body.lightbox-open {
   }
 }
 
-@media (max-width: 860px) {
-  .story-intro,
-  .story-row,
-  .story-row-reverse {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .story-row-reverse .story-row-media,
-  .story-row-reverse .story-row-copy,
-  .story-row .story-row-media,
-  .story-row .story-row-copy,
-  .story-intro-media,
-  .story-intro-copy {
-    order: 0;
-  }
-
+@media (max-width: 640px) {
   .story-intro,
   .story-row {
-    height: auto;
+    aspect-ratio: 3 / 4;
     border-radius: 18px;
-  }
-
-  .story-row-media,
-  .story-intro-media {
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 4 / 3;
   }
 }
 
