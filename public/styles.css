@@ -2371,6 +2371,14 @@ body.lightbox-open {
   order: 1;
 }
 
+.story-intro-copy {
+  order: 2;
+}
+
+.story-intro-media {
+  order: 1;
+}
+
 .story-intro-media::after,
 .story-row-media::after {
   content: '';
