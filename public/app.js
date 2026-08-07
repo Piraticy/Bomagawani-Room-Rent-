@@ -1380,7 +1380,7 @@ function setupHeroSlider(images) {
     .map(
       (src, index) => `
       <div class="hero-slide ${index === 0 ? 'is-active' : ''}">
-        <img src="${escapeHtml(src)}" alt="Bomagawani hero slide" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" />
+        <img ${lazyImgAttr(src, 'home')} alt="Bomagawani hero slide" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `
     )
@@ -1580,6 +1580,40 @@ function getCurrentPage() {
   return pageRoutes[pathname] || 'home';
 }
 
+function isPageActive(pageKey) {
+  return state.currentPage === pageKey;
+}
+
+// Promotes any not-yet-loaded `data-src` image/iframe under `root` to a real
+// `src`, so photos belonging to inactive pages never trigger a network
+// fetch until that page actually becomes the active route.
+function hydrateLazyImages(root) {
+  if (!root) return;
+  root.querySelectorAll('img[data-src], iframe[data-src]').forEach((el) => {
+    el.src = el.dataset.src;
+    delete el.dataset.src;
+  });
+}
+
+// Sets a real `src` immediately when `pageKey` is the active route, otherwise
+// stashes the URL in `data-src` for hydrateLazyImages to pick up once the
+// visitor actually navigates to that page.
+function setLazySrc(el, url, pageKey) {
+  if (!el || !url) return;
+  if (isPageActive(pageKey)) {
+    el.src = url;
+    delete el.dataset.src;
+  } else {
+    el.dataset.src = url;
+  }
+}
+
+// Same idea as setLazySrc but for building an <img ...> attribute string
+// inside a template literal (room cards, galleries, marquee, hero slides).
+function lazyImgAttr(url, pageKey) {
+  return isPageActive(pageKey) ? `src="${escapeHtml(url)}"` : `data-src="${escapeHtml(url)}"`;
+}
+
 function pageTitleForCurrentPage() {
   if (state.currentPage === 'rooms') return t('nav.rooms');
   if (state.currentPage === 'eat-sip') return translateCopy(pageBySlug('eat-sip')?.nav_label || 'Eat & Sip');
@@ -1595,7 +1629,9 @@ function applyPageVisibility() {
   state.currentPage = getCurrentPage();
 
   document.querySelectorAll('[data-page]').forEach((section) => {
-    section.hidden = section.dataset.page !== state.currentPage;
+    const isActive = section.dataset.page === state.currentPage;
+    section.hidden = !isActive;
+    if (isActive) hydrateLazyImages(section);
   });
 
   document.querySelectorAll('[data-page-link]').forEach((link) => {
@@ -1645,7 +1681,7 @@ function renderRooms() {
 
     const slidesHtml = imageSources
       .map(
-        (src, index) => `<img class="room-image ${index === 0 ? 'is-active' : ''}" src="${escapeHtml(src)}" alt="${escapeHtml(room.name)}" loading="lazy" decoding="async" />`
+        (src, index) => `<img class="room-image ${index === 0 ? 'is-active' : ''}" ${lazyImgAttr(src, 'rooms')} alt="${escapeHtml(room.name)}" loading="lazy" decoding="async" />`
       )
       .join('');
 
@@ -1654,7 +1690,7 @@ function renderRooms() {
       .map(
         (src, index) => `
           <button class="room-thumb ${index === 0 ? 'is-active' : ''}" type="button" data-slide-dot="${index}" aria-label="${escapeHtml(room.name)} photo ${index + 1}">
-            <img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" />
+            <img ${lazyImgAttr(src, 'rooms')} alt="" loading="lazy" decoding="async" />
           </button>
         `
       )
@@ -1868,7 +1904,7 @@ function showPropertyGalleryImage(index) {
 
   state.propertyGalleryIndex = (index + PROPERTY_GALLERY_IMAGES.length) % PROPERTY_GALLERY_IMAGES.length;
   const image = PROPERTY_GALLERY_IMAGES[state.propertyGalleryIndex];
-  dom.propertyImage.src = image.src;
+  setLazySrc(dom.propertyImage, image.src, 'bomagawani');
   dom.propertyImage.alt = translateCopy(image.alt);
 
   if (dom.propertyImageCaption) {
@@ -1935,7 +1971,7 @@ function renderPropertyGallery() {
   dom.propertyGalleryThumbs.innerHTML = PROPERTY_GALLERY_IMAGES.map(
     (image, index) => `
       <button type="button" class="property-gallery-thumb ${index === state.propertyGalleryIndex ? 'is-active' : ''}" data-property-thumb="${index}" aria-label="${translateCopy(image.alt)}">
-        <img src="${image.thumb}" alt="" loading="lazy" decoding="async" />
+        <img ${lazyImgAttr(image.thumb, 'bomagawani')} alt="" loading="lazy" decoding="async" />
       </button>
     `
   ).join('');
@@ -2000,7 +2036,7 @@ function renderAboutUsGallery() {
       const a11yAttrs = hiddenFromAssistiveTech ? 'aria-hidden="true" tabindex="-1"' : `aria-label="${escapeHtml(caption)}"`;
       return `
         <button type="button" class="marquee-item" data-about-us-photo="${index}" ${a11yAttrs}>
-          <img src="${image.src}" alt="${hiddenFromAssistiveTech ? '' : escapeHtml(caption)}" loading="lazy" decoding="async" />
+          <img ${lazyImgAttr(image.src, 'about-us')} alt="${hiddenFromAssistiveTech ? '' : escapeHtml(caption)}" loading="lazy" decoding="async" />
         </button>
       `;
     }).join('');
@@ -2033,8 +2069,8 @@ function renderPageContent() {
     renderSimpleHighlights(dom.eatSipHighlights, translateList(eatSip.highlights || []));
     const eatSipImage = eatSip.imageUrl || eatSip.image_url;
     if (eatSipImage) {
-      dom.eatSipImage.src = eatSipImage;
-      dom.eatSipGalleryMain.src = eatSipImage;
+      setLazySrc(dom.eatSipImage, eatSipImage, 'eat-sip');
+      setLazySrc(dom.eatSipGalleryMain, eatSipImage, 'eat-sip');
     }
     updateMenuLabel('[data-page-link="eat-sip"]', translateCopy(eatSip.nav_label));
   }
@@ -2139,7 +2175,9 @@ function applySettings() {
   }
   dom.footerMapLink.href = state.settings.map_link;
 
-  if (dom.mapEmbed) dom.mapEmbed.src = `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&t=h&output=embed`;
+  if (dom.mapEmbed) {
+    setLazySrc(dom.mapEmbed, `https://www.google.com/maps?q=${PROPERTY_COORDS.lat},${PROPERTY_COORDS.lng}&z=16&t=h&output=embed`, 'rooms');
+  }
 
   if (dom.statRooms) {
     dom.statRooms.textContent = `${state.rooms.length} ${t('nav.rooms')}`;
@@ -2894,6 +2932,10 @@ async function boot() {
     state.chatbot = data.chatbot || null;
     state.chatbotFaqs = data.chatbotFaqs || [];
     state.currencies = data.currencies?.length ? data.currencies : state.currencies;
+    // Set before any render*() call below so each one can tell, via
+    // isPageActive()/setLazySrc()/lazyImgAttr(), whether its own page is the
+    // active route and should load its images now rather than on first visit.
+    state.currentPage = getCurrentPage();
 
     await loadExchangeRate(currentCurrency());
     applySettings();
@@ -2912,8 +2954,18 @@ async function boot() {
     refreshIcons();
   } catch (error) {
     dom.quoteBox.textContent = t('status.bookingServiceDown');
+    // If bootstrap failed, applyPageVisibility() above never ran, so no
+    // section ever gets `hidden` and every page's images stay visible.
+    // Hydrate everything rather than leaving non-active pages half-broken.
+    hydrateLazyImages(document);
   }
 }
+
+// Hydrate the current route's static (non-fetch-dependent) images right
+// away, before the bootstrap request even starts, so the page the visitor
+// actually asked for doesn't wait on a network round-trip to begin loading
+// its own photos.
+document.querySelectorAll(`[data-page="${getCurrentPage()}"]`).forEach(hydrateLazyImages);
 
 applyTranslations();
 setFooterYear();
