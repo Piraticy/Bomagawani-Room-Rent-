@@ -72,7 +72,7 @@ function formatPaymentOption(option) {
 }
 
 async function sendNewBookingNotification(booking) {
-  const recipient = process.env.BOOKING_NOTIFICATION_EMAIL || 'hermann.h.chausiku@gmail.com';
+  const recipient = process.env.BOOKING_NOTIFICATION_EMAIL || 'adamurobert@gmail.com';
 
   if (!isConfigured()) {
     console.log(`[email] SMTP not configured, skipping new-booking notification for ${booking.booking_code}.`);
