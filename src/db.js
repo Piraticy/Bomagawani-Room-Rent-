@@ -926,9 +926,9 @@ CREATE TABLE IF NOT EXISTS sessions (
       short_description: 'Comfortable Group Room with ocean breeze.',
       long_description: 'The Master Bedroom is ideal for couples or executives seeking comfort, privacy, and premium in-room relaxation.',
       price_per_night_usd: 120,
-      max_guests: 4,
+      max_guests: 3,
       size_label: '38 m2',
-      bed_size: '2 Double Bed',
+      bed_size: '1 Double Bed + 1 Single Bed',
       featured: 1,
       cover_image: '',
       amenities_json: JSON.stringify([
@@ -948,9 +948,9 @@ CREATE TABLE IF NOT EXISTS sessions (
       short_description: 'Comfortable and affordable room for short or long stays.',
       long_description: 'The Guest Room offers a calm, clean, and budget-friendly option while still giving access to the full property experience.',
       price_per_night_usd: 75,
-      max_guests: 3,
+      max_guests: 2,
       size_label: '24 m2',
-      bed_size: '1 Single Bed + 1 Double Bed',
+      bed_size: '1 Double Bed',
       featured: 0,
       cover_image: '/uploads/rooms/guest-room-main.jpg',
       amenities_json: JSON.stringify([
@@ -982,6 +982,34 @@ CREATE TABLE IF NOT EXISTS sessions (
   // holds that exact old value, so a later admin edit is never clobbered.
   if (guestRoomBedSize && guestRoomBedSize.bed_size === '1 Double Bed + 2 Double Bed') {
     await db.prepare("UPDATE rooms SET bed_size = '1 Single Bed + 1 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
+  }
+
+  // Capacity/bed-layout correction: Master Bedroom is actually 1 double + 1
+  // single bed sleeping up to 3, and Guest Room is 1 double bed sleeping up
+  // to 2. Only applies if the room still holds the old values, so a later
+  // admin edit is never clobbered.
+  const masterBedroomCapacity = await db.prepare("SELECT max_guests, bed_size FROM rooms WHERE slug = 'master-bedroom'").get();
+  if (masterBedroomCapacity && masterBedroomCapacity.max_guests === 4 && masterBedroomCapacity.bed_size === '2 Double Bed') {
+    await db.prepare("UPDATE rooms SET max_guests = 3, bed_size = '1 Double Bed + 1 Single Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'master-bedroom'").run();
+  }
+
+  const guestRoomCapacity = await db.prepare("SELECT max_guests, bed_size FROM rooms WHERE slug = 'guest-room'").get();
+  if (guestRoomCapacity && guestRoomCapacity.max_guests === 3 && guestRoomCapacity.bed_size === '1 Single Bed + 1 Double Bed') {
+    await db.prepare("UPDATE rooms SET max_guests = 2, bed_size = '1 Double Bed', updated_at = CURRENT_TIMESTAMP WHERE slug = 'guest-room'").run();
+  }
+
+  // Drop "Smart TV" from any room's amenities list wherever an admin has
+  // added it, regardless of what else is in the list.
+  const roomsWithAmenities = await db.prepare('SELECT id, amenities_json FROM rooms').all();
+  for (const room of roomsWithAmenities) {
+    const amenities = JSON.parse(room.amenities_json || '[]');
+    const filtered = amenities.filter((item) => String(item.label || '').trim().toLowerCase() !== 'smart tv');
+    if (filtered.length !== amenities.length) {
+      await db.prepare('UPDATE rooms SET amenities_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
+        JSON.stringify(filtered),
+        room.id
+      );
+    }
   }
 
   const linksCount = (await db.prepare('SELECT COUNT(*) AS count FROM platform_links').get()).count;
