@@ -95,7 +95,7 @@ const translations = {
     'offersPage.selectedLabel': 'Selected offer:',
     'aboutUsPage.title': 'Bomagawani For Sale',
     'aboutUsPage.subtitle': 'A personal Swahili Coast retreat, built with care and now ready for its next owner.',
-    'aboutUsPage.p1': 'After many years of passionately building and developing Bomagawani, Hermann has decided that it is time to enjoy more personal freedom and pursue new plans for the future. For this reason, this exceptional villa on Tanzania\'s beautiful Swahili Coast is now offered for sale.',
+    'aboutUsPage.p1': 'After many years of passionately building and developing Bomagawani, Eva and Hermann have decided that it is time to enjoy more personal freedom and pursue new plans for the future. For this reason, this exceptional villa on Tanzania\'s beautiful Swahili Coast is now offered for sale.',
     'aboutUsPage.p2': 'Built to a high standard of quality, the villa combines spacious living with the unique atmosphere of the Indian Ocean. It is the perfect home for those seeking peace, nature, and the relaxed lifestyle that makes the Swahili Coast such a special place to live.',
     'aboutUsPage.p3': 'If you are interested in this unique property, Hermann or Eva will be delighted to provide you with further information and arrange a personal viewing. The asking price is negotiable.',
     'aboutUsPage.galleryHint': 'Tap any photo to view it larger.',
@@ -266,7 +266,7 @@ const translations = {
     'offersPage.selectedLabel': 'Ausgewähltes Angebot:',
     'aboutUsPage.title': 'Bomagawani zu verkaufen',
     'aboutUsPage.subtitle': 'Ein persönliches Refugium an der Swahili-Küste, mit Sorgfalt gebaut und bereit für neue Besitzer.',
-    'aboutUsPage.p1': 'Nach vielen Jahren, in denen Hermann Bomagawani mit viel Leidenschaft aufgebaut und weiterentwickelt hat, ist es nun an der Zeit, mehr persönliche Freiheit zu genießen und neue Pläne für die Zukunft zu verfolgen. Aus diesem Grund wird diese außergewöhnliche Villa an Tansanias wunderschöner Swahili-Küste nun zum Verkauf angeboten.',
+    'aboutUsPage.p1': 'Nach vielen Jahren, in denen Eva und Hermann Bomagawani mit viel Leidenschaft aufgebaut und weiterentwickelt haben, ist es nun an der Zeit, mehr persönliche Freiheit zu genießen und neue Pläne für die Zukunft zu verfolgen. Aus diesem Grund wird diese außergewöhnliche Villa an Tansanias wunderschöner Swahili-Küste nun zum Verkauf angeboten.',
     'aboutUsPage.p2': 'Die Villa wurde mit hohem Qualitätsanspruch gebaut und verbindet großzügiges Wohnen mit der einzigartigen Atmosphäre des Indischen Ozeans. Sie ist das perfekte Zuhause für alle, die Ruhe, Natur und den entspannten Lebensstil suchen, der die Swahili-Küste zu einem so besonderen Ort zum Leben macht.',
     'aboutUsPage.p3': 'Wenn Sie an dieser einzigartigen Immobilie interessiert sind, geben Ihnen Hermann oder Eva gerne weitere Informationen und vereinbaren eine persönliche Besichtigung. Der Kaufpreis ist verhandelbar.',
     'aboutUsPage.galleryHint': 'Tippen Sie auf ein Foto, um es größer anzuzeigen.',
@@ -569,8 +569,17 @@ const copyTranslations = {
     'Shaded veranda living, high ceilings, and natural airflow support comfortable coastal living.': 'Schattige Veranda-Bereiche, hohe Decken und natürliche Luftzirkulation unterstützen komfortables Küstenwohnen.',
     'Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access.': 'Tanga ist etwa 30 km entfernt und bietet Märkte, frische Produkte, Banken, Ärzte, Einkaufsmöglichkeiten, Flughafen und Hafen.',
     'Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.': 'Die Objektnotizen erwähnen Stromunterstützung, Brunnenwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
+    'All rights reserved.': 'Alle Rechte vorbehalten.',
+    'Mon': 'Mo',
+    'Tue': 'Di',
+    'Wed': 'Mi',
+    'Thu': 'Do',
+    'Fri': 'Fr',
+    'Sat': 'Sa',
+    'Sun': 'So',
+    'Clear': 'Zurücksetzen',
     'Warm, gentle swimming waters': 'Warmes, sanftes Badewasser',
-    'From September to April the sea holds a comfortable 26–28°C, calm conditions that make this stretch of coast a lovely spot for beginner swimmers.': 'Von September bis April hat das Meer angenehme 26–28°C bei ruhigen Bedingungen, die diesen Küstenabschnitt zu einem schönen Ort für Schwimmanfänger machen.',
+    'From September to April the sea holds a comfortable 26–28°C, calm conditions that make this stretch of coast a lovely spot for also beginner swimmers.': 'Von September bis April hat das Meer angenehme 26–28°C bei ruhigen Bedingungen, die diesen Küstenabschnitt zu einem schönen Ort auch für Schwimmanfänger machen.',
     'Contact Bomagawani': 'Bomagawani kontaktieren',
     'We look forward to welcoming you to Bomagawani.': 'Wir freuen uns, Sie in Bomagawani willkommen zu heißen.',
     'We are happy to answer your questions and help you plan your stay. Contact us – we will assist you personally and easily with your booking.': 'Wir beantworten gerne Ihre Fragen und helfen Ihnen bei der Planung Ihres Aufenthalts. Kontaktieren Sie uns – wir unterstützen Sie persönlich und unkompliziert bei Ihrer Buchung.',
@@ -753,6 +762,7 @@ const dom = {
   paymentOption: document.getElementById('payment-option'),
   paymentOptionGroup: document.getElementById('payment-option-group'),
   bankTransferPanel: document.getElementById('bank-transfer-panel'),
+  bankTransferNote: document.getElementById('bank-transfer-note'),
   showBankDetailsBtn: document.getElementById('show-bank-details-btn'),
   bankDetailsBox: document.getElementById('bank-details-box'),
   quoteBox: document.getElementById('quote-box'),
@@ -1007,7 +1017,7 @@ function languageLabel(code) {
 function setFooterYear() {
   const year = new Date().getFullYear();
   dom.footerText.textContent = `Bomagawani ${year}`;
-  if (dom.footerCopyright) dom.footerCopyright.textContent = `© ${year} Bomagawani.com. All rights reserved.`;
+  if (dom.footerCopyright) dom.footerCopyright.textContent = `© ${year} Bomagawani.com. ${translateCopy('All rights reserved.')}`;
 }
 
 function applyTranslations() {
@@ -1050,6 +1060,10 @@ function setLanguage(languageCode) {
     requestQuote();
     updateStructuredData();
     applyTranslations();
+    enforceRoomCapacity();
+    refreshOfferSelectedName();
+    updateHeroDateRangeText();
+    updateBookingDateRangeText();
     refreshIcons();
   });
   applyTranslations();
@@ -1821,6 +1835,14 @@ const OFFER_TITLE_I18N_KEY = {
   camping: 'offersPage.camping.title'
 };
 
+function refreshOfferSelectedName() {
+  if (!state.selectedOffer || !dom.offerSelectedName || dom.offerSelectedChip?.hidden) return;
+  const titleKey = OFFER_TITLE_I18N_KEY[state.selectedOffer];
+  if (titleKey) {
+    dom.offerSelectedName.textContent = t(titleKey);
+  }
+}
+
 function configureOfferSelectButtons() {
   const notePrefixPattern = /^(Interested in|Interesse an): .*?\.\s*/;
 
@@ -1829,6 +1851,7 @@ function configureOfferSelectButtons() {
       const titleKey = OFFER_TITLE_I18N_KEY[button.dataset.offerSelect];
       const offerName = (titleKey && t(titleKey)) || button.dataset.offerName || button.dataset.offerSelect;
       state.selectedOffer = button.dataset.offerSelect;
+      updateBankTransferNoteVisibility();
 
       if (dom.offerSelectedChip && dom.offerSelectedName) {
         dom.offerSelectedName.textContent = offerName;
@@ -2630,6 +2653,12 @@ function configureHeroBookingShortcut() {
   });
 }
 
+function updateBankTransferNoteVisibility() {
+  if (dom.bankTransferNote) {
+    dom.bankTransferNote.hidden = state.selectedOffer !== 'retreat';
+  }
+}
+
 function setPaymentOption(value) {
   dom.paymentOption.value = value;
   dom.paymentOptionGroup?.querySelectorAll('[data-payment-option]').forEach((item) => {
@@ -2642,6 +2671,7 @@ function setPaymentOption(value) {
   if (dom.bankDetailsBox) {
     dom.bankDetailsBox.hidden = true;
   }
+  updateBankTransferNoteVisibility();
 }
 
 function configurePaymentOptionButtons() {
@@ -2992,6 +3022,7 @@ configureHeroBookingShortcut();
 configureMobileNav();
 configurePhoneInput();
 configurePaymentOptionButtons();
+updateBankTransferNoteVisibility();
 configureLocationRoute();
 configureInstallPrompt();
 registerServiceWorker();

@@ -2638,7 +2638,7 @@ body.lightbox-open {
 }
 
 .property-fact-grid article:nth-child(5):last-child {
-  grid-column: 1 / -1;
+  grid-column: 2 / span 2;
 }
 
 .property-fact-grid article {
@@ -3458,6 +3458,10 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .property-fact-grid article:nth-child(5):last-child {
+    grid-column: 1 / -1;
+  }
+
   .property-media-grid {
     grid-template-rows: auto;
   }
@@ -3598,6 +3602,10 @@ textarea {
   .property-features,
   .rooms-info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .property-fact-grid article:nth-child(5):last-child {
+    grid-column: auto;
   }
 
   .eat-feature-image {
