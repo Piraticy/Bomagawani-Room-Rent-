@@ -562,6 +562,8 @@ const copyTranslations = {
     'Shaded veranda living, high ceilings, and natural airflow support comfortable coastal living.': 'Schattige Veranda-Bereiche, hohe Decken und natürliche Luftzirkulation unterstützen komfortables Küstenwohnen.',
     'Tanga is about 30 km away, with markets, fresh produce, banks, doctors, shopping, airport, and port access.': 'Tanga ist etwa 30 km entfernt und bietet Märkte, frische Produkte, Banken, Ärzte, Einkaufsmöglichkeiten, Flughafen und Hafen.',
     'Property notes mention power support, well water, bottled drinking water, simple waste handling, and mobile connectivity.': 'Die Objektnotizen erwähnen Stromunterstützung, Brunnenwasser, Trinkwasser in Flaschen, einfache Abfallentsorgung und Mobilfunkempfang.',
+    'Warm, gentle swimming waters': 'Warmes, sanftes Badewasser',
+    'From September to April the sea holds a comfortable 26–28°C, calm conditions that make this stretch of coast a lovely spot for beginner swimmers.': 'Von September bis April hat das Meer angenehme 26–28°C bei ruhigen Bedingungen, die diesen Küstenabschnitt zu einem schönen Ort für Schwimmanfänger machen.',
     'Contact Bomagawani': 'Bomagawani kontaktieren',
     'We look forward to welcoming you to Bomagawani.': 'Wir freuen uns, Sie in Bomagawani willkommen zu heißen.',
     'We are happy to answer your questions and help you plan your stay. Contact us – we will assist you personally and easily with your booking.': 'Wir beantworten gerne Ihre Fragen und helfen Ihnen bei der Planung Ihres Aufenthalts. Kontaktieren Sie uns – wir unterstützen Sie persönlich und unkompliziert bei Ihrer Buchung.',
