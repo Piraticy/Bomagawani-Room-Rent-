@@ -433,6 +433,7 @@ const copyTranslations = {
     'Master Bedroom': 'Master-Schlafzimmer',
     'Guest Room': 'Gästezimmer',
     'Premium private suite with balcony and ocean breeze.': 'Premium-Privatzimmer mit Balkon und Meeresbrise.',
+    'Comfortable Group Room with ocean breeze.': 'Komfortables Gruppenzimmer mit Meeresbrise.',
     'Comfortable and affordable room for short or long stays.': 'Komfortables und bezahlbares Zimmer für kurze oder längere Aufenthalte.',
     'Private coastal room': 'Privates Küstenzimmer',
     'Featured stay': 'Empfohlener Aufenthalt',
