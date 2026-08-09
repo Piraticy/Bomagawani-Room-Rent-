@@ -1750,7 +1750,7 @@ function renderRooms() {
         <div class="room-badges">${badges.join('')}</div>
         <div class="room-amenity-strip">${amenityHighlights}</div>
         <div class="room-actions">
-          <button class="primary-btn" data-book-room="${room.id}">${t('nav.bookNow')}</button>
+          <button class="primary-btn" data-book-room="${room.id}">${t('nav.offersPrices')}</button>
           <a class="hero-text-link" href="/offers-prices#booking" data-book-room="${room.id}">${translateCopy('Check dates')}</a>
         </div>
       </div>
