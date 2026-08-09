@@ -24,6 +24,7 @@ const translations = {
     'form.adults': 'Adults',
     'form.children': 'Children',
     'date.selectRange': 'Select check-in and check-out',
+    'date.selectCheckout': 'Select check-out',
     'date.selectArrival': 'Select your arrival date.',
     'date.selectDeparture': 'Now select your departure date.',
     'date.roomBooked': 'Already booked',
@@ -225,6 +226,7 @@ const translations = {
     'form.roomCapacitySwitched': '{guests} Gäste übersteigen die Kapazität von {oldRoom} ({oldMax}). Wir haben auf {newRoom} umgestellt (bis zu {newMax} Gäste).',
     'form.roomCapacityNoFit': 'Wir haben kein einzelnes Zimmer für {guests} Gäste. Bitte kontaktieren Sie uns direkt, um dies zu arrangieren.',
     'date.selectRange': 'Anreise und Abreise auswählen',
+    'date.selectCheckout': 'Abreise auswählen',
     'date.selectArrival': 'Wählen Sie Ihr Anreisedatum.',
     'date.selectDeparture': 'Wählen Sie jetzt Ihr Abreisedatum.',
     'date.roomBooked': 'Bereits gebucht',
@@ -435,6 +437,11 @@ const copyTranslations = {
     'Premium private suite with balcony and ocean breeze.': 'Premium-Privatzimmer mit Balkon und Meeresbrise.',
     'Comfortable Group Room with ocean breeze.': 'Komfortables Gruppenzimmer mit Meeresbrise.',
     'Comfortable and affordable room for short or long stays.': 'Komfortables und bezahlbares Zimmer für kurze oder längere Aufenthalte.',
+    'Hello Bomagawani, I would like to ask about rooms, food, or directions.': 'Hallo Bomagawani, ich möchte etwas zu Zimmern, Essen oder der Anreise fragen.',
+    '1 Double Bed + 1 Single Bed': '1 Doppelbett + 1 Einzelbett',
+    '1 Single Bed + 1 Double Bed': '1 Einzelbett + 1 Doppelbett',
+    '1 Double Bed': '1 Doppelbett',
+    '2 Double Bed': '2 Doppelbetten',
     'Private coastal room': 'Privates Küstenzimmer',
     'Featured stay': 'Empfohlener Aufenthalt',
     'Direct booking': 'Direktbuchung',
@@ -1109,7 +1116,7 @@ function updateHeroDateRangeText() {
   }
 
   if (checkIn) {
-    dom.heroDateRangeText.textContent = `${formatShortDate(checkIn)} — Select check-out`;
+    dom.heroDateRangeText.textContent = `${formatShortDate(checkIn)} — ${t('date.selectCheckout')}`;
     return;
   }
 
@@ -1220,7 +1227,7 @@ function updateBookingDateRangeText() {
   }
 
   if (checkIn) {
-    dom.bookingDateRangeText.textContent = `${formatShortDate(checkIn)} — Select check-out`;
+    dom.bookingDateRangeText.textContent = `${formatShortDate(checkIn)} — ${t('date.selectCheckout')}`;
     return;
   }
 
@@ -1717,7 +1724,7 @@ function renderRooms() {
       <div class="room-slider" data-slider-key="room-${room.id}">
         ${slidesHtml}
         ${controlsHtml}
-        <div class="room-photo-count"><i data-lucide="images"></i> ${imageSources.length} photo${imageSources.length === 1 ? '' : 's'}</div>
+        <div class="room-photo-count"><i data-lucide="images"></i> ${imageSources.length} ${state.language === 'de' ? (imageSources.length === 1 ? 'Foto' : 'Fotos') : `photo${imageSources.length === 1 ? '' : 's'}`}</div>
         <div class="room-thumbs">${thumbsHtml}</div>
       </div>
       <div class="room-content">
@@ -1808,12 +1815,19 @@ function enforceRoomCapacity() {
   }
 }
 
+const OFFER_TITLE_I18N_KEY = {
+  retreat: 'offersPage.retreat.title',
+  'short-stay': 'offersPage.shortStay.title',
+  camping: 'offersPage.camping.title'
+};
+
 function configureOfferSelectButtons() {
   const notePrefixPattern = /^(Interested in|Interesse an): .*?\.\s*/;
 
   dom.offerSelectButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const offerName = button.dataset.offerName || button.dataset.offerSelect;
+      const titleKey = OFFER_TITLE_I18N_KEY[button.dataset.offerSelect];
+      const offerName = (titleKey && t(titleKey)) || button.dataset.offerName || button.dataset.offerSelect;
       state.selectedOffer = button.dataset.offerSelect;
 
       if (dom.offerSelectedChip && dom.offerSelectedName) {
@@ -2163,7 +2177,7 @@ function applySettings() {
   dom.contactEmailLink.href = `mailto:${state.settings.contact_email || ''}`;
   dom.contactWhatsappLink.href = buildWhatsAppLink(
     state.chatbot?.whatsapp_number,
-    'Hello Bomagawani, I would like to ask about rooms, food, or directions.'
+    translateCopy('Hello Bomagawani, I would like to ask about rooms, food, or directions.')
   );
   dom.contactMapLink.href = state.settings.map_link;
   dom.eatSipRequestLink.href = '/contact';
